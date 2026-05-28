@@ -10,35 +10,35 @@ CrosswordPuzzle _buildTestPuzzle() {
   // A    H→↓  A    A
   // A    A    A    #
   // H→   A    A    A
-  return CrosswordPuzzle(
+  return const CrosswordPuzzle(
     rows: 4,
     cols: 4,
     cells: {
-      (0, 0): const HintCell(
+      (0, 0): HintCell(
         clueText: 'Test',
         arrows: [Direction.right, Direction.down],
       ),
-      (0, 1): const AnswerCell(solution: 'A'),
-      (0, 2): const AnswerCell(solution: 'B'),
-      (0, 3): const AnswerCell(solution: 'C'),
-      (1, 0): const AnswerCell(solution: 'D'),
-      (1, 1): const HintCell(
+      (0, 1): AnswerCell(solution: 'A'),
+      (0, 2): AnswerCell(solution: 'B'),
+      (0, 3): AnswerCell(solution: 'C'),
+      (1, 0): AnswerCell(solution: 'D'),
+      (1, 1): HintCell(
         clueText: 'Test 2',
         arrows: [Direction.right, Direction.down],
       ),
-      (1, 2): const AnswerCell(solution: 'E'),
-      (1, 3): const AnswerCell(solution: 'F'),
-      (2, 0): const AnswerCell(solution: 'G'),
-      (2, 1): const AnswerCell(solution: 'H'),
-      (2, 2): const AnswerCell(solution: 'I'),
-      (2, 3): const BlockedCell(),
-      (3, 0): const HintCell(
+      (1, 2): AnswerCell(solution: 'E'),
+      (1, 3): AnswerCell(solution: 'F'),
+      (2, 0): AnswerCell(solution: 'G'),
+      (2, 1): AnswerCell(solution: 'H'),
+      (2, 2): AnswerCell(solution: 'I'),
+      (2, 3): BlockedCell(),
+      (3, 0): HintCell(
         clueText: 'Test 3',
         arrows: [Direction.right],
       ),
-      (3, 1): const AnswerCell(solution: 'J'),
-      (3, 2): const AnswerCell(solution: 'K'),
-      (3, 3): const AnswerCell(solution: 'L'),
+      (3, 1): AnswerCell(solution: 'J'),
+      (3, 2): AnswerCell(solution: 'K'),
+      (3, 3): AnswerCell(solution: 'L'),
     },
   );
 }
