@@ -122,8 +122,6 @@ void main() {
   });
 
   test('resetView resets the transformation to identity', () {
-    final cubit = CrosswordCubit(puzzle: _buildTestPuzzle());
-
     // Simulate a zoomed/panned state.
     cubit.transformationController.value = Matrix4.identity()
       ..scale(2.0)
@@ -136,7 +134,6 @@ void main() {
     cubit.resetView();
 
     expect(cubit.transformationController.value, equals(Matrix4.identity()));
-    cubit.close();
   });
 
   test('close disposes the transformation controller without throwing', () async {
@@ -145,7 +142,7 @@ void main() {
     // Using a disposed ChangeNotifier throws; confirm it was disposed.
     expect(
       () => cubit.transformationController.addListener(() {}),
-      throwsA(isA<Object>()),
+      throwsA(isA<FlutterError>()),
     );
   });
 }
