@@ -49,6 +49,13 @@ class CrosswordScreenContent extends StatelessWidget {
         backgroundColor: AppColors.brand,
         foregroundColor: AppColors.onBrand,
         elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.fit_screen),
+            tooltip: Strings.resetViewTooltip,
+            onPressed: cubit.resetView,
+          ),
+        ],
       ),
       body: Focus(
         focusNode: cubit.focusNode,
@@ -69,11 +76,25 @@ class CrosswordScreenContent extends StatelessWidget {
           return KeyEventResult.ignored;
         },
         child: SafeArea(
-          child: Center(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: CrosswordGrid(state: state),
-            ),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              const frameWidth = 2.0;
+              const padding = 16.0;
+              final viewportWidth = constraints.maxWidth - padding * 2;
+              final cellSize =
+                  (viewportWidth - frameWidth * 2) / state.puzzle.cols;
+              return InteractiveViewer(
+                transformationController: cubit.transformationController,
+                minScale: 0.5,
+                maxScale: 4.0,
+                constrained: false,
+                boundaryMargin: const EdgeInsets.all(64),
+                child: Padding(
+                  padding: const EdgeInsets.all(padding),
+                  child: CrosswordGrid(state: state, cellSize: cellSize),
+                ),
+              );
+            },
           ),
         ),
       ),
