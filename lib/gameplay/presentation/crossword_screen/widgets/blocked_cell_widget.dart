@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../common/data/constants/app_colors.dart';
+
 class BlockedCellWidget extends StatelessWidget {
   final double size;
 
@@ -7,10 +9,17 @@ class BlockedCellWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: size,
       height: size,
-      color: const Color(0xFF1A237E),
+      child: const DecoratedBox(
+        decoration: BoxDecoration(
+          color: AppColors.blockedCell,
+          border: Border.fromBorderSide(
+            BorderSide(color: AppColors.gridLine, width: 0.5),
+          ),
+        ),
+      ),
     );
   }
 }

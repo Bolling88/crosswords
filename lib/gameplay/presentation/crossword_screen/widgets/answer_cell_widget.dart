@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../../../common/data/constants/app_colors.dart';
+import '../../../../common/data/constants/app_text_styles.dart';
+
 class AnswerCellWidget extends StatelessWidget {
   final String? userInput;
   final bool isSelected;
@@ -18,27 +21,25 @@ class AnswerCellWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final fillColor = isSelected
+        ? AppColors.selection
+        : isHighlighted
+            ? AppColors.highlight
+            : AppColors.paper;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
         width: size,
         height: size,
         decoration: BoxDecoration(
-          color: isSelected
-              ? const Color(0xFF42A5F5)
-              : isHighlighted
-                  ? const Color(0xFFBBDEFB)
-                  : Colors.white,
-          border: Border.all(width: 0.5),
+          color: fillColor,
+          border: Border.all(color: AppColors.gridLine, width: 0.5),
         ),
         alignment: Alignment.center,
         child: Text(
           userInput ?? '',
-          style: TextStyle(
-            fontSize: size * 0.55,
-            fontWeight: FontWeight.bold,
-            color: isSelected ? Colors.white : Colors.black,
-          ),
+          style: AppTextStyles.answerLetter(size * 0.66),
         ),
       ),
     );

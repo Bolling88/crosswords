@@ -53,7 +53,7 @@ InteractiveViewer(
   minScale: 0.5,
   maxScale: 4.0,
   constrained: false,        // child keeps natural size; pan in all directions
-  boundaryMargin: const EdgeInsets.all(<reasonable>),
+  boundaryMargin: const EdgeInsets.all(64),
   child: CrosswordGrid(state: state, cellSize: baseCellSize),
 )
 ```
@@ -61,6 +61,9 @@ InteractiveViewer(
 - `constrained: false` lets the child take its natural (possibly larger than
   viewport) size, enabling panning in every direction — including vertical pan
   for tall grids at default zoom.
+- `boundaryMargin: EdgeInsets.all(64)` gives a small slack around the grid so
+  edges/corners can be brought comfortably into view without letting the grid
+  be flung entirely off-screen. Tune during implementation if it feels tight.
 - Zoom range **0.5x–4x** relative to the fit-width base.
 
 ### State / architecture (CLAUDE.md compliance)

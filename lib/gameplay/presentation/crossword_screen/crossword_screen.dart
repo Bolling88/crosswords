@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../common/data/constants/app_colors.dart';
+import '../../../common/data/constants/app_text_styles.dart';
+import '../../../common/data/constants/strings.dart';
 import '../../../gameplay/data/sample_puzzle.dart';
 import 'cubit/crossword_cubit.dart';
 import 'cubit/crossword_state.dart';
@@ -39,10 +42,13 @@ class CrosswordScreenContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final cubit = context.read<CrosswordCubit>();
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Korsord'),
-        backgroundColor: const Color(0xFF1A237E),
-        foregroundColor: Colors.white,
+        title: Text(Strings.appTitle, style: AppTextStyles.appBarTitle()),
+        centerTitle: true,
+        backgroundColor: AppColors.brand,
+        foregroundColor: AppColors.onBrand,
+        elevation: 0,
       ),
       body: Focus(
         focusNode: cubit.focusNode,
@@ -65,7 +71,7 @@ class CrosswordScreenContent extends StatelessWidget {
         child: SafeArea(
           child: Center(
             child: Padding(
-              padding: const EdgeInsets.all(4),
+              padding: const EdgeInsets.all(16),
               child: CrosswordGrid(state: state),
             ),
           ),

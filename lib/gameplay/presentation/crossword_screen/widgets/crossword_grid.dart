@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../common/data/constants/app_colors.dart';
+import '../../../../common/data/constants/app_text_styles.dart';
+import '../../../../common/data/constants/strings.dart';
 import '../../../../gameplay/data/entities/cell.dart';
 import '../cubit/crossword_cubit.dart';
 import '../cubit/crossword_state.dart';
@@ -17,12 +20,27 @@ class CrosswordGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final cellSize = constraints.maxWidth / state.puzzle.cols;
-        return Stack(
-          children: [
-            _buildTable(context, cellSize),
-            ..._buildImageOverlays(cellSize),
-          ],
+        // Reserve space for the outer frame so cells stay pixel-aligned.
+        const frameWidth = 2.0;
+        final cellSize =
+            (constraints.maxWidth - frameWidth * 2) / state.puzzle.cols;
+        return DecoratedBox(
+          decoration: BoxDecoration(
+            border: Border.all(color: AppColors.frame, width: frameWidth),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x33000000),
+                blurRadius: 12,
+                offset: Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Stack(
+            children: [
+              _buildTable(context, cellSize),
+              ..._buildImageOverlays(cellSize),
+            ],
+          ),
         );
       },
     );
@@ -84,25 +102,21 @@ class CrosswordGrid extends StatelessWidget {
             height: cell.spanRows * cellSize,
             child: Container(
               decoration: BoxDecoration(
-                color: const Color(0xFFE8EAF6),
-                border: Border.all(width: 0.5),
+                color: AppColors.imageCell,
+                border: Border.all(color: AppColors.gridLine, width: 0.5),
               ),
               alignment: Alignment.center,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
-                    Icons.image,
-                    size: cellSize * 1.2,
-                    color: const Color(0xFF7986CB),
+                    Icons.image_outlined,
+                    size: cellSize * 1.1,
+                    color: AppColors.inkMuted,
                   ),
                   Text(
-                    'BILD',
-                    style: TextStyle(
-                      color: const Color(0xFF3F51B5),
-                      fontSize: cellSize * 0.3,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    Strings.imageClueLabel,
+                    style: AppTextStyles.imageLabel(cellSize * 0.28),
                   ),
                 ],
               ),
