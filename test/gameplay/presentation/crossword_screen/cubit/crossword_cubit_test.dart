@@ -123,9 +123,7 @@ void main() {
 
   test('resetView resets the transformation to identity', () {
     // Simulate a zoomed/panned state.
-    cubit.transformationController.value = Matrix4.identity()
-      ..scale(2.0)
-      ..translate(30.0, 40.0);
+    cubit.transformationController.value = Matrix4.diagonal3Values(2.0, 2.0, 1.0);
     expect(
       cubit.transformationController.value,
       isNot(equals(Matrix4.identity())),
