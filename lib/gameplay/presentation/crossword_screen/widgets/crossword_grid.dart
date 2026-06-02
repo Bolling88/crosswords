@@ -13,36 +13,34 @@ import 'hint_cell_widget.dart';
 
 class CrosswordGrid extends StatelessWidget {
   final CrosswordState state;
+  final double cellSize;
 
-  const CrosswordGrid({required this.state, super.key});
+  const CrosswordGrid({
+    required this.state,
+    required this.cellSize,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        // Reserve space for the outer frame so cells stay pixel-aligned.
-        const frameWidth = 2.0;
-        final cellSize =
-            (constraints.maxWidth - frameWidth * 2) / state.puzzle.cols;
-        return DecoratedBox(
-          decoration: BoxDecoration(
-            border: Border.all(color: AppColors.frame, width: frameWidth),
-            boxShadow: const [
-              BoxShadow(
-                color: Color(0x33000000),
-                blurRadius: 12,
-                offset: Offset(0, 4),
-              ),
-            ],
+    const frameWidth = 2.0;
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        border: Border.all(color: AppColors.frame, width: frameWidth),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x33000000),
+            blurRadius: 12,
+            offset: Offset(0, 4),
           ),
-          child: Stack(
-            children: [
-              _buildTable(context, cellSize),
-              ..._buildImageOverlays(cellSize),
-            ],
-          ),
-        );
-      },
+        ],
+      ),
+      child: Stack(
+        children: [
+          _buildTable(context, cellSize),
+          ..._buildImageOverlays(cellSize),
+        ],
+      ),
     );
   }
 
