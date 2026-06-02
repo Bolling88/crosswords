@@ -12,6 +12,11 @@ import 'blocked_cell_widget.dart';
 import 'hint_cell_widget.dart';
 
 class CrosswordGrid extends StatelessWidget {
+  /// Width of the outer frame border. Callers computing the grid's cell size
+  /// from a width budget must subtract this on each side, so it is the shared
+  /// source of truth for both the painted border and that calculation.
+  static const double borderWidth = 2.0;
+
   final CrosswordState state;
   final double cellSize;
 
@@ -23,10 +28,9 @@ class CrosswordGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const frameWidth = 2.0;
     return DecoratedBox(
       decoration: BoxDecoration(
-        border: Border.all(color: AppColors.frame, width: frameWidth),
+        border: Border.all(color: AppColors.frame, width: borderWidth),
         boxShadow: const [
           BoxShadow(
             color: Color(0x33000000),

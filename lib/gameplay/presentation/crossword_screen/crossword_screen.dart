@@ -78,11 +78,11 @@ class CrosswordScreenContent extends StatelessWidget {
         child: SafeArea(
           child: LayoutBuilder(
             builder: (context, constraints) {
-              const frameWidth = 2.0;
-              const padding = 16.0;
-              final viewportWidth = constraints.maxWidth - padding * 2;
+              const gridPadding = 16.0;
+              final viewportWidth = constraints.maxWidth - gridPadding * 2;
               final cellSize =
-                  (viewportWidth - frameWidth * 2) / state.puzzle.cols;
+                  (viewportWidth - CrosswordGrid.borderWidth * 2) /
+                      state.puzzle.cols;
               return InteractiveViewer(
                 transformationController: cubit.transformationController,
                 minScale: 0.5,
@@ -90,7 +90,7 @@ class CrosswordScreenContent extends StatelessWidget {
                 constrained: false,
                 boundaryMargin: const EdgeInsets.all(64),
                 child: Padding(
-                  padding: const EdgeInsets.all(padding),
+                  padding: const EdgeInsets.all(gridPadding),
                   child: CrosswordGrid(state: state, cellSize: cellSize),
                 ),
               );
