@@ -8,6 +8,8 @@ import 'crossword_state.dart';
 
 class CrosswordCubit extends Cubit<CrosswordState> {
   final FocusNode focusNode = FocusNode();
+  final TransformationController transformationController =
+      TransformationController();
 
   CrosswordCubit({required CrosswordPuzzle puzzle})
       : super(CrosswordState(puzzle: puzzle));
@@ -154,9 +156,15 @@ class CrosswordCubit extends Cubit<CrosswordState> {
     return null;
   }
 
+  /// Snap the grid back to the default fit-width, un-panned view.
+  void resetView() {
+    transformationController.value = Matrix4.identity();
+  }
+
   @override
   Future<void> close() {
     focusNode.dispose();
+    transformationController.dispose();
     return super.close();
   }
 }

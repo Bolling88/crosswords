@@ -2,6 +2,7 @@ import 'package:crosswords/gameplay/data/entities/cell.dart';
 import 'package:crosswords/gameplay/data/entities/crossword_puzzle.dart';
 import 'package:crosswords/gameplay/data/entities/direction.dart';
 import 'package:crosswords/gameplay/presentation/crossword_screen/cubit/crossword_cubit.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 CrosswordPuzzle _buildTestPuzzle() {
@@ -118,5 +119,33 @@ void main() {
     // (0,3) was empty, so move back to (0,2) and clear it
     expect(cubit.state.selectedCell, equals((0, 2)));
     expect(cubit.state.userInputs.containsKey((0, 2)), isFalse);
+  });
+
+  test('resetView resets the transformation to identity', () {
+    final cubit = CrosswordCubit(puzzle: _buildTestPuzzle());
+
+    // Simulate a zoomed/panned state.
+    cubit.transformationController.value = Matrix4.identity()
+      ..scale(2.0)
+      ..translate(30.0, 40.0);
+    expect(
+      cubit.transformationController.value,
+      isNot(equals(Matrix4.identity())),
+    );
+
+    cubit.resetView();
+
+    expect(cubit.transformationController.value, equals(Matrix4.identity()));
+    cubit.close();
+  });
+
+  test('close disposes the transformation controller without throwing', () async {
+    final cubit = CrosswordCubit(puzzle: _buildTestPuzzle());
+    await cubit.close();
+    // Using a disposed ChangeNotifier throws; confirm it was disposed.
+    expect(
+      () => cubit.transformationController.addListener(() {}),
+      throwsA(isA<Object>()),
+    );
   });
 }
