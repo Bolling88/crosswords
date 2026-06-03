@@ -9,10 +9,12 @@ class AnswerCellWidget extends StatelessWidget {
   final bool isHighlighted;
   final double size;
   final VoidCallback onTap;
+  final String fontFamily;
 
   const AnswerCellWidget({
     required this.size,
     required this.onTap,
+    required this.fontFamily,
     this.userInput,
     this.isSelected = false,
     this.isHighlighted = false,
@@ -39,7 +41,7 @@ class AnswerCellWidget extends StatelessWidget {
         alignment: Alignment.center,
         child: Text(
           userInput ?? '',
-          style: AppTextStyles.answerLetter(size * 0.66),
+          style: AppTextStyles.answerLetter(size * 0.66, family: fontFamily),
         ),
       ),
     );

@@ -72,11 +72,14 @@ class CrosswordGrid extends StatelessWidget {
       return SizedBox(width: cellSize, height: cellSize);
     }
 
+    final fontFamily = state.font.googleFamily;
+
     return switch (cell) {
       HintCell() => HintCellWidget(
           cell: cell,
           size: cellSize,
           onTap: () => cubit.selectCell(row, col),
+          fontFamily: fontFamily,
         ),
       AnswerCell() => AnswerCellWidget(
           userInput: state.userInputs[(row, col)],
@@ -84,6 +87,7 @@ class CrosswordGrid extends StatelessWidget {
           isHighlighted: state.highlightedCells.contains((row, col)),
           size: cellSize,
           onTap: () => cubit.selectCell(row, col),
+          fontFamily: fontFamily,
         ),
       BlockedCell() => BlockedCellWidget(size: cellSize),
       ImageCell() => SizedBox(width: cellSize, height: cellSize),

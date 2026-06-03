@@ -11,11 +11,13 @@ class HintCellWidget extends StatelessWidget {
   final HintCell cell;
   final double size;
   final VoidCallback onTap;
+  final String fontFamily;
 
   const HintCellWidget({
     required this.cell,
     required this.size,
     required this.onTap,
+    required this.fontFamily,
     super.key,
   });
 
@@ -40,7 +42,7 @@ class HintCellWidget extends StatelessWidget {
                   alignment: Alignment.center,
                   child: Text(
                     cell.clueText,
-                    style: AppTextStyles.clue(size * 0.2),
+                    style: AppTextStyles.clue(size * 0.2, family: fontFamily),
                     textAlign: TextAlign.center,
                     maxLines: 4,
                   ),
