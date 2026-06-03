@@ -1,29 +1,40 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'common/data/constants/app_colors.dart';
 import 'common/data/constants/strings.dart';
 import 'gameplay/presentation/crossword_screen/crossword_screen.dart';
+import 'settings/domain/services/font_service.dart';
 
-void main() {
-  runApp(const CrosswordsApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final prefs = await SharedPreferences.getInstance();
+  final fontService = FontService(prefs: prefs);
+  runApp(CrosswordsApp(fontService: fontService));
 }
 
 class CrosswordsApp extends StatelessWidget {
-  const CrosswordsApp({super.key});
+  final FontService fontService;
+
+  const CrosswordsApp({required this.fontService, super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: Strings.appTitle,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: AppColors.brand,
-          surface: AppColors.background,
+    return RepositoryProvider<FontService>.value(
+      value: fontService,
+      child: MaterialApp(
+        title: Strings.appTitle,
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: AppColors.brand,
+            surface: AppColors.background,
+          ),
+          scaffoldBackgroundColor: AppColors.background,
+          useMaterial3: true,
         ),
-        scaffoldBackgroundColor: AppColors.background,
-        useMaterial3: true,
+        home: const CrosswordScreen(),
       ),
-      home: const CrosswordScreen(),
     );
   }
 }
