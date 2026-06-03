@@ -9,6 +9,7 @@ import '../../../gameplay/data/sample_puzzle.dart';
 import '../../../settings/domain/services/font_service.dart';
 import 'cubit/crossword_cubit.dart';
 import 'cubit/crossword_state.dart';
+import '../../../settings/presentation/settings_screen/settings_screen.dart';
 import 'widgets/crossword_grid.dart';
 
 class CrosswordScreen extends StatelessWidget {
@@ -54,6 +55,14 @@ class CrosswordScreenContent extends StatelessWidget {
         foregroundColor: AppColors.onBrand,
         elevation: 0,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.settings),
+            tooltip: Strings.settingsTooltip,
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const SettingsScreen()),
+            ),
+          ),
           IconButton(
             icon: const Icon(Icons.fit_screen),
             tooltip: Strings.resetViewTooltip,

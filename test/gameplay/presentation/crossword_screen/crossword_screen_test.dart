@@ -1,5 +1,6 @@
 import 'package:crosswords/gameplay/presentation/crossword_screen/crossword_screen.dart';
 import 'package:crosswords/settings/domain/services/font_service.dart';
+import 'package:crosswords/settings/presentation/settings_screen/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -29,6 +30,18 @@ void main() {
       expect(find.byType(InteractiveViewer), findsOneWidget);
     },
   );
+
+  testWidgets('tapping the settings icon opens the settings screen', (
+    tester,
+  ) async {
+    await tester.pumpWidget(await _appUnderTest());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byIcon(Icons.settings));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(SettingsScreen), findsOneWidget);
+  });
 
   testWidgets('tapping the reset icon resets zoom/pan to identity', (
     tester,
