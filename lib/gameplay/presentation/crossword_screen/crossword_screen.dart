@@ -83,6 +83,23 @@ class CrosswordScreenContent extends StatelessWidget {
               final cellSize =
                   (viewportWidth - CrosswordGrid.borderWidth * 2) /
                       state.puzzle.cols;
+
+              // Full rendered height of the grid (cells + frame border +
+              // surrounding padding).
+              final contentHeight = state.puzzle.rows * cellSize +
+                  CrosswordGrid.borderWidth * 2 +
+                  gridPadding * 2;
+              // The viewer's child must be at least as large as the viewport in
+              // both axes. If it were smaller (e.g. a grid shorter than the
+              // screen), InteractiveViewer forces a minimum scale > 1.0 to keep
+              // the child covering the viewport — making it impossible to zoom
+              // back out to the whole puzzle. Sizing to max(content, viewport)
+              // keeps fit-to-screen reachable while still growing for puzzles
+              // taller than the screen so they can be scrolled.
+              final boxHeight = contentHeight > constraints.maxHeight
+                  ? contentHeight
+                  : constraints.maxHeight;
+
               return InteractiveViewer(
                 transformationController: cubit.transformationController,
                 // Fit-to-screen (scale 1.0) is the most zoomed-out state;
@@ -92,12 +109,19 @@ class CrosswordScreenContent extends StatelessWidget {
                 minScale: 1.0,
                 maxScale: 4.0,
                 constrained: false,
-                // Zero margin pins panning to the grid's own bounds. The
+                // Zero margin pins panning to the child's bounds. The
                 // gridPadding below keeps a small visual gutter at the edges.
                 boundaryMargin: EdgeInsets.zero,
-                child: Padding(
-                  padding: const EdgeInsets.all(gridPadding),
-                  child: CrosswordGrid(state: state, cellSize: cellSize),
+                child: SizedBox(
+                  width: constraints.maxWidth,
+                  height: boxHeight,
+                  child: Align(
+                    alignment: Alignment.topCenter,
+                    child: Padding(
+                      padding: const EdgeInsets.all(gridPadding),
+                      child: CrosswordGrid(state: state, cellSize: cellSize),
+                    ),
+                  ),
                 ),
               );
             },
