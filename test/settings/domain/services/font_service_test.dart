@@ -34,4 +34,15 @@ void main() {
     expect(service.selectedFont.value, AppFont.caveat);
     expect(prefs.getString('selected_font'), AppFont.caveat.name);
   });
+
+  test('a new service restores the previously selected font (restart)', () async {
+    SharedPreferences.setMockInitialValues({});
+    final prefs = await SharedPreferences.getInstance();
+
+    await FontService(prefs: prefs).selectFont(AppFont.indieFlower);
+
+    // Simulate a fresh launch: a new service built from the same storage.
+    final restarted = FontService(prefs: prefs);
+    expect(restarted.selectedFont.value, AppFont.indieFlower);
+  });
 }

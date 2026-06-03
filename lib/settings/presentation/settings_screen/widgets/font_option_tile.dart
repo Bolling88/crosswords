@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../common/data/constants/app_colors.dart';
+import '../../../../common/data/constants/strings.dart';
 import '../../../domain/entities/app_font.dart';
 
 /// A single selectable font row that previews itself in its own font.
@@ -41,7 +42,7 @@ class FontOptionTile extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'ABCÅÄÖ',
+                      Strings.fontPreviewSample,
                       style: GoogleFonts.getFont(
                         font.googleFamily,
                         fontSize: 18,

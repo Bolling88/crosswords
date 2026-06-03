@@ -18,4 +18,7 @@ class Strings {
 
   /// Section header for the font picker on the settings screen.
   static const String fontSettingLabel = 'Typsnitt';
+
+  /// Sample glyphs shown under each font option to preview its look.
+  static const String fontPreviewSample = 'ABCÅÄÖ';
 }
