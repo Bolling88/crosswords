@@ -88,7 +88,11 @@ class CrosswordScreenContent extends StatelessWidget {
                 minScale: 0.5,
                 maxScale: 4.0,
                 constrained: false,
-                boundaryMargin: const EdgeInsets.all(64),
+                // Zero margin pins panning to the grid's own bounds, so the
+                // puzzle can never be dragged off-screen — including when
+                // fully zoomed out, where the grid is smaller than the
+                // viewport. The gridPadding below keeps a small visual gutter.
+                boundaryMargin: EdgeInsets.zero,
                 child: Padding(
                   padding: const EdgeInsets.all(gridPadding),
                   child: CrosswordGrid(state: state, cellSize: cellSize),
