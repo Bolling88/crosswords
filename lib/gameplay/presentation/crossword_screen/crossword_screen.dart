@@ -85,13 +85,15 @@ class CrosswordScreenContent extends StatelessWidget {
                       state.puzzle.cols;
               return InteractiveViewer(
                 transformationController: cubit.transformationController,
-                minScale: 0.5,
+                // Fit-to-screen (scale 1.0) is the most zoomed-out state;
+                // zoom only goes inward from there up to 4x. Combined with the
+                // zero boundaryMargin this guarantees the puzzle always returns
+                // cleanly to fit and can never be dragged off-screen.
+                minScale: 1.0,
                 maxScale: 4.0,
                 constrained: false,
-                // Zero margin pins panning to the grid's own bounds, so the
-                // puzzle can never be dragged off-screen — including when
-                // fully zoomed out, where the grid is smaller than the
-                // viewport. The gridPadding below keeps a small visual gutter.
+                // Zero margin pins panning to the grid's own bounds. The
+                // gridPadding below keeps a small visual gutter at the edges.
                 boundaryMargin: EdgeInsets.zero,
                 child: Padding(
                   padding: const EdgeInsets.all(gridPadding),
