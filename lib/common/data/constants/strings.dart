@@ -9,4 +9,13 @@ class Strings {
 
   /// Tooltip/semantics label for the app-bar button that resets zoom & pan.
   static const String resetViewTooltip = 'Återställ vy';
+
+  /// Tooltip/semantics label for the app-bar button that opens settings.
+  static const String settingsTooltip = 'Inställningar';
+
+  /// Title of the settings screen.
+  static const String settingsTitle = 'Inställningar';
+
+  /// Section header for the font picker on the settings screen.
+  static const String fontSettingLabel = 'Typsnitt';
 }
