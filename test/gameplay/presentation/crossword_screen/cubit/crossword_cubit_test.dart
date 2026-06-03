@@ -2,8 +2,11 @@ import 'package:crosswords/gameplay/data/entities/cell.dart';
 import 'package:crosswords/gameplay/data/entities/crossword_puzzle.dart';
 import 'package:crosswords/gameplay/data/entities/direction.dart';
 import 'package:crosswords/gameplay/presentation/crossword_screen/cubit/crossword_cubit.dart';
+import 'package:crosswords/settings/domain/entities/app_font.dart';
+import 'package:crosswords/settings/domain/services/font_service.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 CrosswordPuzzle _buildTestPuzzle() {
   // 4x4 test grid:
@@ -45,14 +48,24 @@ CrosswordPuzzle _buildTestPuzzle() {
 }
 
 void main() {
-  late CrosswordCubit cubit;
+  TestWidgetsFlutterBinding.ensureInitialized();
 
-  setUp(() {
-    cubit = CrosswordCubit(puzzle: _buildTestPuzzle());
+  late CrosswordCubit cubit;
+  late FontService fontService;
+
+  setUp(() async {
+    SharedPreferences.setMockInitialValues({});
+    final prefs = await SharedPreferences.getInstance();
+    fontService = FontService(prefs: prefs);
+    cubit = CrosswordCubit(
+      puzzle: _buildTestPuzzle(),
+      fontService: fontService,
+    );
   });
 
   tearDown(() {
     cubit.close();
+    fontService.dispose();
   });
 
   test('initial state has no selection', () {
@@ -135,12 +148,24 @@ void main() {
   });
 
   test('close disposes the transformation controller without throwing', () async {
-    final cubit = CrosswordCubit(puzzle: _buildTestPuzzle());
+    final localPrefs = await SharedPreferences.getInstance();
+    final cubit = CrosswordCubit(
+      puzzle: _buildTestPuzzle(),
+      fontService: FontService(prefs: localPrefs),
+    );
     await cubit.close();
     // Using a disposed ChangeNotifier throws; confirm it was disposed.
     expect(
       () => cubit.transformationController.addListener(() {}),
       throwsA(isA<FlutterError>()),
     );
+  });
+
+  test('font changes in the service are reflected in state', () async {
+    expect(cubit.state.font, AppFont.defaultFont);
+
+    await fontService.selectFont(AppFont.caveat);
+
+    expect(cubit.state.font, AppFont.caveat);
   });
 }

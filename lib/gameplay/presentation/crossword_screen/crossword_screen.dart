@@ -6,6 +6,7 @@ import '../../../common/data/constants/app_colors.dart';
 import '../../../common/data/constants/app_text_styles.dart';
 import '../../../common/data/constants/strings.dart';
 import '../../../gameplay/data/sample_puzzle.dart';
+import '../../../settings/domain/services/font_service.dart';
 import 'cubit/crossword_cubit.dart';
 import 'cubit/crossword_state.dart';
 import 'widgets/crossword_grid.dart';
@@ -16,7 +17,10 @@ class CrosswordScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => CrosswordCubit(puzzle: buildSamplePuzzle()),
+      create: (context) => CrosswordCubit(
+        puzzle: buildSamplePuzzle(),
+        fontService: context.read<FontService>(),
+      ),
       child: const CrosswordScreenBuilder(),
     );
   }

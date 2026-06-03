@@ -1,13 +1,25 @@
 import 'package:crosswords/gameplay/presentation/crossword_screen/crossword_screen.dart';
+import 'package:crosswords/settings/domain/services/font_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+Future<Widget> _appUnderTest() async {
+  SharedPreferences.setMockInitialValues({});
+  final prefs = await SharedPreferences.getInstance();
+  return RepositoryProvider<FontService>.value(
+    value: FontService(prefs: prefs),
+    child: const MaterialApp(home: CrosswordScreen()),
+  );
+}
 
 void main() {
   testWidgets(
     'CrosswordScreen renders the sample puzzle inside an InteractiveViewer '
     'without throwing',
     (tester) async {
-      await tester.pumpWidget(const MaterialApp(home: CrosswordScreen()));
+      await tester.pumpWidget(await _appUnderTest());
       await tester.pumpAndSettle();
 
       // No exception was thrown while laying out the real 15x13 sample puzzle
@@ -21,7 +33,7 @@ void main() {
   testWidgets('tapping the reset icon resets zoom/pan to identity', (
     tester,
   ) async {
-    await tester.pumpWidget(const MaterialApp(home: CrosswordScreen()));
+    await tester.pumpWidget(await _appUnderTest());
     await tester.pumpAndSettle();
 
     final viewer = tester.widget<InteractiveViewer>(

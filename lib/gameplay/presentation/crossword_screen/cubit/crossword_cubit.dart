@@ -4,15 +4,29 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../gameplay/data/entities/cell.dart';
 import '../../../../gameplay/data/entities/crossword_puzzle.dart';
 import '../../../../gameplay/data/entities/direction.dart';
+import '../../../../settings/domain/services/font_service.dart';
 import 'crossword_state.dart';
 
 class CrosswordCubit extends Cubit<CrosswordState> {
   final FocusNode focusNode = FocusNode();
   final TransformationController transformationController =
       TransformationController();
+  final FontService _fontService;
 
-  CrosswordCubit({required CrosswordPuzzle puzzle})
-      : super(CrosswordState(puzzle: puzzle));
+  CrosswordCubit({
+    required CrosswordPuzzle puzzle,
+    required FontService fontService,
+  })  : _fontService = fontService,
+        super(CrosswordState(
+          puzzle: puzzle,
+          font: fontService.selectedFont.value,
+        )) {
+    _fontService.selectedFont.addListener(_onFontChanged);
+  }
+
+  void _onFontChanged() {
+    emit(state.copyWith(font: _fontService.selectedFont.value));
+  }
 
   void selectCell(int row, int col) {
     final cell = state.puzzle.cells[(row, col)];
@@ -163,6 +177,7 @@ class CrosswordCubit extends Cubit<CrosswordState> {
 
   @override
   Future<void> close() {
+    _fontService.selectedFont.removeListener(_onFontChanged);
     focusNode.dispose();
     transformationController.dispose();
     return super.close();

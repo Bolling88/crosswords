@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 
 import '../../../../gameplay/data/entities/crossword_puzzle.dart';
 import '../../../../gameplay/data/entities/direction.dart';
+import '../../../../settings/domain/entities/app_font.dart';
 
 class CrosswordState extends Equatable {
   final CrosswordPuzzle puzzle;
@@ -9,6 +10,7 @@ class CrosswordState extends Equatable {
   final (int, int)? selectedCell;
   final Direction currentDirection;
   final Set<(int, int)> highlightedCells;
+  final AppFont font;
 
   const CrosswordState({
     required this.puzzle,
@@ -16,6 +18,7 @@ class CrosswordState extends Equatable {
     this.selectedCell,
     this.currentDirection = Direction.right,
     this.highlightedCells = const <(int, int)>{},
+    this.font = AppFont.defaultFont,
   });
 
   @override
@@ -24,6 +27,7 @@ class CrosswordState extends Equatable {
         selectedCell,
         currentDirection,
         highlightedCells,
+        font,
       ];
 
   CrosswordState copyWith({
@@ -31,6 +35,7 @@ class CrosswordState extends Equatable {
     (int, int)? selectedCell,
     Direction? currentDirection,
     Set<(int, int)>? highlightedCells,
+    AppFont? font,
   }) {
     return CrosswordState(
       puzzle: puzzle,
@@ -38,6 +43,7 @@ class CrosswordState extends Equatable {
       selectedCell: selectedCell ?? this.selectedCell,
       currentDirection: currentDirection ?? this.currentDirection,
       highlightedCells: highlightedCells ?? this.highlightedCells,
+      font: font ?? this.font,
     );
   }
 }
