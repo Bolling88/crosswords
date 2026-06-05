@@ -5,7 +5,9 @@ import 'package:crosswords/gameplay/domain/entities/crossword_puzzle.dart';
 import 'package:crosswords/gameplay/domain/entities/direction.dart';
 import 'package:crosswords/gameplay/domain/entities/word.dart';
 import 'package:crosswords/gameplay/presentation/crossword_screen/cubit/crossword_cubit.dart';
+import 'package:crosswords/settings/domain/entities/app_font.dart';
 import 'package:crosswords/settings/domain/services/font_service.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -58,7 +60,10 @@ void main() {
     cubit = CrosswordCubit(puzzle: _puzzle(), fontService: fontService);
   });
 
-  tearDown(() => cubit.close());
+  tearDown(() async {
+    await cubit.close();
+    fontService.dispose();
+  });
 
   test('tapping a clue selects the first cell of its word and highlights it',
       () {
@@ -100,5 +105,18 @@ void main() {
     expect(cubit.state.selectedCell, (0, 2));
     expect(cubit.state.userInputs.containsKey((0, 2)), isFalse);
     expect(cubit.state.userInputs[(0, 1)], 'A');
+  });
+
+  test('resetView resets transformationController to identity', () {
+    // Mutate to a non-identity value first to make the reset meaningful.
+    cubit.transformationController.value = Matrix4.translationValues(10, 10, 0);
+    cubit.resetView();
+    expect(cubit.transformationController.value, Matrix4.identity());
+  });
+
+  test('font change on FontService propagates to cubit state', () async {
+    expect(cubit.state.font, AppFont.defaultFont);
+    await fontService.selectFont(AppFont.caveat);
+    expect(cubit.state.font, AppFont.caveat);
   });
 }
