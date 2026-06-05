@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
-import '../../../../gameplay/data/entities/crossword_puzzle.dart';
-import '../../../../gameplay/data/entities/direction.dart';
+import '../../../../gameplay/domain/entities/crossword_puzzle.dart';
+import '../../../../gameplay/domain/entities/direction.dart';
 import '../../../../settings/domain/entities/app_font.dart';
 
 class CrosswordState extends Equatable {

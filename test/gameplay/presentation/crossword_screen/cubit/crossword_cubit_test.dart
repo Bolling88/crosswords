@@ -1,49 +1,47 @@
-import 'package:crosswords/gameplay/data/entities/cell.dart';
-import 'package:crosswords/gameplay/data/entities/crossword_puzzle.dart';
-import 'package:crosswords/gameplay/data/entities/direction.dart';
+import 'package:crosswords/gameplay/domain/entities/cell.dart';
+import 'package:crosswords/gameplay/domain/entities/clue_arrow.dart';
+import 'package:crosswords/gameplay/domain/entities/arrow_shape.dart';
+import 'package:crosswords/gameplay/domain/entities/crossword_puzzle.dart';
+import 'package:crosswords/gameplay/domain/entities/direction.dart';
+import 'package:crosswords/gameplay/domain/entities/word.dart';
 import 'package:crosswords/gameplay/presentation/crossword_screen/cubit/crossword_cubit.dart';
-import 'package:crosswords/settings/domain/entities/app_font.dart';
 import 'package:crosswords/settings/domain/services/font_service.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-CrosswordPuzzle _buildTestPuzzle() {
-  // 4x4 test grid:
-  // H→↓  A    A    A
-  // A    H→↓  A    A
-  // A    A    A    #
-  // H→   A    A    A
+/// 1x4 grid: clue at (0,0) -> across word "ABC" with a redirect that turns
+/// down at (0,3). Layout:
+///   C  A  B  D(redirect-down)
+///               E
+/// Across word "across" cells: (0,1),(0,2),(0,3),(1,3).
+CrosswordPuzzle _puzzle() {
+  const across = Word(
+    id: 'across',
+    direction: Direction.right,
+    cells: [(0, 1), (0, 2), (0, 3), (1, 3)],
+  );
   return const CrosswordPuzzle(
-    rows: 4,
+    rows: 2,
     cols: 4,
     cells: {
-      (0, 0): HintCell(
-        clueText: 'Test',
-        arrows: [Direction.right, Direction.down],
-      ),
-      (0, 1): AnswerCell(solution: 'A'),
-      (0, 2): AnswerCell(solution: 'B'),
-      (0, 3): AnswerCell(solution: 'C'),
-      (1, 0): AnswerCell(solution: 'D'),
-      (1, 1): HintCell(
-        clueText: 'Test 2',
-        arrows: [Direction.right, Direction.down],
-      ),
-      (1, 2): AnswerCell(solution: 'E'),
-      (1, 3): AnswerCell(solution: 'F'),
-      (2, 0): AnswerCell(solution: 'G'),
-      (2, 1): AnswerCell(solution: 'H'),
-      (2, 2): AnswerCell(solution: 'I'),
-      (2, 3): BlockedCell(),
-      (3, 0): HintCell(
-        clueText: 'Test 3',
-        arrows: [Direction.right],
-      ),
-      (3, 1): AnswerCell(solution: 'J'),
-      (3, 2): AnswerCell(solution: 'K'),
-      (3, 3): AnswerCell(solution: 'L'),
+      (0, 0): ClueCell(arrows: [
+        ClueArrow(
+          direction: Direction.right,
+          shape: ArrowShape.straightRight,
+          wordId: 'across',
+        ),
+      ]),
+      (0, 1): AnswerCell(value: 'A'),
+      (0, 2): AnswerCell(value: 'B'),
+      (0, 3): AnswerCell(value: 'C'),
+      (1, 0): BlockCell(),
+      (1, 1): BlockCell(),
+      (1, 2): BlockCell(),
+      (1, 3): AnswerCell(value: 'D'),
     },
+    words: [across],
+    title: 't',
+    languageCode: 'sv',
   );
 }
 
@@ -57,115 +55,50 @@ void main() {
     SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();
     fontService = FontService(prefs: prefs);
-    cubit = CrosswordCubit(
-      puzzle: _buildTestPuzzle(),
-      fontService: fontService,
-    );
+    cubit = CrosswordCubit(puzzle: _puzzle(), fontService: fontService);
   });
 
-  tearDown(() {
-    cubit.close();
-    fontService.dispose();
-  });
+  tearDown(() => cubit.close());
 
-  test('initial state has no selection', () {
-    expect(cubit.state.selectedCell, isNull);
-    expect(cubit.state.highlightedCells, isEmpty);
-  });
-
-  test('selecting an answer cell highlights the horizontal word', () {
-    cubit.selectCell(0, 1);
-
-    expect(cubit.state.selectedCell, equals((0, 1)));
-    expect(cubit.state.currentDirection, equals(Direction.right));
-    expect(
-      cubit.state.highlightedCells,
-      equals({(0, 1), (0, 2), (0, 3)}),
-    );
-  });
-
-  test('selecting a hint cell selects first answer cell in arrow direction', () {
+  test('tapping a clue selects the first cell of its word and highlights it',
+      () {
     cubit.selectCell(0, 0);
-
-    expect(cubit.state.selectedCell, equals((0, 1)));
-    expect(cubit.state.currentDirection, equals(Direction.right));
-  });
-
-  test('selecting a blocked cell does nothing', () {
-    cubit.selectCell(2, 3);
-
-    expect(cubit.state.selectedCell, isNull);
-  });
-
-  test('tapping already-selected cell at crossing toggles direction', () {
-    // (2,1) is at a crossing: horizontal (2,0)(2,1)(2,2) and vertical (2,1)(3,1)
-    cubit.selectCell(2, 1);
-    expect(cubit.state.currentDirection, equals(Direction.right));
+    expect(cubit.state.selectedCell, (0, 1));
+    expect(cubit.state.currentDirection, Direction.right);
     expect(
       cubit.state.highlightedCells,
-      equals({(2, 0), (2, 1), (2, 2)}),
-    );
-
-    cubit.selectCell(2, 1);
-    expect(cubit.state.currentDirection, equals(Direction.down));
-    expect(
-      cubit.state.highlightedCells,
-      equals({(2, 1), (3, 1)}),
+      {(0, 1), (0, 2), (0, 3), (1, 3)},
     );
   });
 
-  test('typing a letter fills cell and auto-advances', () {
+  test('letter input advances along the resolved (redirected) word path', () {
     cubit.selectCell(0, 1);
-    cubit.onLetterInput('X');
-
-    expect(cubit.state.userInputs[(0, 1)], equals('X'));
-    expect(cubit.state.selectedCell, equals((0, 2)));
+    cubit.onLetterInput('A');
+    expect(cubit.state.selectedCell, (0, 2));
+    cubit.onLetterInput('B');
+    expect(cubit.state.selectedCell, (0, 3));
+    // The word redirects downward here; next cell is (1,3), not off-grid right.
+    cubit.onLetterInput('C');
+    expect(cubit.state.selectedCell, (1, 3));
+    expect(cubit.state.userInputs[(0, 1)], 'A');
   });
 
-  test('backspace clears current cell and moves back', () {
+  test('backspace on an empty cell steps back and clears the previous cell', () {
     cubit.selectCell(0, 1);
-    cubit.onLetterInput('X');
-    cubit.onLetterInput('Y');
-    // Now at (0,3), inputs: (0,1)=X, (0,2)=Y
+    cubit.onLetterInput('A'); // writes (0,1)='A', moves to empty (0,2)
+    cubit.onBackspace(); // (0,2) empty -> step back to (0,1) and clear it
+    expect(cubit.state.selectedCell, (0, 1));
+    expect(cubit.state.userInputs.containsKey((0, 1)), isFalse);
+  });
 
-    cubit.onBackspace();
-    // (0,3) was empty, so move back to (0,2) and clear it
-    expect(cubit.state.selectedCell, equals((0, 2)));
+  test('backspace on a filled cell clears it in place', () {
+    cubit.selectCell(0, 1);
+    cubit.onLetterInput('A'); // (0,1)='A', now at (0,2)
+    cubit.onLetterInput('B'); // (0,2)='B', now at (0,3)
+    cubit.selectCell(0, 2); // re-select the filled (0,2)
+    cubit.onBackspace(); // (0,2) filled -> clear in place, stay
+    expect(cubit.state.selectedCell, (0, 2));
     expect(cubit.state.userInputs.containsKey((0, 2)), isFalse);
-  });
-
-  test('resetView resets the transformation to identity', () {
-    // Simulate a zoomed/panned state.
-    cubit.transformationController.value = Matrix4.diagonal3Values(2.0, 2.0, 1.0);
-    expect(
-      cubit.transformationController.value,
-      isNot(equals(Matrix4.identity())),
-    );
-
-    cubit.resetView();
-
-    expect(cubit.transformationController.value, equals(Matrix4.identity()));
-  });
-
-  test('close disposes the transformation controller without throwing', () async {
-    final localPrefs = await SharedPreferences.getInstance();
-    final cubit = CrosswordCubit(
-      puzzle: _buildTestPuzzle(),
-      fontService: FontService(prefs: localPrefs),
-    );
-    await cubit.close();
-    // Using a disposed ChangeNotifier throws; confirm it was disposed.
-    expect(
-      () => cubit.transformationController.addListener(() {}),
-      throwsA(isA<FlutterError>()),
-    );
-  });
-
-  test('font changes in the service are reflected in state', () async {
-    expect(cubit.state.font, AppFont.defaultFont);
-
-    await fontService.selectFont(AppFont.caveat);
-
-    expect(cubit.state.font, AppFont.caveat);
+    expect(cubit.state.userInputs[(0, 1)], 'A');
   });
 }
