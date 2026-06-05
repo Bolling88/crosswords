@@ -10,6 +10,12 @@ enum ArrowShape {
   /// Word starts in the cell below, then runs right (L-shaped, down→right).
   bentDownThenRight,
 
+  /// Word starts in the cell above, then runs right (L-shaped, up→right).
+  bentUpThenRight,
+
   /// Word starts in the cell to the right, then runs down (L-shaped, right→down).
   bentRightThenDown,
+
+  /// Word starts in the cell to the left, then runs down (L-shaped, left→down).
+  bentLeftThenDown,
 }

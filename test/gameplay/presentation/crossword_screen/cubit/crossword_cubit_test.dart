@@ -47,6 +47,58 @@ CrosswordPuzzle _puzzle() {
   );
 }
 
+/// Grid where a redirected across word (h1) and a genuine across word (h2)
+/// share cell (2,2) — h1 runs through it vertically (its bent tail), h2
+/// horizontally — even though BOTH have base Direction.right.
+///   Cl(h1) A  B          (h1: (0,1),(0,2) then redirects DOWN)
+///          .  C  .
+///       .  Cl(h2) D  E    (h2: (2,2),(2,3))
+CrosswordPuzzle _overlapPuzzle() {
+  const h1 = Word(
+    id: 'h1',
+    direction: Direction.right,
+    cells: [(0, 1), (0, 2), (1, 2), (2, 2)],
+  );
+  const h2 = Word(
+    id: 'h2',
+    direction: Direction.right,
+    cells: [(2, 2), (2, 3)],
+  );
+  return const CrosswordPuzzle(
+    rows: 3,
+    cols: 4,
+    cells: {
+      (0, 0): ClueCell(arrows: [
+        ClueArrow(
+          direction: Direction.right,
+          shape: ArrowShape.straightRight,
+          wordId: 'h1',
+        ),
+      ]),
+      (0, 1): AnswerCell(value: 'A'),
+      (0, 2): AnswerCell(value: 'B'),
+      (0, 3): BlockCell(),
+      (1, 0): BlockCell(),
+      (1, 1): BlockCell(),
+      (1, 2): AnswerCell(value: 'C'),
+      (1, 3): BlockCell(),
+      (2, 0): BlockCell(),
+      (2, 1): ClueCell(arrows: [
+        ClueArrow(
+          direction: Direction.right,
+          shape: ArrowShape.straightRight,
+          wordId: 'h2',
+        ),
+      ]),
+      (2, 2): AnswerCell(value: 'D'),
+      (2, 3): AnswerCell(value: 'E'),
+    },
+    words: [h1, h2],
+    title: 't',
+    languageCode: 'sv',
+  );
+}
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -118,5 +170,41 @@ void main() {
     expect(cubit.state.font, AppFont.defaultFont);
     await fontService.selectFont(AppFont.caveat);
     expect(cubit.state.font, AppFont.caveat);
+  });
+
+  group('overlapping same-base-direction words', () {
+    late CrosswordCubit overlap;
+
+    setUp(() {
+      overlap = CrosswordCubit(puzzle: _overlapPuzzle(), fontService: fontService);
+    });
+
+    tearDown(() => overlap.close());
+
+    test('a shared cell selects the across word, then toggles to the '
+        'vertical (redirected) word', () {
+      // Default direction is right -> the genuinely-across word h2.
+      overlap.selectCell(2, 2);
+      expect(overlap.state.activeWordId, 'h2');
+      expect(overlap.state.currentDirection, Direction.right);
+      expect(overlap.state.highlightedCells, {(2, 2), (2, 3)});
+
+      // Re-tapping toggles to the word running vertically through (2,2): h1.
+      overlap.selectCell(2, 2);
+      expect(overlap.state.activeWordId, 'h1');
+      expect(overlap.state.currentDirection, Direction.down);
+      expect(overlap.state.highlightedCells, {(0, 1), (0, 2), (1, 2), (2, 2)});
+    });
+
+    test('typing follows the redirected word through its bend', () {
+      overlap.selectCell(0, 0); // activates h1 at (0,1)
+      expect(overlap.state.selectedCell, (0, 1));
+      overlap.onLetterInput('A');
+      expect(overlap.state.selectedCell, (0, 2));
+      overlap.onLetterInput('B'); // bend: continues DOWN, not off-grid right
+      expect(overlap.state.selectedCell, (1, 2));
+      overlap.onLetterInput('C');
+      expect(overlap.state.selectedCell, (2, 2));
+    });
   });
 }

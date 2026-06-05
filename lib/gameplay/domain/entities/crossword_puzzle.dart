@@ -35,10 +35,15 @@ class CrosswordPuzzle {
     return null;
   }
 
-  /// The word running [direction] that contains [cell], or null.
+  /// The word whose path runs along [direction] *through* [cell], or null.
+  ///
+  /// Uses each word's local axis at the cell rather than its base direction, so
+  /// a redirected word's perpendicular tail and a genuine crossing word that
+  /// share a cell (and a base direction) are still told apart.
   Word? wordAt((int, int) cell, Direction direction) {
     for (final w in words) {
-      if (w.direction == direction && w.cells.contains(cell)) return w;
+      final index = w.cells.indexOf(cell);
+      if (index >= 0 && w.axisAt(index) == direction) return w;
     }
     return null;
   }

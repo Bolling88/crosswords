@@ -25,6 +25,18 @@ class Word extends Equatable {
     this.separators = const {},
   });
 
+  /// The local travel axis at the cell at [index] in [cells]. A redirected
+  /// word bends, so its tail runs perpendicular to [direction]; this reports
+  /// the orientation of the path *at that cell* (the segment entering it, or
+  /// leaving it for the first cell), which is what disambiguates the word from
+  /// a crossing word sharing the same base [direction].
+  Direction axisAt(int index) {
+    if (cells.length < 2) return direction;
+    final a = index == 0 ? cells[0] : cells[index - 1];
+    final b = index == 0 ? cells[1] : cells[index];
+    return a.$1 == b.$1 ? Direction.right : Direction.down;
+  }
+
   @override
   List<Object?> get props => [id, clueId, clueText, direction, cells, separators];
 }

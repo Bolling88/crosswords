@@ -56,10 +56,21 @@ class HintCellWidget extends StatelessWidget {
           ),
         ),
       // Bent arrows: an elbow glyph hugging the corner the word turns through.
+      // The base glyph (subdirectory_arrow_right) comes DOWN then turns RIGHT;
+      // the other three orientations mirror/rotate it.
       ArrowShape.bentDownThenRight => Align(
           alignment: Alignment.bottomRight,
           child: Icon(Icons.subdirectory_arrow_right,
               color: AppColors.ink, size: size * 0.34),
+        ),
+      ArrowShape.bentUpThenRight => Align(
+          alignment: Alignment.topRight,
+          child: Transform(
+            alignment: Alignment.center,
+            transform: Matrix4.diagonal3Values(1, -1, 1), // flip vertically
+            child: Icon(Icons.subdirectory_arrow_right,
+                color: AppColors.ink, size: size * 0.34),
+          ),
         ),
       ArrowShape.bentRightThenDown => Align(
           alignment: Alignment.bottomRight,
@@ -67,6 +78,18 @@ class HintCellWidget extends StatelessWidget {
             angle: 1.5707963267948966, // pi/2: turns the elbow to right→down
             child: Icon(Icons.subdirectory_arrow_right,
                 color: AppColors.ink, size: size * 0.34),
+          ),
+        ),
+      ArrowShape.bentLeftThenDown => Align(
+          alignment: Alignment.bottomLeft,
+          child: Transform(
+            alignment: Alignment.center,
+            transform: Matrix4.diagonal3Values(-1, 1, 1), // mirror horizontally
+            child: Transform.rotate(
+              angle: 1.5707963267948966, // pi/2
+              child: Icon(Icons.subdirectory_arrow_right,
+                  color: AppColors.ink, size: size * 0.34),
+            ),
           ),
         ),
     };

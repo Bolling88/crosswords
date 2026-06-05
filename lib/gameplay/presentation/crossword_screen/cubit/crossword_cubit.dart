@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../gameplay/domain/entities/cell.dart';
 import '../../../../gameplay/domain/entities/crossword_puzzle.dart';
 import '../../../../gameplay/domain/entities/direction.dart';
+import '../../../../gameplay/domain/entities/word.dart';
 import '../../../../settings/domain/services/font_service.dart';
 import 'crossword_state.dart';
 
@@ -40,16 +41,12 @@ class CrosswordCubit extends Cubit<CrosswordState> {
         if (cell.arrows.isEmpty) return;
         final word = state.puzzle.wordById(cell.arrows.first.wordId);
         if (word == null || word.cells.isEmpty) return;
-        emit(state.copyWith(
-          selectedCell: word.cells.first,
-          currentDirection: word.direction,
-          highlightedCells: word.cells.toSet(),
-        ));
+        _activateWord(word, word.cells.first);
       case AnswerCell():
         if (state.selectedCell == (row, col)) {
           _toggleDirection(row, col);
         } else {
-          _selectAnswerCell(row, col, state.currentDirection);
+          _selectAnswerCell(row, col);
         }
     }
   }
@@ -60,9 +57,13 @@ class CrosswordCubit extends Cubit<CrosswordState> {
 
     final newInputs = Map<(int, int), String>.from(state.userInputs)
       ..[sel] = letter;
-    final next = _nextCell(sel, state.currentDirection) ?? sel;
+    final next = _step(sel, 1) ?? sel;
 
-    emit(state.copyWith(userInputs: newInputs, selectedCell: next));
+    emit(state.copyWith(
+      userInputs: newInputs,
+      selectedCell: next,
+      currentDirection: _axisAt(next),
+    ));
   }
 
   void onBackspace() {
@@ -74,19 +75,37 @@ class CrosswordCubit extends Cubit<CrosswordState> {
       newInputs.remove(sel);
       emit(state.copyWith(userInputs: newInputs));
     } else {
-      final prev = _prevCell(sel, state.currentDirection);
+      final prev = _step(sel, -1);
       if (prev != null) {
         newInputs.remove(prev);
-        emit(state.copyWith(userInputs: newInputs, selectedCell: prev));
+        emit(state.copyWith(
+          userInputs: newInputs,
+          selectedCell: prev,
+          currentDirection: _axisAt(prev),
+        ));
       }
     }
   }
 
-  void _selectAnswerCell(int row, int col, Direction direction) {
-    final word = state.puzzle.wordAt((row, col), direction) ??
+  /// Make [word] the active word and select [cell] within it, highlighting the
+  /// whole word and pinning the direction to the word's local axis there.
+  void _activateWord(Word word, (int, int) cell) {
+    final index = word.cells.indexOf(cell);
+    emit(state.copyWith(
+      activeWordId: word.id,
+      selectedCell: cell,
+      currentDirection: word.axisAt(index < 0 ? 0 : index),
+      highlightedCells: word.cells.toSet(),
+    ));
+  }
+
+  void _selectAnswerCell(int row, int col) {
+    final word = state.puzzle.wordAt((row, col), state.currentDirection) ??
         state.puzzle.wordAt(
           (row, col),
-          direction == Direction.right ? Direction.down : Direction.right,
+          state.currentDirection == Direction.right
+              ? Direction.down
+              : Direction.right,
         );
 
     if (word == null) {
@@ -97,11 +116,7 @@ class CrosswordCubit extends Cubit<CrosswordState> {
       return;
     }
 
-    emit(state.copyWith(
-      selectedCell: (row, col),
-      currentDirection: word.direction,
-      highlightedCells: word.cells.toSet(),
-    ));
+    _activateWord(word, (row, col));
   }
 
   void _toggleDirection(int row, int col) {
@@ -109,28 +124,28 @@ class CrosswordCubit extends Cubit<CrosswordState> {
         ? Direction.down
         : Direction.right;
     final word = state.puzzle.wordAt((row, col), other);
-    if (word != null) {
-      emit(state.copyWith(
-        currentDirection: other,
-        highlightedCells: word.cells.toSet(),
-      ));
-    }
+    if (word != null) _activateWord(word, (row, col));
   }
 
-  (int, int)? _nextCell((int, int) cell, Direction direction) {
-    final word = state.puzzle.wordAt(cell, direction);
-    if (word == null) return null;
+  /// The active word's local axis at [cell], or the current direction if the
+  /// cell is not on the active word.
+  Direction _axisAt((int, int) cell) {
+    final word = state.puzzle.wordById(state.activeWordId ?? '');
+    if (word == null) return state.currentDirection;
     final i = word.cells.indexOf(cell);
-    if (i < 0 || i + 1 >= word.cells.length) return null;
-    return word.cells[i + 1];
+    return i < 0 ? state.currentDirection : word.axisAt(i);
   }
 
-  (int, int)? _prevCell((int, int) cell, Direction direction) {
-    final word = state.puzzle.wordAt(cell, direction);
+  /// Step [delta] cells along the active word's ordered path from [cell],
+  /// following the word through any bend; null if it would leave the word.
+  (int, int)? _step((int, int) cell, int delta) {
+    final word = state.puzzle.wordById(state.activeWordId ?? '');
     if (word == null) return null;
     final i = word.cells.indexOf(cell);
-    if (i <= 0) return null;
-    return word.cells[i - 1];
+    if (i < 0) return null;
+    final j = i + delta;
+    if (j < 0 || j >= word.cells.length) return null;
+    return word.cells[j];
   }
 
   /// Snap the grid back to the default fit-width, un-panned view.

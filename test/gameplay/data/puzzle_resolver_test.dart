@@ -163,4 +163,66 @@ void main() {
     expect(seedCell.isSeed, isTrue);
     expect(plainCell.isSeed, isFalse);
   });
+
+  test('bent arrow up-then-right when an across word starts above the clue', () {
+    // Clue at (1,0); the across word starts at (0,0) — directly above — and
+    // runs right.
+    final dto = _puzzle([
+      [_a('A'), _a('B')],
+      [
+        const ClueCellDto(rightWordId: 'w', rightStart: PositionDto(col: 0, row: 0)),
+        _block,
+      ],
+    ]);
+
+    final clue = PuzzleResolver.resolve(dto).cells[(1, 0)] as ClueCell;
+    expect(clue.arrows.single.shape, ArrowShape.bentUpThenRight);
+  });
+
+  test('bent arrow left-then-down when a down word starts left of the clue', () {
+    // Clue at (0,1); the down word starts at (0,0) — directly left — and runs
+    // down.
+    final dto = _puzzle([
+      [
+        _a('A'),
+        const ClueCellDto(downWordId: 'w', downStart: PositionDto(col: 0, row: 0)),
+      ],
+      [_a('B'), _block],
+    ]);
+
+    final clue = PuzzleResolver.resolve(dto).cells[(0, 1)] as ClueCell;
+    expect(clue.arrows.single.shape, ArrowShape.bentLeftThenDown);
+  });
+
+  test('a redirected tail and a crossing word of the same base direction are '
+      'told apart by local axis', () {
+    // h1 runs right then redirects DOWN through column 2; h2 is a genuine
+    // across word. They share cell (2,2): h1 passes through it vertically,
+    // h2 horizontally — yet both have base Direction.right.
+    final dto = _puzzle([
+      [
+        const ClueCellDto(rightWordId: 'h1', rightStart: PositionDto(col: 1, row: 0)),
+        _a('A'),
+        _a('B', rightRedirect: true),
+        _block,
+      ],
+      [_block, _block, _a('C'), _block],
+      [
+        _block,
+        const ClueCellDto(rightWordId: 'h2', rightStart: PositionDto(col: 2, row: 2)),
+        _a('D'),
+        _a('E'),
+      ],
+      [_block, _block, _block, _block],
+    ]);
+
+    final p = PuzzleResolver.resolve(dto);
+    expect(p.wordById('h1')!.cells, [(0, 1), (0, 2), (1, 2), (2, 2)]);
+    expect(p.wordById('h2')!.cells, [(2, 2), (2, 3)]);
+
+    // The shared cell resolves to the horizontally-running word for "right"
+    // and the vertically-running (redirected) word for "down".
+    expect(p.wordAt((2, 2), Direction.right)!.id, 'h2');
+    expect(p.wordAt((2, 2), Direction.down)!.id, 'h1');
+  });
 }
