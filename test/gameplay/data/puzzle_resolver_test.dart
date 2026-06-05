@@ -36,7 +36,7 @@ void main() {
   test('resolves a straight across word', () {
     final dto = _puzzle([
       [
-        ClueCellDto(rightWordId: 'w1', rightClueId: 'c1', rightStart: const PositionDto(col: 1, row: 0)),
+        const ClueCellDto(rightWordId: 'w1', rightClueId: 'c1', rightStart: PositionDto(col: 1, row: 0)),
         _a('C'),
         _a('A'),
         _a('T'),
@@ -54,7 +54,7 @@ void main() {
   test('clue arrow shape is straightRight when start is adjacent right', () {
     final dto = _puzzle([
       [
-        ClueCellDto(rightWordId: 'w1', rightStart: const PositionDto(col: 1, row: 0)),
+        const ClueCellDto(rightWordId: 'w1', rightStart: PositionDto(col: 1, row: 0)),
         _a('A'),
         _a('B'),
       ],
@@ -68,7 +68,7 @@ void main() {
     // Clue at (0,0). Across word starts at (1,0) and runs right.
     final dto = _puzzle([
       [
-        ClueCellDto(rightWordId: 'w1', rightStart: const PositionDto(col: 0, row: 1)),
+        const ClueCellDto(rightWordId: 'w1', rightStart: PositionDto(col: 0, row: 1)),
         _block,
         _block,
       ],
@@ -89,7 +89,7 @@ void main() {
     // A B(redirect) then down to C, D.
     final dto = _puzzle([
       [
-        ClueCellDto(rightWordId: 'w1', rightStart: const PositionDto(col: 1, row: 0)),
+        const ClueCellDto(rightWordId: 'w1', rightStart: PositionDto(col: 1, row: 0)),
         _a('A'),
         _a('B', rightRedirect: true),
       ],
@@ -112,7 +112,7 @@ void main() {
   test('records separator index and a right separator edge', () {
     final dto = _puzzle([
       [
-        ClueCellDto(rightWordId: 'w1', rightStart: const PositionDto(col: 1, row: 0)),
+        const ClueCellDto(rightWordId: 'w1', rightStart: PositionDto(col: 1, row: 0)),
         _a('A', rightSeparator: '_'),
         _a('B'),
       ],
@@ -126,11 +126,11 @@ void main() {
   test('two-clue cell yields an across and a down word with two arrows', () {
     final dto = _puzzle([
       [
-        ClueCellDto(
+        const ClueCellDto(
           rightWordId: 'across',
-          rightStart: const PositionDto(col: 1, row: 0),
+          rightStart: PositionDto(col: 1, row: 0),
           downWordId: 'down',
-          downStart: const PositionDto(col: 0, row: 1),
+          downStart: PositionDto(col: 0, row: 1),
         ),
         _a('A'),
       ],
@@ -150,7 +150,7 @@ void main() {
   test('marks seed answer cells and preserves åäö values', () {
     final dto = _puzzle([
       [
-        ClueCellDto(rightWordId: 'w1', rightStart: const PositionDto(col: 1, row: 0)),
+        const ClueCellDto(rightWordId: 'w1', rightStart: PositionDto(col: 1, row: 0)),
         _a('Å'),
         _a('Ä'),
       ],

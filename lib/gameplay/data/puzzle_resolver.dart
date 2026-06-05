@@ -106,6 +106,7 @@ class PuzzleResolver {
     required Map<(int, int), Set<Direction>> separatorEdges,
   }) {
     final cells = <(int, int)>[];
+    final visited = <(int, int)>{};
     final separators = <int>{};
     var r = start.row;
     var c = start.col;
@@ -115,6 +116,7 @@ class PuzzleResolver {
       final cell = answerAt(r, c);
       if (cell == null) break;
       cells.add((r, c));
+      visited.add((r, c));
       final index = cells.length - 1;
 
       final separator =
@@ -132,7 +134,7 @@ class PuzzleResolver {
 
       final (nr, nc) =
           dir == Direction.right ? (r, c + 1) : (r + 1, c);
-      if (answerAt(nr, nc) == null) break;
+      if (answerAt(nr, nc) == null || visited.contains((nr, nc))) break;
       r = nr;
       c = nc;
     }
