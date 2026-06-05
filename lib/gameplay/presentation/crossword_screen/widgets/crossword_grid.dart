@@ -4,7 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../common/data/constants/app_colors.dart';
 import '../../../../common/data/constants/app_text_styles.dart';
 import '../../../../common/data/constants/strings.dart';
-import '../../../../gameplay/data/entities/cell.dart';
+import '../../../../gameplay/domain/entities/cell.dart';
+import '../../../../gameplay/domain/entities/direction.dart';
 import '../cubit/crossword_cubit.dart';
 import '../cubit/crossword_state.dart';
 import 'answer_cell_widget.dart';
@@ -73,9 +74,10 @@ class CrosswordGrid extends StatelessWidget {
     }
 
     final fontFamily = state.font.googleFamily;
+    final edges = state.puzzle.separatorEdges[(row, col)] ?? const {};
 
     return switch (cell) {
-      HintCell() => HintCellWidget(
+      ClueCell() => HintCellWidget(
           cell: cell,
           size: cellSize,
           onTap: () => cubit.selectCell(row, col),
@@ -85,11 +87,14 @@ class CrosswordGrid extends StatelessWidget {
           userInput: state.userInputs[(row, col)],
           isSelected: state.selectedCell == (row, col),
           isHighlighted: state.highlightedCells.contains((row, col)),
+          isSeed: cell.isSeed,
+          hasRightSeparator: edges.contains(Direction.right),
+          hasBottomSeparator: edges.contains(Direction.down),
           size: cellSize,
           onTap: () => cubit.selectCell(row, col),
           fontFamily: fontFamily,
         ),
-      BlockedCell() => BlockedCellWidget(size: cellSize),
+      BlockCell() => BlockedCellWidget(size: cellSize),
       ImageCell() => SizedBox(width: cellSize, height: cellSize),
     };
   }

@@ -1,14 +1,11 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 
 import '../../../../common/data/constants/app_colors.dart';
-import '../../../../common/data/constants/app_text_styles.dart';
-import '../../../../gameplay/data/entities/cell.dart';
-import '../../../../gameplay/data/entities/direction.dart';
+import '../../../../gameplay/domain/entities/arrow_shape.dart';
+import '../../../../gameplay/domain/entities/cell.dart';
 
 class HintCellWidget extends StatelessWidget {
-  final HintCell cell;
+  final ClueCell cell;
   final double size;
   final VoidCallback onTap;
   final String fontFamily;
@@ -34,49 +31,44 @@ class HintCellWidget extends StatelessWidget {
         ),
         child: Stack(
           children: [
-            Positioned.fill(
-              child: Padding(
-                padding: EdgeInsets.all(size * 0.07),
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  alignment: Alignment.center,
-                  child: Text(
-                    cell.clueText,
-                    style: AppTextStyles.clue(size * 0.2, family: fontFamily),
-                    textAlign: TextAlign.center,
-                    maxLines: 4,
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              bottom: size * 0.02,
-              right: size * 0.02,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children:
-                    cell.arrows.map((arrow) => _buildArrow(arrow)).toList(),
-              ),
-            ),
+            // Clue prose is null in generator output, so clue cells render
+            // arrows only. Texts can be layered here once authored.
+            for (final arrow in cell.arrows) _buildArrow(arrow.shape),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildArrow(Direction direction) {
-    final angle = switch (direction) {
-      Direction.right => 0.0,
-      Direction.down => pi / 2,
-      Direction.downRight => pi / 4,
+  Widget _buildArrow(ArrowShape shape) {
+    return switch (shape) {
+      ArrowShape.straightRight => Align(
+          alignment: Alignment.centerRight,
+          child: Icon(Icons.play_arrow,
+              color: AppColors.ink, size: size * 0.3),
+        ),
+      ArrowShape.straightDown => Align(
+          alignment: Alignment.bottomCenter,
+          child: Transform.rotate(
+            angle: 1.5707963267948966, // pi/2
+            child: Icon(Icons.play_arrow,
+                color: AppColors.ink, size: size * 0.3),
+          ),
+        ),
+      // Bent arrows: an elbow glyph hugging the corner the word turns through.
+      ArrowShape.bentDownThenRight => Align(
+          alignment: Alignment.bottomRight,
+          child: Icon(Icons.subdirectory_arrow_right,
+              color: AppColors.ink, size: size * 0.34),
+        ),
+      ArrowShape.bentRightThenDown => Align(
+          alignment: Alignment.bottomRight,
+          child: Transform.rotate(
+            angle: 1.5707963267948966, // pi/2: turns the elbow to right→down
+            child: Icon(Icons.subdirectory_arrow_right,
+                color: AppColors.ink, size: size * 0.34),
+          ),
+        ),
     };
-    return Transform.rotate(
-      angle: angle,
-      child: Icon(
-        Icons.play_arrow,
-        color: AppColors.ink,
-        size: size * 0.28,
-      ),
-    );
   }
 }

@@ -7,6 +7,9 @@ class AnswerCellWidget extends StatelessWidget {
   final String? userInput;
   final bool isSelected;
   final bool isHighlighted;
+  final bool isSeed;
+  final bool hasRightSeparator;
+  final bool hasBottomSeparator;
   final double size;
   final VoidCallback onTap;
   final String fontFamily;
@@ -18,6 +21,9 @@ class AnswerCellWidget extends StatelessWidget {
     this.userInput,
     this.isSelected = false,
     this.isHighlighted = false,
+    this.isSeed = false,
+    this.hasRightSeparator = false,
+    this.hasBottomSeparator = false,
     super.key,
   });
 
@@ -27,7 +33,9 @@ class AnswerCellWidget extends StatelessWidget {
         ? AppColors.selection
         : isHighlighted
             ? AppColors.highlight
-            : AppColors.paper;
+            : isSeed
+                ? AppColors.seedCell
+                : AppColors.paper;
 
     return GestureDetector(
       onTap: onTap,
@@ -36,7 +44,19 @@ class AnswerCellWidget extends StatelessWidget {
         height: size,
         decoration: BoxDecoration(
           color: fillColor,
-          border: Border.all(color: AppColors.gridLine, width: 0.5),
+          border: Border(
+            top: const BorderSide(color: AppColors.gridLine, width: 0.5),
+            left: const BorderSide(color: AppColors.gridLine, width: 0.5),
+            right: BorderSide(
+              color: hasRightSeparator ? AppColors.separator : AppColors.gridLine,
+              width: hasRightSeparator ? 2.0 : 0.5,
+            ),
+            bottom: BorderSide(
+              color:
+                  hasBottomSeparator ? AppColors.separator : AppColors.gridLine,
+              width: hasBottomSeparator ? 2.0 : 0.5,
+            ),
+          ),
         ),
         alignment: Alignment.center,
         child: Text(
