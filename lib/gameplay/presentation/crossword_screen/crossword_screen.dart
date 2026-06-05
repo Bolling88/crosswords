@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -5,7 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../common/data/constants/app_colors.dart';
 import '../../../common/data/constants/app_text_styles.dart';
 import '../../../common/data/constants/strings.dart';
-import '../../../gameplay/data/sample_puzzle.dart';
+import '../../../gameplay/domain/entities/crossword_puzzle.dart';
 import '../../../settings/domain/services/font_service.dart';
 import 'cubit/crossword_cubit.dart';
 import 'cubit/crossword_state.dart';
@@ -13,13 +15,15 @@ import '../../../settings/presentation/settings_screen/settings_screen.dart';
 import 'widgets/crossword_grid.dart';
 
 class CrosswordScreen extends StatelessWidget {
-  const CrosswordScreen({super.key});
+  final CrosswordPuzzle puzzle;
+
+  const CrosswordScreen({required this.puzzle, super.key});
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => CrosswordCubit(
-        puzzle: buildSamplePuzzle(),
+        puzzle: puzzle,
         fontService: context.read<FontService>(),
       ),
       child: const CrosswordScreenBuilder(),
@@ -93,25 +97,20 @@ class CrosswordScreenContent extends StatelessWidget {
             builder: (context, constraints) {
               const gridPadding = 16.0;
               final viewportWidth = constraints.maxWidth - gridPadding * 2;
-              final cellSize =
+              final viewportHeight = constraints.maxHeight - gridPadding * 2;
+
+              // Fit the whole puzzle within the viewport on BOTH axes: derive a
+              // cell size from the available width and from the available
+              // height, then take the smaller so neither dimension overflows.
+              // Width-only sizing clips the bottom on wide/short viewports
+              // (e.g. tablets) where the height-fit is the binding constraint.
+              final cellSizeByWidth =
                   (viewportWidth - CrosswordGrid.borderWidth * 2) /
                       state.puzzle.cols;
-
-              // Full rendered height of the grid (cells + frame border +
-              // surrounding padding).
-              final contentHeight = state.puzzle.rows * cellSize +
-                  CrosswordGrid.borderWidth * 2 +
-                  gridPadding * 2;
-              // The viewer's child must be at least as large as the viewport in
-              // both axes. If it were smaller (e.g. a grid shorter than the
-              // screen), InteractiveViewer forces a minimum scale > 1.0 to keep
-              // the child covering the viewport — making it impossible to zoom
-              // back out to the whole puzzle. Sizing to max(content, viewport)
-              // keeps fit-to-screen reachable while still growing for puzzles
-              // taller than the screen so they can be scrolled.
-              final boxHeight = contentHeight > constraints.maxHeight
-                  ? contentHeight
-                  : constraints.maxHeight;
+              final cellSizeByHeight =
+                  (viewportHeight - CrosswordGrid.borderWidth * 2) /
+                      state.puzzle.rows;
+              final cellSize = min(cellSizeByWidth, cellSizeByHeight);
 
               return InteractiveViewer(
                 transformationController: cubit.transformationController,
@@ -127,9 +126,8 @@ class CrosswordScreenContent extends StatelessWidget {
                 boundaryMargin: EdgeInsets.zero,
                 child: SizedBox(
                   width: constraints.maxWidth,
-                  height: boxHeight,
+                  height: constraints.maxHeight,
                   child: Align(
-                    alignment: Alignment.topCenter,
                     child: Padding(
                       padding: const EdgeInsets.all(gridPadding),
                       child: CrosswordGrid(state: state, cellSize: cellSize),
