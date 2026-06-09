@@ -55,4 +55,19 @@ class CrosswordState extends Equatable {
       font: font ?? this.font,
     );
   }
+
+  /// Select [cell] as a standalone cell that belongs to no word, clearing the
+  /// active word so later navigation and typing don't act on a stale word.
+  /// (Separate from [copyWith] because that cannot null [activeWordId].)
+  CrosswordState withLoneCell((int, int) cell) {
+    return CrosswordState(
+      puzzle: puzzle,
+      userInputs: userInputs,
+      selectedCell: cell,
+      activeWordId: null,
+      currentDirection: currentDirection,
+      highlightedCells: {cell},
+      font: font,
+    );
+  }
 }

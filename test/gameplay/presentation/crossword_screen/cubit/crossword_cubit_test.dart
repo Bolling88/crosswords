@@ -99,6 +99,39 @@ CrosswordPuzzle _overlapPuzzle() {
   );
 }
 
+/// A word plus an isolated answer cell (1,2) that belongs to no word, used to
+/// exercise the lone-cell selection branch.
+///   Cl(w) A  B
+///    .   .  X(lone)
+CrosswordPuzzle _loneCellPuzzle() {
+  const w = Word(
+    id: 'w',
+    direction: Direction.right,
+    cells: [(0, 1), (0, 2)],
+  );
+  return const CrosswordPuzzle(
+    rows: 2,
+    cols: 3,
+    cells: {
+      (0, 0): ClueCell(arrows: [
+        ClueArrow(
+          direction: Direction.right,
+          shape: ArrowShape.straightRight,
+          wordId: 'w',
+        ),
+      ]),
+      (0, 1): AnswerCell(value: 'A'),
+      (0, 2): AnswerCell(value: 'B'),
+      (1, 0): BlockCell(),
+      (1, 1): BlockCell(),
+      (1, 2): AnswerCell(value: 'X'),
+    },
+    words: [w],
+    title: 't',
+    languageCode: 'sv',
+  );
+}
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -246,6 +279,26 @@ void main() {
     });
   });
 
+  test('selecting an answer cell in no word clears the active word and does '
+      'not teleport on the next keystroke', () {
+    final lone =
+        CrosswordCubit(puzzle: _loneCellPuzzle(), fontService: fontService);
+    addTearDown(lone.close);
+
+    lone.selectCell(0, 0); // activates word w at (0,1)
+    expect(lone.state.activeWordId, 'w');
+
+    lone.selectCell(1, 2); // lone answer cell, in no word
+    expect(lone.state.selectedCell, (1, 2));
+    expect(lone.state.activeWordId, isNull);
+    expect(lone.state.highlightedCells, {(1, 2)});
+
+    // Typing here must NOT jump back into word w.
+    lone.onLetterInput('X');
+    expect(lone.state.userInputs[(1, 2)], 'X');
+    expect(lone.state.selectedCell, (1, 2));
+  });
+
   test('resetView resets transformationController to identity', () {
     // Mutate to a non-identity value first to make the reset meaningful.
     cubit.transformationController.value = Matrix4.translationValues(10, 10, 0);
@@ -305,6 +358,15 @@ void main() {
       // Stay on h1 and jump back to its gap rather than advancing words.
       expect(overlap.state.activeWordId, 'h1');
       expect(overlap.state.selectedCell, (0, 2));
+    });
+
+    test('typing after arrowing into the vertical run follows that word', () {
+      overlap.selectCell(0, 1); // h1 across at (0,1)
+      overlap.moveSelection(0, 1); // -> (0,2)
+      overlap.moveSelection(1, 0); // down -> (1,2), now on h1's vertical run
+      overlap.onLetterInput('C'); // must continue DOWN along h1
+      expect(overlap.state.userInputs[(1, 2)], 'C');
+      expect(overlap.state.selectedCell, (2, 2));
     });
 
     test('typing follows the redirected word through its bend', () {

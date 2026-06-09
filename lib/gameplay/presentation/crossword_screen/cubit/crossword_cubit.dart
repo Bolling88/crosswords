@@ -259,10 +259,7 @@ class CrosswordCubit extends Cubit<CrosswordState> {
         );
 
     if (word == null) {
-      emit(state.copyWith(
-        selectedCell: (row, col),
-        highlightedCells: {(row, col)},
-      ));
+      emit(state.withLoneCell((row, col)));
       _raiseKeyboard();
       return;
     }
