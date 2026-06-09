@@ -159,6 +159,85 @@ void main() {
     expect(cubit.state.userInputs[(0, 1)], 'A');
   });
 
+  group('arrow-key navigation', () {
+    test('moving right/left steps between adjacent answer cells', () {
+      cubit.selectCell(0, 1);
+      cubit.moveSelection(0, 1);
+      expect(cubit.state.selectedCell, (0, 2));
+      cubit.moveSelection(0, 1);
+      expect(cubit.state.selectedCell, (0, 3));
+      cubit.moveSelection(0, -1);
+      expect(cubit.state.selectedCell, (0, 2));
+    });
+
+    test('moving right activates the across word at the new cell', () {
+      cubit.selectCell(0, 1);
+      cubit.moveSelection(0, 1);
+      expect(cubit.state.activeWordId, 'across');
+      expect(cubit.state.currentDirection, Direction.right);
+    });
+
+    test('moving off the grid keeps the current selection', () {
+      cubit.selectCell(0, 3);
+      cubit.moveSelection(0, 1); // (0,4) is off-grid
+      expect(cubit.state.selectedCell, (0, 3));
+    });
+
+    test('moving over non-answer cells skips to the next answer cell', () {
+      // (0,3) down is the redirected tail (1,3); everything else in column 3
+      // above/below is answer/edge. From (0,1) moving down hits block cells.
+      cubit.selectCell(0, 3);
+      cubit.moveSelection(1, 0); // (1,3) is an answer cell
+      expect(cubit.state.selectedCell, (1, 3));
+    });
+
+    test('moving with no selection does nothing', () {
+      cubit.moveSelection(0, 1);
+      expect(cubit.state.selectedCell, isNull);
+    });
+
+    test('moving down selects the vertical word through a shared cell', () {
+      final overlap =
+          CrosswordCubit(puzzle: _overlapPuzzle(), fontService: fontService);
+      addTearDown(overlap.close);
+      overlap.selectCell(0, 1); // activates h1 across, at (0,1)
+      overlap.moveSelection(0, 1); // to (0,2), shared by h1's vertical run
+      overlap.moveSelection(1, 0); // down -> (1,2), vertical word h1
+      expect(overlap.state.selectedCell, (1, 2));
+      expect(overlap.state.activeWordId, 'h1');
+      expect(overlap.state.currentDirection, Direction.down);
+    });
+  });
+
+  group('mobile soft-keyboard input', () {
+    test('typing a letter via the hidden field fills the cell and advances', () {
+      cubit.selectCell(0, 1); // active across word, selected at (0,1)
+      cubit.onInputChanged('${CrosswordCubit.inputSentinel}a');
+      expect(cubit.state.userInputs[(0, 1)], 'A');
+      expect(cubit.state.selectedCell, (0, 2));
+      // Controller is reset to the sentinel so the next keystroke is detectable.
+      expect(cubit.inputController.text, CrosswordCubit.inputSentinel);
+    });
+
+    test('deleting the sentinel triggers a backspace', () {
+      cubit.selectCell(0, 1);
+      cubit.onInputChanged('${CrosswordCubit.inputSentinel}A'); // (0,1)=A -> (0,2)
+      cubit.onInputChanged(''); // sentinel deleted on the now-empty (0,2)
+      // Matches the existing backspace rule: empty cell steps back and clears.
+      expect(cubit.state.selectedCell, (0, 1));
+      expect(cubit.state.userInputs.containsKey((0, 1)), isFalse);
+      expect(cubit.inputController.text, CrosswordCubit.inputSentinel);
+    });
+
+    test('non-letter input is ignored', () {
+      cubit.selectCell(0, 1);
+      cubit.onInputChanged('${CrosswordCubit.inputSentinel}5');
+      expect(cubit.state.userInputs.containsKey((0, 1)), isFalse);
+      expect(cubit.state.selectedCell, (0, 1));
+      expect(cubit.inputController.text, CrosswordCubit.inputSentinel);
+    });
+  });
+
   test('resetView resets transformationController to identity', () {
     // Mutate to a non-identity value first to make the reset meaningful.
     cubit.transformationController.value = Matrix4.translationValues(10, 10, 0);
@@ -194,6 +273,30 @@ void main() {
       expect(overlap.state.activeWordId, 'h1');
       expect(overlap.state.currentDirection, Direction.down);
       expect(overlap.state.highlightedCells, {(0, 1), (0, 2), (1, 2), (2, 2)});
+    });
+
+    test('finishing a word jumps to the next word\'s first empty cell', () {
+      overlap.selectCell(0, 0); // activates h1 at (0,1)
+      overlap.onLetterInput('A'); // (0,1) -> (0,2)
+      overlap.onLetterInput('B'); // (0,2) -> (1,2)
+      overlap.onLetterInput('C'); // (1,2) -> (2,2)
+      overlap.onLetterInput('D'); // (2,2) completes h1 -> jump to h2
+      // h2 is [(2,2),(2,3)]; (2,2) was just filled, so land on (2,3).
+      expect(overlap.state.activeWordId, 'h2');
+      expect(overlap.state.selectedCell, (2, 3));
+      expect(overlap.state.currentDirection, Direction.right);
+      expect(overlap.state.highlightedCells, {(2, 2), (2, 3)});
+    });
+
+    test('finishing the last cell fills a remaining gap before jumping', () {
+      overlap.selectCell(0, 0); // activates h1 at (0,1)
+      overlap.onLetterInput('A'); // (0,1) -> (0,2)
+      overlap.moveSelection(1, 0); // skip (0,2), move down to (1,2)
+      overlap.onLetterInput('C'); // (1,2) -> (2,2)
+      overlap.onLetterInput('D'); // (2,2) is last cell, but (0,2) still empty
+      // Stay on h1 and jump back to its gap rather than advancing words.
+      expect(overlap.state.activeWordId, 'h1');
+      expect(overlap.state.selectedCell, (0, 2));
     });
 
     test('typing follows the redirected word through its bend', () {

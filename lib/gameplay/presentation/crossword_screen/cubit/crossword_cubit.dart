@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../gameplay/domain/entities/cell.dart';
@@ -9,9 +10,22 @@ import '../../../../settings/domain/services/font_service.dart';
 import 'crossword_state.dart';
 
 class CrosswordCubit extends Cubit<CrosswordState> {
+  /// Invisible seed character kept in [inputController] so the hidden mobile
+  /// field always has content: a longer value means a letter was typed, an
+  /// empty value means the user pressed backspace on the sentinel.
+  static const inputSentinel = '​'; // zero-width space
+
   final FocusNode focusNode = FocusNode();
   final TransformationController transformationController =
       TransformationController();
+
+  /// Controller + focus node for the hidden, mobile-only text field that summons
+  /// the OS soft keyboard. Owned here per the project rule that controllers live
+  /// in the Cubit. Seeded with [inputSentinel].
+  final TextEditingController inputController =
+      TextEditingController(text: inputSentinel);
+  final FocusNode keyboardFocusNode = FocusNode();
+
   final FontService _fontService;
 
   CrosswordCubit({
@@ -57,13 +71,45 @@ class CrosswordCubit extends Cubit<CrosswordState> {
 
     final newInputs = Map<(int, int), String>.from(state.userInputs)
       ..[sel] = letter;
-    final next = _step(sel, 1) ?? sel;
 
-    emit(state.copyWith(
-      userInputs: newInputs,
-      selectedCell: next,
-      currentDirection: _axisAt(next),
-    ));
+    // Still room to advance within the active word: step to the next cell.
+    final next = _step(sel, 1);
+    if (next != null) {
+      emit(state.copyWith(
+        userInputs: newInputs,
+        selectedCell: next,
+        currentDirection: _axisAt(next),
+      ));
+      return;
+    }
+
+    // Reached the last cell of the active word. If the word still has a gap
+    // (the player skipped a cell), jump back to it; otherwise the word is done,
+    // so advance to the next unfinished word. With neither, just keep the input.
+    final activeWord = state.puzzle.wordById(state.activeWordId ?? '');
+    if (activeWord == null) {
+      emit(state.copyWith(userInputs: newInputs));
+      return;
+    }
+
+    final gap = _firstEmptyCell(activeWord, newInputs);
+    if (gap != null) {
+      emit(state.copyWith(
+        userInputs: newInputs,
+        selectedCell: gap,
+        currentDirection: _axisAt(gap),
+      ));
+      return;
+    }
+
+    final nextWord = _nextUnfinishedWord(newInputs);
+    if (nextWord == null) {
+      emit(state.copyWith(userInputs: newInputs));
+      return;
+    }
+
+    final target = _firstEmptyCell(nextWord, newInputs) ?? nextWord.cells.first;
+    _activateWord(nextWord, target, userInputs: newInputs);
   }
 
   void onBackspace() {
@@ -87,25 +133,121 @@ class CrosswordCubit extends Cubit<CrosswordState> {
     }
   }
 
+  /// Translate an edit from the hidden mobile text field into a letter or
+  /// backspace action. The field is seeded with [inputSentinel]; a value longer
+  /// than the sentinel means a character was typed (we take the last one), an
+  /// empty value means the sentinel itself was deleted. The controller is then
+  /// reset to the sentinel so the next keystroke is detectable.
+  void onInputChanged(String value) {
+    if (value.length > inputSentinel.length) {
+      // åäöÅÄÖ are single UTF-16 code units, so the last unit is a full char.
+      final typed = value.substring(value.length - 1);
+      if (RegExp(r'[a-zA-ZåäöÅÄÖ]').hasMatch(typed)) {
+        onLetterInput(typed.toUpperCase());
+      }
+    } else if (value.isEmpty) {
+      onBackspace();
+    }
+    inputController.value = const TextEditingValue(
+      text: inputSentinel,
+      selection: TextSelection.collapsed(offset: inputSentinel.length),
+    );
+  }
+
+  /// True on platforms that use a soft keyboard. Reported by
+  /// [defaultTargetPlatform], which on the web returns the *device's* platform —
+  /// so a phone browser counts as mobile and a desktop browser does not. Never
+  /// keyed off `kIsWeb` or `dart:io`'s `Platform` (the latter throws on web).
+  bool get _isTouchPlatform =>
+      defaultTargetPlatform == TargetPlatform.iOS ||
+      defaultTargetPlatform == TargetPlatform.android;
+
+  /// Focus the hidden field to raise the soft keyboard, but only on touch
+  /// platforms and only once the field is mounted (its node has a context). On
+  /// desktop the field is never built, so the existing hardware [Focus] keeps
+  /// sole ownership of input and arrow navigation.
+  void _raiseKeyboard() {
+    if (_isTouchPlatform && keyboardFocusNode.context != null) {
+      keyboardFocusNode.requestFocus();
+    }
+  }
+
   /// Make [word] the active word and select [cell] within it, highlighting the
-  /// whole word and pinning the direction to the word's local axis there.
-  void _activateWord(Word word, (int, int) cell) {
+  /// whole word and pinning the direction to the word's local axis there. Pass
+  /// [userInputs] to fold a just-typed letter into the same emit.
+  void _activateWord(
+    Word word,
+    (int, int) cell, {
+    Map<(int, int), String>? userInputs,
+  }) {
     final index = word.cells.indexOf(cell);
     emit(state.copyWith(
+      userInputs: userInputs,
       activeWordId: word.id,
       selectedCell: cell,
       currentDirection: word.axisAt(index < 0 ? 0 : index),
       highlightedCells: word.cells.toSet(),
     ));
+    _raiseKeyboard();
   }
 
-  void _selectAnswerCell(int row, int col) {
-    final word = state.puzzle.wordAt((row, col), state.currentDirection) ??
+  /// The first fillable (non-seed) cell of [word] still missing input, or null
+  /// when the word is fully filled.
+  (int, int)? _firstEmptyCell(Word word, Map<(int, int), String> inputs) {
+    for (final cell in word.cells) {
+      if (_isEmptyFillable(cell, inputs)) return cell;
+    }
+    return null;
+  }
+
+  /// The next word after the active one (wrapping) that still has an empty
+  /// fillable cell, or null when every other word is complete.
+  Word? _nextUnfinishedWord(Map<(int, int), String> inputs) {
+    final words = state.puzzle.words;
+    if (words.isEmpty) return null;
+    final start = words.indexWhere((w) => w.id == state.activeWordId);
+    for (var offset = 1; offset <= words.length; offset++) {
+      final word = words[(start + offset) % words.length];
+      if (_firstEmptyCell(word, inputs) != null) return word;
+    }
+    return null;
+  }
+
+  /// Whether [cell] is an answer cell the player still needs to fill. Seed cells
+  /// carry a given letter, so they never count as empty.
+  bool _isEmptyFillable((int, int) cell, Map<(int, int), String> inputs) {
+    final c = state.puzzle.cells[cell];
+    return c is AnswerCell && !c.isSeed && !inputs.containsKey(cell);
+  }
+
+  /// Move the selection one cell in the given direction (e.g. (0, 1) for the
+  /// right arrow), skipping over non-answer cells until the next answer cell.
+  /// The pressed axis becomes the preferred word direction at the landing cell,
+  /// so arrowing into a shared cell picks the word running along that axis.
+  void moveSelection(int rowDelta, int colDelta) {
+    final sel = state.selectedCell;
+    if (sel == null) return;
+
+    final axis = colDelta != 0 ? Direction.right : Direction.down;
+    var (row, col) = sel;
+    while (true) {
+      row += rowDelta;
+      col += colDelta;
+      final cell = state.puzzle.cells[(row, col)];
+      if (cell == null) return; // ran off the grid; keep the current selection
+      if (cell is AnswerCell) {
+        _selectAnswerCell(row, col, axis);
+        return;
+      }
+    }
+  }
+
+  void _selectAnswerCell(int row, int col, [Direction? preferAxis]) {
+    final axis = preferAxis ?? state.currentDirection;
+    final word = state.puzzle.wordAt((row, col), axis) ??
         state.puzzle.wordAt(
           (row, col),
-          state.currentDirection == Direction.right
-              ? Direction.down
-              : Direction.right,
+          axis == Direction.right ? Direction.down : Direction.right,
         );
 
     if (word == null) {
@@ -113,6 +255,7 @@ class CrosswordCubit extends Cubit<CrosswordState> {
         selectedCell: (row, col),
         highlightedCells: {(row, col)},
       ));
+      _raiseKeyboard();
       return;
     }
 
@@ -158,6 +301,8 @@ class CrosswordCubit extends Cubit<CrosswordState> {
     _fontService.selectedFont.removeListener(_onFontChanged);
     focusNode.dispose();
     transformationController.dispose();
+    inputController.dispose();
+    keyboardFocusNode.dispose();
     return super.close();
   }
 }
