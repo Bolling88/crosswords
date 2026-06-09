@@ -236,6 +236,14 @@ void main() {
       expect(cubit.state.selectedCell, (0, 1));
       expect(cubit.inputController.text, CrosswordCubit.inputSentinel);
     });
+
+    test('a multi-character value enters every letter in order', () {
+      cubit.selectCell(0, 1); // across word (0,1),(0,2),(0,3),(1,3)
+      cubit.onInputChanged('${CrosswordCubit.inputSentinel}AB');
+      expect(cubit.state.userInputs[(0, 1)], 'A');
+      expect(cubit.state.userInputs[(0, 2)], 'B');
+      expect(cubit.state.selectedCell, (0, 3));
+    });
   });
 
   test('resetView resets transformationController to identity', () {

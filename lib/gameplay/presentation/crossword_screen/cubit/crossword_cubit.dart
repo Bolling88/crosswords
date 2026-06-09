@@ -12,8 +12,12 @@ import 'crossword_state.dart';
 class CrosswordCubit extends Cubit<CrosswordState> {
   /// Invisible seed character kept in [inputController] so the hidden mobile
   /// field always has content: a longer value means a letter was typed, an
-  /// empty value means the user pressed backspace on the sentinel.
+  /// empty value means the user pressed backspace on the sentinel. Public only
+  /// so tests can reference it.
+  @visibleForTesting
   static const inputSentinel = '​'; // zero-width space
+
+  static final _letterPattern = RegExp(r'[a-zA-ZåäöÅÄÖ]');
 
   final FocusNode focusNode = FocusNode();
   final TransformationController transformationController =
@@ -133,17 +137,19 @@ class CrosswordCubit extends Cubit<CrosswordState> {
     }
   }
 
-  /// Translate an edit from the hidden mobile text field into a letter or
-  /// backspace action. The field is seeded with [inputSentinel]; a value longer
-  /// than the sentinel means a character was typed (we take the last one), an
-  /// empty value means the sentinel itself was deleted. The controller is then
-  /// reset to the sentinel so the next keystroke is detectable.
+  /// Translate an edit from the hidden mobile text field into letter or
+  /// backspace actions. The field is seeded with [inputSentinel]; a value longer
+  /// than the sentinel means characters were typed, an empty value means the
+  /// sentinel itself was deleted. Every typed character is entered in order —
+  /// not just the last — so a suggestion-bar word, glide-typed word, or paste
+  /// is not silently truncated. The controller is then reset to the sentinel so
+  /// the next keystroke is detectable.
   void onInputChanged(String value) {
     if (value.length > inputSentinel.length) {
-      // åäöÅÄÖ are single UTF-16 code units, so the last unit is a full char.
-      final typed = value.substring(value.length - 1);
-      if (RegExp(r'[a-zA-ZåäöÅÄÖ]').hasMatch(typed)) {
-        onLetterInput(typed.toUpperCase());
+      for (final char in value.substring(inputSentinel.length).split('')) {
+        if (_letterPattern.hasMatch(char)) {
+          onLetterInput(char.toUpperCase());
+        }
       }
     } else if (value.isEmpty) {
       onBackspace();
