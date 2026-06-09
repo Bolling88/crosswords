@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -74,70 +75,119 @@ class CrosswordScreenContent extends StatelessWidget {
           ),
         ],
       ),
-      body: Focus(
-        focusNode: cubit.focusNode,
-        autofocus: true,
-        onKeyEvent: (node, event) {
-          if (event is! KeyDownEvent) return KeyEventResult.ignored;
-          final char = event.character;
-          if (char != null &&
-              char.length == 1 &&
-              RegExp(r'[a-zA-ZåäöÅÄÖ]').hasMatch(char)) {
-            cubit.onLetterInput(char.toUpperCase());
-            return KeyEventResult.handled;
-          }
-          if (event.logicalKey == LogicalKeyboardKey.backspace) {
-            cubit.onBackspace();
-            return KeyEventResult.handled;
-          }
-          return KeyEventResult.ignored;
-        },
-        child: SafeArea(
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              const gridPadding = 16.0;
-              final viewportWidth = constraints.maxWidth - gridPadding * 2;
-              final viewportHeight = constraints.maxHeight - gridPadding * 2;
+      body: Stack(
+        children: [
+          Focus(
+            focusNode: cubit.focusNode,
+            autofocus: true,
+            onKeyEvent: (node, event) {
+              if (event is! KeyDownEvent) return KeyEventResult.ignored;
+              final char = event.character;
+              if (char != null &&
+                  char.length == 1 &&
+                  RegExp(r'[a-zA-ZåäöÅÄÖ]').hasMatch(char)) {
+                cubit.onLetterInput(char.toUpperCase());
+                return KeyEventResult.handled;
+              }
+              if (event.logicalKey == LogicalKeyboardKey.backspace) {
+                cubit.onBackspace();
+                return KeyEventResult.handled;
+              }
+              switch (event.logicalKey) {
+                case LogicalKeyboardKey.arrowUp:
+                  cubit.moveSelection(-1, 0);
+                  return KeyEventResult.handled;
+                case LogicalKeyboardKey.arrowDown:
+                  cubit.moveSelection(1, 0);
+                  return KeyEventResult.handled;
+                case LogicalKeyboardKey.arrowLeft:
+                  cubit.moveSelection(0, -1);
+                  return KeyEventResult.handled;
+                case LogicalKeyboardKey.arrowRight:
+                  cubit.moveSelection(0, 1);
+                  return KeyEventResult.handled;
+              }
+              return KeyEventResult.ignored;
+            },
+            child: SafeArea(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  const gridPadding = 16.0;
+                  final viewportWidth = constraints.maxWidth - gridPadding * 2;
+                  final viewportHeight =
+                      constraints.maxHeight - gridPadding * 2;
 
-              // Fit the whole puzzle within the viewport on BOTH axes: derive a
-              // cell size from the available width and from the available
-              // height, then take the smaller so neither dimension overflows.
-              // Width-only sizing clips the bottom on wide/short viewports
-              // (e.g. tablets) where the height-fit is the binding constraint.
-              final cellSizeByWidth =
-                  (viewportWidth - CrosswordGrid.borderWidth * 2) /
-                      state.puzzle.cols;
-              final cellSizeByHeight =
-                  (viewportHeight - CrosswordGrid.borderWidth * 2) /
-                      state.puzzle.rows;
-              final cellSize = min(cellSizeByWidth, cellSizeByHeight);
+                  // Fit the whole puzzle within the viewport on BOTH axes:
+                  // derive a cell size from the available width and from the
+                  // available height, then take the smaller so neither
+                  // dimension overflows. Width-only sizing clips the bottom on
+                  // wide/short viewports (e.g. tablets) where the height-fit is
+                  // the binding constraint.
+                  final cellSizeByWidth =
+                      (viewportWidth - CrosswordGrid.borderWidth * 2) /
+                          state.puzzle.cols;
+                  final cellSizeByHeight =
+                      (viewportHeight - CrosswordGrid.borderWidth * 2) /
+                          state.puzzle.rows;
+                  final cellSize = min(cellSizeByWidth, cellSizeByHeight);
 
-              return InteractiveViewer(
-                transformationController: cubit.transformationController,
-                // Fit-to-screen (scale 1.0) is the most zoomed-out state;
-                // zoom only goes inward from there up to 4x. Combined with the
-                // zero boundaryMargin this guarantees the puzzle always returns
-                // cleanly to fit and can never be dragged off-screen.
-                minScale: 1.0,
-                maxScale: 4.0,
-                constrained: false,
-                // Zero margin pins panning to the child's bounds. The
-                // gridPadding below keeps a small visual gutter at the edges.
-                boundaryMargin: EdgeInsets.zero,
-                child: SizedBox(
-                  width: constraints.maxWidth,
-                  height: constraints.maxHeight,
-                  child: Align(
-                    child: Padding(
-                      padding: const EdgeInsets.all(gridPadding),
-                      child: CrosswordGrid(state: state, cellSize: cellSize),
+                  return InteractiveViewer(
+                    transformationController: cubit.transformationController,
+                    // Fit-to-screen (scale 1.0) is the most zoomed-out state;
+                    // zoom only goes inward from there up to 4x. Combined with
+                    // the zero boundaryMargin this guarantees the puzzle always
+                    // returns cleanly to fit and can never be dragged
+                    // off-screen.
+                    minScale: 1.0,
+                    maxScale: 4.0,
+                    constrained: false,
+                    // Zero margin pins panning to the child's bounds. The
+                    // gridPadding below keeps a small visual gutter at the
+                    // edges.
+                    boundaryMargin: EdgeInsets.zero,
+                    child: SizedBox(
+                      width: constraints.maxWidth,
+                      height: constraints.maxHeight,
+                      child: Align(
+                        child: Padding(
+                          padding: const EdgeInsets.all(gridPadding),
+                          child:
+                              CrosswordGrid(state: state, cellSize: cellSize),
+                        ),
+                      ),
                     ),
+                  );
+                },
+              ),
+            ),
+          ),
+          // Hidden, mobile-only input that summons the OS soft keyboard. Built
+          // only on touch platforms (incl. phone browsers, via
+          // defaultTargetPlatform). Behind everything, pointer-ignoring, and
+          // fully transparent so it never shows or blocks cell taps; the Cubit
+          // focuses it on selection to raise the keyboard.
+          if (defaultTargetPlatform == TargetPlatform.iOS ||
+              defaultTargetPlatform == TargetPlatform.android)
+            Positioned.fill(
+              child: IgnorePointer(
+                child: Opacity(
+                  opacity: 0,
+                  child: TextField(
+                    key: const Key('mobileTextInput'),
+                    controller: cubit.inputController,
+                    focusNode: cubit.keyboardFocusNode,
+                    autocorrect: false,
+                    enableSuggestions: false,
+                    keyboardType: TextInputType.text,
+                    textCapitalization: TextCapitalization.characters,
+                    showCursor: false,
+                    onChanged: cubit.onInputChanged,
+                    decoration: const InputDecoration(border: InputBorder.none),
                   ),
                 ),
-              );
-            },
-          ),
-        ),
+              ),
+            ),
+        ],
       ),
     );
   }
