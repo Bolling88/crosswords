@@ -29,8 +29,9 @@ void main() {
 
     expect(find.byKey(const Key('mobileTextInput')), findsNothing);
 
-    // Reset within the test body: the framework verifies foundation debug
-    // vars are unset immediately after the body, before tearDown runs.
+    // Reset here too: with tearDown alone this Flutter version asserts the
+    // override was left set (debugAssertAllFoundationVarsUnset runs before
+    // tearDown).
     debugDefaultTargetPlatformOverride = null;
   });
 }

@@ -164,7 +164,9 @@ class CrosswordCubit extends Cubit<CrosswordState> {
   /// [defaultTargetPlatform], which on the web returns the *device's* platform —
   /// so a phone browser counts as mobile and a desktop browser does not. Never
   /// keyed off `kIsWeb` or `dart:io`'s `Platform` (the latter throws on web).
-  bool get _isTouchPlatform =>
+  /// Also used by the view to decide whether to build the hidden mobile field,
+  /// so the gate lives in one place.
+  bool get isTouchPlatform =>
       defaultTargetPlatform == TargetPlatform.iOS ||
       defaultTargetPlatform == TargetPlatform.android;
 
@@ -173,7 +175,7 @@ class CrosswordCubit extends Cubit<CrosswordState> {
   /// desktop the field is never built, so the existing hardware [Focus] keeps
   /// sole ownership of input and arrow navigation.
   void _raiseKeyboard() {
-    if (_isTouchPlatform && keyboardFocusNode.context != null) {
+    if (isTouchPlatform && keyboardFocusNode.context != null) {
       keyboardFocusNode.requestFocus();
     }
   }

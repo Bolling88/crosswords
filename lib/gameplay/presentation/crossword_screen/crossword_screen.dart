@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -166,8 +165,7 @@ class CrosswordScreenContent extends StatelessWidget {
           // defaultTargetPlatform). Behind everything, pointer-ignoring, and
           // fully transparent so it never shows or blocks cell taps; the Cubit
           // focuses it on selection to raise the keyboard.
-          if (defaultTargetPlatform == TargetPlatform.iOS ||
-              defaultTargetPlatform == TargetPlatform.android)
+          if (cubit.isTouchPlatform)
             Positioned.fill(
               child: IgnorePointer(
                 child: Opacity(
