@@ -62,8 +62,11 @@ class CrosswordCubit extends Cubit<CrosswordState> {
   /// Emit [next] and raise the soft keyboard. Used only for selection actions
   /// (tapping a cell, arrow keys): the player is moving the caret, so summon the
   /// keyboard. Typing and backspace emit directly and never re-raise it — the
-  /// keyboard is already up mid-entry.
+  /// keyboard is already up mid-entry. A no-op selection (tapping a block/image
+  /// cell, or a re-tap with no crossing word) leaves [state] unchanged, so it
+  /// neither emits nor raises the keyboard — matching the pre-refactor behaviour.
   void _applySelection(CrosswordState next) {
+    if (next == state) return;
     emit(next);
     _raiseKeyboard();
   }
