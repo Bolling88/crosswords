@@ -1,0 +1,1856 @@
+{
+  "grid": {
+    "height": 15,
+    "rows": [
+      [
+        {
+          "down": null,
+          "down_clue_id": null,
+          "down_start": null,
+          "down_word_id": null,
+          "kind": "clue",
+          "right": null,
+          "right_clue_id": "clue-12",
+          "right_start": {
+            "col": 0,
+            "row": 1
+          },
+          "right_word_id": "word-12"
+        },
+        {
+          "down": null,
+          "down_clue_id": "clue-52",
+          "down_start": {
+            "col": 1,
+            "row": 1
+          },
+          "down_word_id": "word-52",
+          "kind": "clue",
+          "right": null,
+          "right_clue_id": null,
+          "right_start": null,
+          "right_word_id": null
+        },
+        {
+          "down": null,
+          "down_clue_id": "clue-10",
+          "down_start": {
+            "col": 2,
+            "row": 1
+          },
+          "down_word_id": "word-10",
+          "kind": "clue",
+          "right": null,
+          "right_clue_id": null,
+          "right_start": null,
+          "right_word_id": null
+        },
+        {
+          "kind": "block"
+        },
+        {
+          "down": null,
+          "down_clue_id": "clue-8",
+          "down_start": {
+            "col": 5,
+            "row": 0
+          },
+          "down_word_id": "word-8",
+          "kind": "clue",
+          "right": null,
+          "right_clue_id": "clue-39",
+          "right_start": {
+            "col": 5,
+            "row": 0
+          },
+          "right_word_id": "word-39"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "T"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "U"
+        },
+        {
+          "down": null,
+          "down_clue_id": "clue-21",
+          "down_start": {
+            "col": 6,
+            "row": 0
+          },
+          "down_word_id": "word-21",
+          "kind": "clue",
+          "right": null,
+          "right_clue_id": null,
+          "right_start": null,
+          "right_word_id": null
+        },
+        {
+          "kind": "block"
+        },
+        {
+          "kind": "block"
+        },
+        {
+          "kind": "block"
+        },
+        {
+          "kind": "block"
+        },
+        {
+          "kind": "block"
+        }
+      ],
+      [
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "F"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "I"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "L"
+        },
+        {
+          "down": null,
+          "down_clue_id": "clue-6",
+          "down_start": {
+            "col": 4,
+            "row": 1
+          },
+          "down_word_id": "word-6",
+          "kind": "clue",
+          "right": null,
+          "right_clue_id": "clue-40",
+          "right_start": {
+            "col": 4,
+            "row": 1
+          },
+          "right_word_id": "word-40"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "S"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "I"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "N"
+        },
+        {
+          "kind": "block"
+        },
+        {
+          "kind": "block"
+        },
+        {
+          "kind": "block"
+        },
+        {
+          "down": null,
+          "down_clue_id": "clue-62",
+          "down_start": {
+            "col": 10,
+            "row": 2
+          },
+          "down_word_id": "word-62",
+          "kind": "clue",
+          "right": null,
+          "right_clue_id": null,
+          "right_start": null,
+          "right_word_id": null
+        },
+        {
+          "kind": "block"
+        },
+        {
+          "kind": "block"
+        }
+      ],
+      [
+        {
+          "down": null,
+          "down_clue_id": null,
+          "down_start": null,
+          "down_word_id": null,
+          "kind": "clue",
+          "right": null,
+          "right_clue_id": "clue-11",
+          "right_start": {
+            "col": 1,
+            "row": 2
+          },
+          "right_word_id": "word-11"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "L"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "A"
+        },
+        {
+          "down": null,
+          "down_clue_id": "clue-1",
+          "down_start": {
+            "col": 3,
+            "row": 3
+          },
+          "down_word_id": "word-1",
+          "kind": "clue",
+          "right": null,
+          "right_clue_id": "clue-7",
+          "right_start": {
+            "col": 4,
+            "row": 2
+          },
+          "right_word_id": "word-7"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "Y"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "O"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "G"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "A"
+        },
+        {
+          "kind": "block"
+        },
+        {
+          "down": null,
+          "down_clue_id": "clue-60",
+          "down_start": {
+            "col": 9,
+            "row": 3
+          },
+          "down_word_id": "word-60",
+          "kind": "clue",
+          "right": null,
+          "right_clue_id": "clue-26",
+          "right_start": {
+            "col": 10,
+            "row": 2
+          },
+          "right_word_id": "word-26"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "W"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "I"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": true,
+          "right_separator": null,
+          "value": "K"
+        }
+      ],
+      [
+        {
+          "kind": "block"
+        },
+        {
+          "down": null,
+          "down_clue_id": null,
+          "down_start": null,
+          "down_word_id": null,
+          "kind": "clue",
+          "right": null,
+          "right_clue_id": "clue-41",
+          "right_start": {
+            "col": 2,
+            "row": 3
+          },
+          "right_word_id": "word-41"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "M"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "M"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "S"
+        },
+        {
+          "kind": "block"
+        },
+        {
+          "down": null,
+          "down_clue_id": "clue-20",
+          "down_start": {
+            "col": 6,
+            "row": 4
+          },
+          "down_word_id": "word-20",
+          "kind": "clue",
+          "right": null,
+          "right_clue_id": null,
+          "right_start": null,
+          "right_word_id": null
+        },
+        {
+          "down": null,
+          "down_clue_id": "clue-58",
+          "down_start": {
+            "col": 7,
+            "row": 4
+          },
+          "down_word_id": "word-58",
+          "kind": "clue",
+          "right": null,
+          "right_clue_id": null,
+          "right_start": null,
+          "right_word_id": null
+        },
+        {
+          "down": null,
+          "down_clue_id": null,
+          "down_start": null,
+          "down_word_id": null,
+          "kind": "clue",
+          "right": null,
+          "right_clue_id": "clue-25",
+          "right_start": {
+            "col": 9,
+            "row": 3
+          },
+          "right_word_id": "word-25"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "G"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "E"
+        },
+        {
+          "down": null,
+          "down_clue_id": "clue-64",
+          "down_start": {
+            "col": 11,
+            "row": 4
+          },
+          "down_word_id": "word-64",
+          "kind": "clue",
+          "right": null,
+          "right_clue_id": null,
+          "right_start": null,
+          "right_word_id": null
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "I"
+        }
+      ],
+      [
+        {
+          "kind": "block"
+        },
+        {
+          "down": null,
+          "down_clue_id": "clue-13",
+          "down_start": {
+            "col": 1,
+            "row": 5
+          },
+          "down_word_id": "word-13",
+          "kind": "clue",
+          "right": null,
+          "right_clue_id": "clue-42",
+          "right_start": {
+            "col": 2,
+            "row": 4
+          },
+          "right_word_id": "word-42"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "P"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "E"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "T"
+        },
+        {
+          "down": null,
+          "down_clue_id": null,
+          "down_start": null,
+          "down_word_id": null,
+          "kind": "clue",
+          "right": null,
+          "right_clue_id": "clue-24",
+          "right_start": {
+            "col": 6,
+            "row": 4
+          },
+          "right_word_id": "word-24"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "O"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "R"
+        },
+        {
+          "down": null,
+          "down_clue_id": null,
+          "down_start": null,
+          "down_word_id": null,
+          "kind": "clue",
+          "right": null,
+          "right_clue_id": "clue-23",
+          "right_start": {
+            "col": 9,
+            "row": 4
+          },
+          "right_word_id": "word-23"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "O"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "B"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "S"
+        },
+        {
+          "down": null,
+          "down_clue_id": "clue-65",
+          "down_start": {
+            "col": 12,
+            "row": 5
+          },
+          "down_word_id": "word-65",
+          "kind": "clue",
+          "right": null,
+          "right_clue_id": null,
+          "right_start": null,
+          "right_word_id": null
+        }
+      ],
+      [
+        {
+          "down": null,
+          "down_clue_id": null,
+          "down_start": null,
+          "down_word_id": null,
+          "kind": "clue",
+          "right": null,
+          "right_clue_id": "clue-43",
+          "right_start": {
+            "col": 1,
+            "row": 5
+          },
+          "right_word_id": "word-43"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "V"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "A"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "L"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "E"
+        },
+        {
+          "down": null,
+          "down_clue_id": null,
+          "down_start": null,
+          "down_word_id": null,
+          "kind": "clue",
+          "right": null,
+          "right_clue_id": "clue-19",
+          "right_start": {
+            "col": 6,
+            "row": 5
+          },
+          "right_word_id": "word-19"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "J"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "A"
+        },
+        {
+          "down": null,
+          "down_clue_id": "clue-59",
+          "down_start": {
+            "col": 8,
+            "row": 6
+          },
+          "down_word_id": "word-59",
+          "kind": "clue",
+          "right": null,
+          "right_clue_id": null,
+          "right_start": null,
+          "right_word_id": null
+        },
+        {
+          "down": null,
+          "down_clue_id": "clue-61",
+          "down_start": {
+            "col": 9,
+            "row": 6
+          },
+          "down_word_id": "word-61",
+          "kind": "clue",
+          "right": null,
+          "right_clue_id": "clue-22",
+          "right_start": {
+            "col": 10,
+            "row": 5
+          },
+          "right_word_id": "word-22"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "B"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "L"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "\u00c5"
+        }
+      ],
+      [
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "N"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "Y"
+        },
+        {
+          "down": null,
+          "down_clue_id": "clue-5",
+          "down_start": {
+            "col": 2,
+            "row": 7
+          },
+          "down_word_id": "word-5",
+          "kind": "clue",
+          "right": null,
+          "right_clue_id": "clue-44",
+          "right_start": {
+            "col": 3,
+            "row": 6
+          },
+          "right_word_id": "word-44"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "O"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "M"
+        },
+        {
+          "down": null,
+          "down_clue_id": "clue-9",
+          "down_start": {
+            "col": 5,
+            "row": 7
+          },
+          "down_word_id": "word-9",
+          "kind": "clue",
+          "right": null,
+          "right_clue_id": null,
+          "right_start": null,
+          "right_word_id": null
+        },
+        {
+          "down": null,
+          "down_clue_id": null,
+          "down_start": null,
+          "down_word_id": null,
+          "kind": "clue",
+          "right": null,
+          "right_clue_id": "clue-18",
+          "right_start": {
+            "col": 7,
+            "row": 6
+          },
+          "right_word_id": "word-18"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "T"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "\u00c5"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "G"
+        },
+        {
+          "down": null,
+          "down_clue_id": "clue-63",
+          "down_start": {
+            "col": 10,
+            "row": 7
+          },
+          "down_word_id": "word-63",
+          "kind": "clue",
+          "right": null,
+          "right_clue_id": "clue-17",
+          "right_start": {
+            "col": 11,
+            "row": 6
+          },
+          "right_word_id": "word-17"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "I"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "D"
+        }
+      ],
+      [
+        {
+          "down": null,
+          "down_clue_id": null,
+          "down_start": null,
+          "down_word_id": null,
+          "kind": "clue",
+          "right": null,
+          "right_clue_id": "clue-14",
+          "right_start": {
+            "col": 0,
+            "row": 6
+          },
+          "right_word_id": "word-14"
+        },
+        {
+          "down": null,
+          "down_clue_id": "clue-37",
+          "down_start": {
+            "col": 1,
+            "row": 8
+          },
+          "down_word_id": "word-37",
+          "kind": "clue",
+          "right": null,
+          "right_clue_id": "clue-45",
+          "right_start": {
+            "col": 2,
+            "row": 7
+          },
+          "right_word_id": "word-45"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "E"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "D"
+        },
+        {
+          "down": null,
+          "down_clue_id": "clue-4",
+          "down_start": {
+            "col": 4,
+            "row": 8
+          },
+          "down_word_id": "word-4",
+          "kind": "clue",
+          "right": null,
+          "right_clue_id": "clue-15",
+          "right_start": {
+            "col": 5,
+            "row": 7
+          },
+          "right_word_id": "word-15"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "E"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "T"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "T"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "H"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "U"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "N"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "D"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": true,
+          "right_separator": null,
+          "value": "R"
+        }
+      ],
+      [
+        {
+          "down": null,
+          "down_clue_id": null,
+          "down_start": null,
+          "down_word_id": null,
+          "kind": "clue",
+          "right": null,
+          "right_clue_id": "clue-46",
+          "right_start": {
+            "col": 1,
+            "row": 8
+          },
+          "right_word_id": "word-46"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "V"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "R"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "I"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "S"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "T"
+        },
+        {
+          "down": null,
+          "down_clue_id": "clue-57",
+          "down_start": {
+            "col": 6,
+            "row": 9
+          },
+          "down_word_id": "word-57",
+          "kind": "clue",
+          "right": null,
+          "right_clue_id": null,
+          "right_start": null,
+          "right_word_id": null
+        },
+        {
+          "kind": "block"
+        },
+        {
+          "down": null,
+          "down_clue_id": null,
+          "down_start": null,
+          "down_word_id": null,
+          "kind": "clue",
+          "right": null,
+          "right_clue_id": "clue-16",
+          "right_start": {
+            "col": 9,
+            "row": 8
+          },
+          "right_word_id": "word-16"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "D"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "\u00c5"
+        },
+        {
+          "kind": "block"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "A"
+        }
+      ],
+      [
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "V"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "I"
+        },
+        {
+          "down": null,
+          "down_clue_id": null,
+          "down_start": null,
+          "down_word_id": null,
+          "kind": "clue",
+          "right": null,
+          "right_clue_id": "clue-47",
+          "right_start": {
+            "col": 3,
+            "row": 9
+          },
+          "right_word_id": "word-47"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "F"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "Y"
+        },
+        {
+          "down": null,
+          "down_clue_id": "clue-56",
+          "down_start": {
+            "col": 5,
+            "row": 10
+          },
+          "down_word_id": "word-56",
+          "kind": "clue",
+          "right": null,
+          "right_clue_id": "clue-27",
+          "right_start": {
+            "col": 6,
+            "row": 9
+          },
+          "right_word_id": "word-27"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "H"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "A"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "N"
+        },
+        {
+          "down": null,
+          "down_clue_id": null,
+          "down_start": null,
+          "down_word_id": null,
+          "kind": "clue",
+          "right": null,
+          "right_clue_id": "clue-28",
+          "right_start": {
+            "col": 10,
+            "row": 9
+          },
+          "right_word_id": "word-28"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "D"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": true,
+          "right_separator": null,
+          "value": "A"
+        },
+        {
+          "kind": "block"
+        }
+      ],
+      [
+        {
+          "down": null,
+          "down_clue_id": null,
+          "down_start": null,
+          "down_word_id": null,
+          "kind": "clue",
+          "right": null,
+          "right_clue_id": "clue-38",
+          "right_start": {
+            "col": 0,
+            "row": 9
+          },
+          "right_word_id": "word-38"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "N"
+        },
+        {
+          "kind": "block"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "E"
+        },
+        {
+          "down": null,
+          "down_clue_id": "clue-55",
+          "down_start": {
+            "col": 4,
+            "row": 11
+          },
+          "down_word_id": "word-55",
+          "kind": "clue",
+          "right": null,
+          "right_clue_id": "clue-2",
+          "right_start": {
+            "col": 5,
+            "row": 10
+          },
+          "right_word_id": "word-2"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "D"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "U"
+        },
+        {
+          "kind": "block"
+        },
+        {
+          "kind": "block"
+        },
+        {
+          "kind": "block"
+        },
+        {
+          "kind": "block"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "N"
+        },
+        {
+          "down": null,
+          "down_clue_id": "clue-30",
+          "down_start": {
+            "col": 12,
+            "row": 11
+          },
+          "down_word_id": "word-30",
+          "kind": "clue",
+          "right": null,
+          "right_clue_id": null,
+          "right_start": null,
+          "right_word_id": null
+        }
+      ],
+      [
+        {
+          "down": null,
+          "down_clue_id": null,
+          "down_start": null,
+          "down_word_id": null,
+          "kind": "clue",
+          "right": null,
+          "right_clue_id": "clue-35",
+          "right_start": {
+            "col": 0,
+            "row": 12
+          },
+          "right_word_id": "word-35"
+        },
+        {
+          "down": null,
+          "down_clue_id": "clue-53",
+          "down_start": {
+            "col": 1,
+            "row": 12
+          },
+          "down_word_id": "word-53",
+          "kind": "clue",
+          "right": null,
+          "right_clue_id": null,
+          "right_start": null,
+          "right_word_id": null
+        },
+        {
+          "down": null,
+          "down_clue_id": "clue-34",
+          "down_start": {
+            "col": 2,
+            "row": 12
+          },
+          "down_word_id": "word-34",
+          "kind": "clue",
+          "right": null,
+          "right_clue_id": null,
+          "right_start": null,
+          "right_word_id": null
+        },
+        {
+          "down_redirect": true,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "S"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "T"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "I"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "V"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "A"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "L"
+        },
+        {
+          "down": null,
+          "down_clue_id": "clue-31",
+          "down_start": {
+            "col": 9,
+            "row": 12
+          },
+          "down_word_id": "word-31",
+          "kind": "clue",
+          "right": null,
+          "right_clue_id": null,
+          "right_start": null,
+          "right_word_id": null
+        },
+        {
+          "down": null,
+          "down_clue_id": null,
+          "down_start": null,
+          "down_word_id": null,
+          "kind": "clue",
+          "right": null,
+          "right_clue_id": "clue-48",
+          "right_start": {
+            "col": 11,
+            "row": 11
+          },
+          "right_word_id": "word-48"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "M"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "O"
+        }
+      ],
+      [
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "S"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "M"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "S"
+        },
+        {
+          "down": null,
+          "down_clue_id": "clue-54",
+          "down_start": {
+            "col": 3,
+            "row": 13
+          },
+          "down_word_id": "word-54",
+          "kind": "clue",
+          "right": null,
+          "right_clue_id": "clue-3",
+          "right_start": {
+            "col": 4,
+            "row": 12
+          },
+          "right_word_id": "word-3"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "I"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "N"
+        },
+        {
+          "kind": "block"
+        },
+        {
+          "down": null,
+          "down_clue_id": "clue-33",
+          "down_start": {
+            "col": 7,
+            "row": 13
+          },
+          "down_word_id": "word-33",
+          "kind": "clue",
+          "right": null,
+          "right_clue_id": null,
+          "right_start": null,
+          "right_word_id": null
+        },
+        {
+          "kind": "block"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "E"
+        },
+        {
+          "down": null,
+          "down_clue_id": "clue-29",
+          "down_start": {
+            "col": 10,
+            "row": 13
+          },
+          "down_word_id": "word-29",
+          "kind": "clue",
+          "right": null,
+          "right_clue_id": "clue-49",
+          "right_start": {
+            "col": 11,
+            "row": 12
+          },
+          "right_word_id": "word-49"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "A"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "S"
+        }
+      ],
+      [
+        {
+          "down": null,
+          "down_clue_id": null,
+          "down_start": null,
+          "down_word_id": null,
+          "kind": "clue",
+          "right": null,
+          "right_clue_id": "clue-32",
+          "right_start": {
+            "col": 1,
+            "row": 13
+          },
+          "right_word_id": "word-32"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": "_",
+          "value": "I"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "M"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "O"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "R"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "G"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "O"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "N"
+        },
+        {
+          "down": null,
+          "down_clue_id": null,
+          "down_start": null,
+          "down_word_id": null,
+          "kind": "clue",
+          "right": null,
+          "right_clue_id": "clue-50",
+          "right_start": {
+            "col": 9,
+            "row": 13
+          },
+          "right_word_id": "word-50"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "M"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "\u00c5"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "R"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "A"
+        }
+      ],
+      [
+        {
+          "down": null,
+          "down_clue_id": null,
+          "down_start": null,
+          "down_word_id": null,
+          "kind": "clue",
+          "right": null,
+          "right_clue_id": "clue-36",
+          "right_start": {
+            "col": 1,
+            "row": 14
+          },
+          "right_word_id": "word-36"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "L"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "\u00c5"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "S"
+        },
+        {
+          "kind": "block"
+        },
+        {
+          "kind": "block"
+        },
+        {
+          "kind": "block"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "\u00c5"
+        },
+        {
+          "kind": "block"
+        },
+        {
+          "down": null,
+          "down_clue_id": null,
+          "down_start": null,
+          "down_word_id": null,
+          "kind": "clue",
+          "right": null,
+          "right_clue_id": "clue-51",
+          "right_start": {
+            "col": 10,
+            "row": 14
+          },
+          "right_word_id": "word-51"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "K"
+        },
+        {
+          "down_redirect": false,
+          "down_separator": null,
+          "kind": "answer",
+          "right_redirect": false,
+          "right_separator": null,
+          "value": "K"
+        },
+        {
+          "kind": "block"
+        }
+      ]
+    ],
+    "width": 13
+  },
+  "language_code": "sv",
+  "seed_positions": [
+    {
+      "col": 3,
+      "row": 3
+    },
+    {
+      "col": 3,
+      "row": 4
+    },
+    {
+      "col": 3,
+      "row": 5
+    },
+    {
+      "col": 3,
+      "row": 6
+    },
+    {
+      "col": 3,
+      "row": 7
+    },
+    {
+      "col": 3,
+      "row": 8
+    },
+    {
+      "col": 3,
+      "row": 9
+    },
+    {
+      "col": 3,
+      "row": 10
+    },
+    {
+      "col": 3,
+      "row": 11
+    },
+    {
+      "col": 4,
+      "row": 11
+    },
+    {
+      "col": 5,
+      "row": 11
+    },
+    {
+      "col": 6,
+      "row": 11
+    },
+    {
+      "col": 7,
+      "row": 11
+    },
+    {
+      "col": 8,
+      "row": 11
+    }
+  ],
+  "title": "Generated crossword"
+}
