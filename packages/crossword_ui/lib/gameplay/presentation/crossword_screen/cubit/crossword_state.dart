@@ -28,6 +28,7 @@ class CrosswordState extends Equatable {
 
   @override
   List<Object?> get props => [
+        puzzle,
         userInputs,
         selectedCell,
         activeWordId,
