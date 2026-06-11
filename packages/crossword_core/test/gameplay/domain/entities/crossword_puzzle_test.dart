@@ -1,6 +1,4 @@
-import 'package:crosswords/gameplay/domain/entities/crossword_puzzle.dart';
-import 'package:crosswords/gameplay/domain/entities/direction.dart';
-import 'package:crosswords/gameplay/domain/entities/word.dart';
+import 'package:crossword_core/crossword_core.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

@@ -1,11 +1,4 @@
-import 'package:crosswords/gameplay/data/entities/dto/grid_cell_dto.dart';
-import 'package:crosswords/gameplay/data/entities/dto/grid_dto.dart';
-import 'package:crosswords/gameplay/data/entities/dto/position_dto.dart';
-import 'package:crosswords/gameplay/data/entities/dto/puzzle_dto.dart';
-import 'package:crosswords/gameplay/data/puzzle_resolver.dart';
-import 'package:crosswords/gameplay/domain/entities/arrow_shape.dart';
-import 'package:crosswords/gameplay/domain/entities/cell.dart';
-import 'package:crosswords/gameplay/domain/entities/direction.dart';
+import 'package:crossword_core/crossword_core.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// Builds a PuzzleDto from a compact grid spec for focused tests.

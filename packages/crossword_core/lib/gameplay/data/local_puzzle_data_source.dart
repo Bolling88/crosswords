@@ -9,7 +9,8 @@ import 'puzzle_resolver.dart';
 /// Loads the bundled, hardcoded crossword from assets. A backend-backed
 /// source can replace this later behind the same return type.
 class LocalPuzzleDataSource {
-  static const String _assetPath = 'assets/puzzles/generated_crossword.json';
+  static const String _assetPath =
+      'packages/crossword_core/assets/puzzles/generated_crossword.json';
 
   final AssetBundle _bundle;
 

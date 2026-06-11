@@ -1,4 +1,4 @@
-import 'package:crosswords/gameplay/data/local_puzzle_data_source.dart';
+import 'package:crossword_core/crossword_core.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

@@ -1,8 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:crosswords/gameplay/data/entities/dto/grid_cell_dto.dart';
-import 'package:crosswords/gameplay/data/entities/dto/puzzle_dto.dart';
+import 'package:crossword_core/crossword_core.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
