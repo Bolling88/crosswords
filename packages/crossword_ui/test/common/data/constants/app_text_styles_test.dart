@@ -1,4 +1,4 @@
-import 'package:crosswords/common/data/constants/app_text_styles.dart';
+import 'package:crossword_ui/crossword_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
 

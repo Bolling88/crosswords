@@ -1,4 +1,4 @@
-import 'package:crosswords/settings/domain/entities/app_font.dart';
+import 'package:crossword_ui/crossword_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

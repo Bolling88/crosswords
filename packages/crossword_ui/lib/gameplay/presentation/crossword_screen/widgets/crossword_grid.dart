@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:crossword_core/crossword_core.dart';
+
 import '../../../../common/data/constants/app_colors.dart';
 import '../../../../common/data/constants/app_text_styles.dart';
 import '../../../../common/data/constants/strings.dart';
-import '../../../../gameplay/domain/entities/cell.dart';
-import '../../../../gameplay/domain/entities/direction.dart';
 import '../cubit/crossword_cubit.dart';
 import '../cubit/crossword_state.dart';
 import 'answer_cell_widget.dart';

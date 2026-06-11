@@ -2,10 +2,8 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../gameplay/domain/entities/cell.dart';
-import '../../../../gameplay/domain/entities/crossword_puzzle.dart';
-import '../../../../gameplay/domain/entities/direction.dart';
-import '../../../../gameplay/domain/entities/word.dart';
+import 'package:crossword_core/crossword_core.dart';
+
 import '../../../../settings/domain/services/font_service.dart';
 import 'crossword_state.dart';
 

@@ -1,12 +1,5 @@
-import 'package:crosswords/gameplay/domain/entities/cell.dart';
-import 'package:crosswords/gameplay/domain/entities/clue_arrow.dart';
-import 'package:crosswords/gameplay/domain/entities/arrow_shape.dart';
-import 'package:crosswords/gameplay/domain/entities/crossword_puzzle.dart';
-import 'package:crosswords/gameplay/domain/entities/direction.dart';
-import 'package:crosswords/gameplay/domain/entities/word.dart';
-import 'package:crosswords/gameplay/presentation/crossword_screen/cubit/crossword_cubit.dart';
-import 'package:crosswords/settings/domain/entities/app_font.dart';
-import 'package:crosswords/settings/domain/services/font_service.dart';
+import 'package:crossword_core/crossword_core.dart';
+import 'package:crossword_ui/crossword_ui.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';

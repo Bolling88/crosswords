@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
+import 'package:crossword_core/crossword_core.dart';
+
 import '../../../../common/data/constants/app_colors.dart';
-import '../../../../gameplay/domain/entities/arrow_shape.dart';
-import '../../../../gameplay/domain/entities/cell.dart';
 
 class HintCellWidget extends StatelessWidget {
   final ClueCell cell;

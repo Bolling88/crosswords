@@ -1,6 +1,5 @@
-import 'package:crosswords/gameplay/data/local_puzzle_data_source.dart';
-import 'package:crosswords/gameplay/presentation/crossword_screen/crossword_screen.dart';
-import 'package:crosswords/settings/domain/services/font_service.dart';
+import 'package:crossword_core/crossword_core.dart';
+import 'package:crossword_ui/crossword_ui.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -10,24 +9,33 @@ import 'package:shared_preferences/shared_preferences.dart';
 Future<Widget> _app() async {
   SharedPreferences.setMockInitialValues({});
   final prefs = await SharedPreferences.getInstance();
+  final fontService = FontService(prefs: prefs);
   final puzzle = await LocalPuzzleDataSource().loadGeneratedPuzzle();
-  return RepositoryProvider<FontService>.value(
-    value: FontService(prefs: prefs),
-    child: MaterialApp(home: CrosswordScreen(puzzle: puzzle)),
+  return MaterialApp(
+    home: RepositoryProvider<FontService>.value(
+      value: fontService,
+      child: BlocProvider(
+        create: (context) => CrosswordCubit(
+          puzzle: puzzle,
+          fontService: fontService,
+        ),
+        child: const Scaffold(body: CrosswordPlayer()),
+      ),
+    ),
   );
 }
 
 void main() {
   tearDown(() => debugDefaultTargetPlatformOverride = null);
 
-  testWidgets('hidden mobile text field is present on a touch platform', (
+  testWidgets('hidden mobile text field is absent on a desktop platform', (
     tester,
   ) async {
-    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    debugDefaultTargetPlatformOverride = TargetPlatform.macOS;
     await tester.pumpWidget(await _app());
     await tester.pumpAndSettle();
 
-    expect(find.byKey(const Key('mobileTextInput')), findsOneWidget);
+    expect(find.byKey(const Key('mobileTextInput')), findsNothing);
 
     // Reset here too: with tearDown alone this Flutter version asserts the
     // override was left set (debugAssertAllFoundationVarsUnset runs before
