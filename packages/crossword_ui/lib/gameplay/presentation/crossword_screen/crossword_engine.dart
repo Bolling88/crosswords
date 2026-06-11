@@ -2,7 +2,7 @@ import 'package:crossword_core/crossword_core.dart';
 
 import 'cubit/crossword_state.dart';
 
-/// Pure crossword-solving logic, extracted from [CrosswordCubit]. Stateless and
+/// Pure crossword-solving logic, extracted from `CrosswordCubit`. Stateless and
 /// Flutter-free: every method takes the current [CrosswordState] plus an action
 /// and returns the next state with the logic fields updated (selection, active
 /// word, direction, inputs, and the active word's highlighted cells). It never

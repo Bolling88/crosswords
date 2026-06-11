@@ -90,6 +90,55 @@ CrosswordPuzzle _loneCellPuzzle() {
   );
 }
 
+/// 3x4 grid where a redirected word h1 (cells (0,1),(0,2),(1,2),(2,2), bending
+/// down) and a straight word h2 (cells (2,2),(2,3)) share the cell (2,2): h1
+/// passes through it vertically, h2 horizontally.
+CrosswordPuzzle _overlapPuzzle() {
+  const h1 = Word(
+    id: 'h1',
+    direction: Direction.right,
+    cells: [(0, 1), (0, 2), (1, 2), (2, 2)],
+  );
+  const h2 = Word(
+    id: 'h2',
+    direction: Direction.right,
+    cells: [(2, 2), (2, 3)],
+  );
+  return const CrosswordPuzzle(
+    rows: 3,
+    cols: 4,
+    cells: {
+      (0, 0): ClueCell(arrows: [
+        ClueArrow(
+          direction: Direction.right,
+          shape: ArrowShape.straightRight,
+          wordId: 'h1',
+        ),
+      ]),
+      (0, 1): AnswerCell(value: 'A'),
+      (0, 2): AnswerCell(value: 'B'),
+      (0, 3): BlockCell(),
+      (1, 0): BlockCell(),
+      (1, 1): BlockCell(),
+      (1, 2): AnswerCell(value: 'C'),
+      (1, 3): BlockCell(),
+      (2, 0): BlockCell(),
+      (2, 1): ClueCell(arrows: [
+        ClueArrow(
+          direction: Direction.right,
+          shape: ArrowShape.straightRight,
+          wordId: 'h2',
+        ),
+      ]),
+      (2, 2): AnswerCell(value: 'D'),
+      (2, 3): AnswerCell(value: 'E'),
+    },
+    words: [h1, h2],
+    title: 't',
+    languageCode: 'sv',
+  );
+}
+
 void main() {
   const engine = CrosswordEngine();
 
@@ -126,6 +175,20 @@ void main() {
       final state = CrosswordState(puzzle: _puzzle());
       expect(engine.selectCell(state, 1, 0), state); // block
       expect(engine.selectCell(state, 5, 5), state); // off-grid
+    });
+
+    test('re-selecting the current cell toggles to the crossing word', () {
+      // First tap selects the horizontal word h2 at the shared cell (2,2).
+      final selected =
+          engine.selectCell(CrosswordState(puzzle: _overlapPuzzle()), 2, 2);
+      expect(selected.activeWordId, 'h2');
+      expect(selected.currentDirection, Direction.right);
+
+      // Re-tapping the same cell toggles to the vertical word h1 there.
+      final toggled = engine.selectCell(selected, 2, 2);
+      expect(toggled.activeWordId, 'h1');
+      expect(toggled.selectedCell, (2, 2));
+      expect(toggled.currentDirection, Direction.down);
     });
   });
 
@@ -194,6 +257,16 @@ void main() {
 
       expect(next.userInputs.containsKey((0, 1)), isFalse);
       expect(next.selectedCell, (0, 1));
+    });
+
+    test('at the first empty cell of a word it is a no-op', () {
+      final state = CrosswordState(
+        puzzle: _puzzle(),
+        activeWordId: 'across',
+        selectedCell: (0, 1),
+      );
+
+      expect(engine.backspace(state), state);
     });
   });
 
