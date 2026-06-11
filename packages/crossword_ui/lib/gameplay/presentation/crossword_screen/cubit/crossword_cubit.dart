@@ -50,25 +50,28 @@ class CrosswordCubit extends Cubit<CrosswordState> {
   }
 
   void selectCell(int row, int col) =>
-      _applySelection(_engine.selectCell(state, row, col));
+      _apply(_engine.selectCell(state, row, col), raiseKeyboard: true);
 
-  void onLetterInput(String letter) => emit(_engine.inputLetter(state, letter));
+  void onLetterInput(String letter) =>
+      _apply(_engine.inputLetter(state, letter), raiseKeyboard: false);
 
-  void onBackspace() => emit(_engine.backspace(state));
+  void onBackspace() =>
+      _apply(_engine.backspace(state), raiseKeyboard: false);
 
   void moveSelection(int rowDelta, int colDelta) =>
-      _applySelection(_engine.moveSelection(state, rowDelta, colDelta));
+      _apply(_engine.moveSelection(state, rowDelta, colDelta),
+          raiseKeyboard: true);
 
-  /// Emit [next] and raise the soft keyboard. Used only for selection actions
-  /// (tapping a cell, arrow keys): the player is moving the caret, so summon the
-  /// keyboard. Typing and backspace emit directly and never re-raise it — the
-  /// keyboard is already up mid-entry. A no-op selection (tapping a block/image
-  /// cell, or a re-tap with no crossing word) leaves [state] unchanged, so it
-  /// neither emits nor raises the keyboard — matching the pre-refactor behaviour.
-  void _applySelection(CrosswordState next) {
+  /// Emit [next] when it differs from the current state, and — for selection
+  /// actions only — raise the soft keyboard. A no-op (unchanged state: tapping a
+  /// block/image cell, a re-tap with no crossing word, or an arrow move off the
+  /// grid) neither emits nor raises the keyboard, matching the pre-refactor
+  /// early-returns. Typing and backspace pass [raiseKeyboard] false — the
+  /// keyboard is already up mid-entry.
+  void _apply(CrosswordState next, {required bool raiseKeyboard}) {
     if (next == state) return;
     emit(next);
-    _raiseKeyboard();
+    if (raiseKeyboard) _raiseKeyboard();
   }
 
   /// Translate an edit from the hidden mobile text field into letter or

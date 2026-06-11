@@ -122,6 +122,9 @@ class CrosswordEngine {
     }
   }
 
+  /// Select the answer cell at [row],[col], activating the word that runs along
+  /// [preferAxis] (or the current direction), falling back to the crossing word,
+  /// or a lone-cell selection when the cell belongs to no word.
   CrosswordState _selectAnswerCell(
     CrosswordState state,
     int row,
@@ -141,6 +144,8 @@ class CrosswordEngine {
     return _activateWord(state, word, (row, col));
   }
 
+  /// Re-select the current cell along its other axis, switching to the crossing
+  /// word there. No change when no word runs the other way.
   CrosswordState _toggleDirection(CrosswordState state, int row, int col) {
     final other = state.currentDirection == Direction.right
         ? Direction.down
