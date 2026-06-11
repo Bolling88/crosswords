@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../common/data/constants/app_colors.dart';
-import '../../../common/data/constants/app_text_styles.dart';
-import '../../../common/data/constants/strings.dart';
-import '../../domain/services/font_service.dart';
+import 'package:crossword_ui/crossword_ui.dart';
+
 import 'cubit/settings_cubit.dart';
 import 'cubit/settings_state.dart';
 import 'widgets/font_option_tile.dart';

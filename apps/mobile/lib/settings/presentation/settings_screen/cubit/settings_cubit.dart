@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../domain/entities/app_font.dart';
-import '../../../domain/services/font_service.dart';
+import 'package:crossword_ui/crossword_ui.dart';
+
 import 'settings_state.dart';
 
 class SettingsCubit extends Cubit<SettingsState> {

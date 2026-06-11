@@ -1,0 +1,28 @@
+name: crosswords
+description: Crosswords — Swedish korsord game (mobile).
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.11.5
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  equatable: ^2.0.7
+  flutter_bloc: ^9.1.1
+  google_fonts: ^6.2.1
+  shared_preferences: ^2.5.3
+  crossword_core:
+    path: ../../packages/crossword_core
+  crossword_ui:
+    path: ../../packages/crossword_ui
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
