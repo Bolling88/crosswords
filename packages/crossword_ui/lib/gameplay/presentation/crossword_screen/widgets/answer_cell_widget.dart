@@ -104,7 +104,7 @@ class AnswerCellWidget extends StatelessWidget {
         builder: (context, strength, child) => Stack(
           fit: StackFit.passthrough,
           children: [
-            if (child != null) child,
+            ?child,
             Positioned.fill(
               child: IgnorePointer(
                 child: ColoredBox(
