@@ -38,4 +38,13 @@ class Strings {
   static const String restartConfirmBody =
       'All ifylld text rensas. Detta går inte att ångra.';
   static const String cancelAction = 'Avbryt';
+
+  /// Celebration dialog after solving the puzzle.
+  static const String solvedTitle = 'Grattis!';
+  static const String solvedBody = 'Du löste korsordet.';
+  static const String closeAction = 'Stäng';
+
+  /// SnackBar nudge when the grid is full but something is wrong.
+  static const String puzzleFilledButIncorrect =
+      'Korsordet är fullt – något stämmer inte än.';
 }

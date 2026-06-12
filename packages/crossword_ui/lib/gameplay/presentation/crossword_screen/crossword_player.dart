@@ -4,20 +4,61 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../common/data/constants/app_colors.dart';
+import '../../../common/data/constants/strings.dart';
 import 'cubit/crossword_cubit.dart';
 import 'cubit/crossword_state.dart';
 import 'widgets/crossword_grid.dart';
 
 /// The reusable crossword play surface. Embed inside any [Scaffold]. Expects a
 /// [CrosswordCubit] provided above it in the tree so host app bars can drive it
-/// (e.g. `cubit.resetView`).
+/// (e.g. `cubit.resetView`). Also hosts the one-shot feedback for solving the
+/// puzzle (celebration dialog) and filling it incorrectly (SnackBar nudge).
 class CrosswordPlayer extends StatelessWidget {
   const CrosswordPlayer({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<CrosswordCubit, CrosswordState>(
+    return BlocConsumer<CrosswordCubit, CrosswordState>(
+      listener: (context, state) {
+        if (state is PuzzleSolved) {
+          _showSolvedDialog(context);
+        } else if (state is PuzzleFilledButIncorrect) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(Strings.puzzleFilledButIncorrect),
+            ),
+          );
+        }
+      },
       builder: (context, state) => _CrosswordPlayerBody(state: state),
+    );
+  }
+
+  /// Subtle, paper-styled celebration: congratulations plus the choice to
+  /// keep admiring the grid or start over.
+  void _showSolvedDialog(BuildContext context) {
+    final cubit = context.read<CrosswordCubit>();
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: AppColors.paper,
+        title: const Text(Strings.solvedTitle),
+        content: const Text(Strings.solvedBody),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              cubit.restartPuzzle();
+            },
+            child: const Text(Strings.restartAction),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text(Strings.closeAction),
+          ),
+        ],
+      ),
     );
   }
 }
