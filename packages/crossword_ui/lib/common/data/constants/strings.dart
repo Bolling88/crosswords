@@ -47,4 +47,12 @@ class Strings {
   /// SnackBar nudge when the grid is full but something is wrong.
   static const String puzzleFilledButIncorrect =
       'Korsordet är fullt – något stämmer inte än.';
+
+  /// Section header for gameplay settings.
+  static const String gameplaySettingLabel = 'Spel';
+
+  /// Autocheck switch label and description.
+  static const String autocheckLabel = 'Automatisk kontroll';
+  static const String autocheckDescription =
+      'Markera felaktiga bokstäver direkt';
 }

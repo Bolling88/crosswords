@@ -7,18 +7,24 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   late FontService fontService;
+  late GameplaySettingsService settingsService;
   late SettingsCubit cubit;
 
   setUp(() async {
     SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();
     fontService = FontService(prefs: prefs);
-    cubit = SettingsCubit(fontService: fontService);
+    settingsService = GameplaySettingsService(prefs: prefs);
+    cubit = SettingsCubit(
+      fontService: fontService,
+      settingsService: settingsService,
+    );
   });
 
   tearDown(() {
     cubit.close();
     fontService.dispose();
+    settingsService.dispose();
   });
 
   test('initial state lists all fonts and the current selection', () {
@@ -31,5 +37,15 @@ void main() {
 
     expect(cubit.state.selectedFont, AppFont.gloriaHallelujah);
     expect(fontService.selectedFont.value, AppFont.gloriaHallelujah);
+  });
+
+  test('autocheck defaults off and setAutocheck updates state and service',
+      () async {
+    expect(cubit.state.autocheck, isFalse);
+
+    await cubit.setAutocheck(true);
+
+    expect(cubit.state.autocheck, isTrue);
+    expect(settingsService.autocheck.value, isTrue);
   });
 }

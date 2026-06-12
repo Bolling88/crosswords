@@ -9,8 +9,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 Future<Widget> _settingsUnderTest() async {
   SharedPreferences.setMockInitialValues({});
   final prefs = await SharedPreferences.getInstance();
-  return RepositoryProvider<FontService>.value(
-    value: FontService(prefs: prefs),
+  return MultiRepositoryProvider(
+    providers: [
+      RepositoryProvider<FontService>.value(value: FontService(prefs: prefs)),
+      RepositoryProvider<GameplaySettingsService>.value(
+        value: GameplaySettingsService(prefs: prefs),
+      ),
+    ],
     child: const MaterialApp(home: SettingsScreen()),
   );
 }
@@ -22,5 +27,13 @@ void main() {
 
     expect(tester.takeException(), isNull);
     expect(find.byType(FontOptionTile), findsNWidgets(AppFont.values.length));
+  });
+
+  testWidgets('shows the autocheck switch', (tester) async {
+    await tester.pumpWidget(await _settingsUnderTest());
+    await tester.pumpAndSettle();
+
+    expect(find.text(Strings.autocheckLabel), findsOneWidget);
+    expect(find.byType(SwitchListTile), findsOneWidget);
   });
 }

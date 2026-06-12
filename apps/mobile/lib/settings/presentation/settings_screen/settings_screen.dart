@@ -13,8 +13,10 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) =>
-          SettingsCubit(fontService: context.read<FontService>()),
+      create: (context) => SettingsCubit(
+        fontService: context.read<FontService>(),
+        settingsService: context.read<GameplaySettingsService>(),
+      ),
       child: const SettingsScreenBuilder(),
     );
   }
@@ -66,6 +68,19 @@ class SettingsScreenContent extends StatelessWidget {
                   isSelected: font == state.selectedFont,
                   onTap: () => cubit.selectFont(font),
                 ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+                child: Text(
+                  Strings.gameplaySettingLabel,
+                  style: AppTextStyles.clue(16),
+                ),
+              ),
+              SwitchListTile(
+                title: const Text(Strings.autocheckLabel),
+                subtitle: const Text(Strings.autocheckDescription),
+                value: state.autocheck,
+                onChanged: cubit.setAutocheck,
+              ),
             ],
           ),
         ),
