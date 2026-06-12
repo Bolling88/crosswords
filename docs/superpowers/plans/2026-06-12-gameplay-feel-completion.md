@@ -20,7 +20,7 @@
 - Modify: `packages/crossword_core/lib/gameplay/domain/entities/crossword_puzzle.dart`
 - Test: `packages/crossword_core/test/gameplay/domain/entities/crossword_puzzle_test.dart`
 
-- [ ] **Step 1: Write the failing tests** — append this group inside `main()` of the existing test file:
+- [x] **Step 1: Write the failing tests** — append this group inside `main()` of the existing test file:
 
 ```dart
 group('cluePositionOf', () {
@@ -54,12 +54,12 @@ group('cluePositionOf', () {
 });
 ```
 
-- [ ] **Step 2: Run to verify failure**
+- [x] **Step 2: Run to verify failure**
 
 Run: `cd packages/crossword_core && flutter test test/gameplay/domain/entities/crossword_puzzle_test.dart`
 Expected: FAIL — `cluePositionOf` isn't defined.
 
-- [ ] **Step 3: Implement** — add to `CrosswordPuzzle` (below `wordAt`):
+- [x] **Step 3: Implement** — add to `CrosswordPuzzle` (below `wordAt`):
 
 ```dart
   /// The grid position of the clue cell whose arrow starts the word with
@@ -76,12 +76,12 @@ Expected: FAIL — `cluePositionOf` isn't defined.
   }
 ```
 
-- [ ] **Step 4: Run to verify pass**
+- [x] **Step 4: Run to verify pass**
 
 Run: `cd packages/crossword_core && flutter test`
 Expected: ALL PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add packages/crossword_core
@@ -96,7 +96,7 @@ git commit -m "feat(core): look up a word's clue cell via cluePositionOf"
 - Modify: `packages/crossword_ui/lib/gameplay/presentation/crossword_screen/cubit/crossword_state.dart` (full rewrite below)
 - Test (create): `packages/crossword_ui/test/gameplay/presentation/crossword_screen/cubit/crossword_state_test.dart`
 
-- [ ] **Step 1: Write the failing tests** — create the test file:
+- [x] **Step 1: Write the failing tests** — create the test file:
 
 ```dart
 import 'package:crossword_core/crossword_core.dart';
@@ -182,12 +182,12 @@ void main() {
 }
 ```
 
-- [ ] **Step 2: Run to verify failure**
+- [x] **Step 2: Run to verify failure**
 
 Run: `cd packages/crossword_ui && flutter test test/gameplay/presentation/crossword_screen/cubit/crossword_state_test.dart`
 Expected: FAIL — new members don't exist.
 
-- [ ] **Step 3: Implement** — replace `crossword_state.dart` entirely:
+- [x] **Step 3: Implement** — replace `crossword_state.dart` entirely:
 
 ```dart
 import 'package:equatable/equatable.dart';
@@ -402,12 +402,12 @@ class PuzzleFilledButIncorrect extends CrosswordState {
 
 Note `copyWith` carries `activeClueCell`, `confirmedWordId`, and `confirmedWordToken` through unchanged — they are only set via the dedicated `with*` transitions.
 
-- [ ] **Step 4: Run to verify pass**
+- [x] **Step 4: Run to verify pass**
 
 Run: `cd packages/crossword_ui && flutter test`
 Expected: ALL PASS (existing engine/cubit tests still green — `_activateWord` still uses `copyWith` until Task 3).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add packages/crossword_ui
@@ -422,7 +422,7 @@ git commit -m "feat(state): correctness, reveal, solved, clue-cell and event-sta
 - Modify: `packages/crossword_ui/lib/gameplay/presentation/crossword_screen/crossword_engine.dart`
 - Test: `packages/crossword_ui/test/gameplay/presentation/crossword_screen/crossword_engine_test.dart`
 
-- [ ] **Step 1: Write the failing tests** — add a `_seedPuzzle` fixture next to the existing fixtures, and the new test groups inside `main()`:
+- [x] **Step 1: Write the failing tests** — add a `_seedPuzzle` fixture next to the existing fixtures, and the new test groups inside `main()`:
 
 ```dart
 /// 1x3 grid: clue, a seed cell with given letter 'A', and one normal cell.
@@ -503,12 +503,12 @@ CrosswordPuzzle _seedPuzzle() {
   });
 ```
 
-- [ ] **Step 2: Run to verify failure**
+- [x] **Step 2: Run to verify failure**
 
 Run: `cd packages/crossword_ui && flutter test test/gameplay/presentation/crossword_screen/crossword_engine_test.dart`
 Expected: FAIL — `computeSolved`/`isFilled` undefined, `activeClueCell` null.
 
-- [ ] **Step 3: Implement** — in `crossword_engine.dart`:
+- [x] **Step 3: Implement** — in `crossword_engine.dart`:
 
 Replace `_activateWord` with:
 
@@ -590,12 +590,12 @@ Add these public/private helpers (e.g. after `moveSelection`):
 
 **Note:** add only `isFilled`, `computeSolved`, and the `_activateWord` replacement in this task. `_isWordCorrect` and `_isLocked` (listed above for reference) are added in Task 4 together with their first callers, so `flutter analyze` stays clean at this commit.
 
-- [ ] **Step 4: Run to verify pass**
+- [x] **Step 4: Run to verify pass**
 
 Run: `cd packages/crossword_ui && flutter test && flutter analyze`
 Expected: ALL PASS, no analyzer issues.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add packages/crossword_ui
@@ -610,7 +610,7 @@ git commit -m "feat(engine): solved/filled detection and active clue-cell tracki
 - Modify: `packages/crossword_ui/lib/gameplay/presentation/crossword_screen/crossword_engine.dart`
 - Test: `packages/crossword_ui/test/gameplay/presentation/crossword_screen/crossword_engine_test.dart`
 
-- [ ] **Step 1: Write the failing tests** — add inside `main()`:
+- [x] **Step 1: Write the failing tests** — add inside `main()`:
 
 ```dart
   group('inputLetter correctness', () {
@@ -711,12 +711,12 @@ git commit -m "feat(engine): solved/filled detection and active clue-cell tracki
   });
 ```
 
-- [ ] **Step 2: Run to verify failure**
+- [x] **Step 2: Run to verify failure**
 
 Run: `cd packages/crossword_ui && flutter test test/gameplay/presentation/crossword_screen/crossword_engine_test.dart`
 Expected: FAIL — `autocheck` parameter doesn't exist; solved/marks not computed.
 
-- [ ] **Step 3: Implement** — in `crossword_engine.dart`, add `_isWordCorrect` and `_isLocked` from Task 3's listing (if not already present), extract the advance logic, and replace `inputLetter`:
+- [x] **Step 3: Implement** — in `crossword_engine.dart`, add `_isWordCorrect` and `_isLocked` from Task 3's listing (if not already present), extract the advance logic, and replace `inputLetter`:
 
 ```dart
   /// Record [letter] at the selected cell and advance: to the next cell of the
@@ -799,12 +799,12 @@ Expected: FAIL — `autocheck` parameter doesn't exist; solved/marks not compute
   }
 ```
 
-- [ ] **Step 4: Run to verify pass**
+- [x] **Step 4: Run to verify pass**
 
 Run: `cd packages/crossword_ui && flutter test`
 Expected: ALL PASS (existing inputLetter tests unchanged in behavior).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add packages/crossword_ui
@@ -819,7 +819,7 @@ git commit -m "feat(engine): autocheck, locked cells, and solved detection on in
 - Modify: `packages/crossword_ui/lib/gameplay/presentation/crossword_screen/crossword_engine.dart`
 - Test: `packages/crossword_ui/test/gameplay/presentation/crossword_screen/crossword_engine_test.dart`
 
-- [ ] **Step 1: Write the failing tests** — add to the existing `backspace` group:
+- [x] **Step 1: Write the failing tests** — add to the existing `backspace` group:
 
 ```dart
     test('clearing a letter also clears its incorrect mark', () {
@@ -863,12 +863,12 @@ git commit -m "feat(engine): autocheck, locked cells, and solved detection on in
     });
 ```
 
-- [ ] **Step 2: Run to verify failure**
+- [x] **Step 2: Run to verify failure**
 
 Run: `cd packages/crossword_ui && flutter test test/gameplay/presentation/crossword_screen/crossword_engine_test.dart`
 Expected: FAIL on the new tests.
 
-- [ ] **Step 3: Implement** — replace `backspace`:
+- [x] **Step 3: Implement** — replace `backspace`:
 
 ```dart
   /// Delete the selected cell's letter (and its incorrect mark), or step back
@@ -909,12 +909,12 @@ Expected: FAIL on the new tests.
   }
 ```
 
-- [ ] **Step 4: Run to verify pass**
+- [x] **Step 4: Run to verify pass**
 
 Run: `cd packages/crossword_ui && flutter test`
 Expected: ALL PASS (the existing "at the first empty cell of a word it is a no-op" test still passes: `_step` returns null there).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add packages/crossword_ui
@@ -929,7 +929,7 @@ git commit -m "feat(engine): backspace respects locked cells and clears marks"
 - Modify: `packages/crossword_ui/lib/gameplay/presentation/crossword_screen/crossword_engine.dart`
 - Test: `packages/crossword_ui/test/gameplay/presentation/crossword_screen/crossword_engine_test.dart`
 
-- [ ] **Step 1: Write the failing tests:**
+- [x] **Step 1: Write the failing tests:**
 
 ```dart
   group('check actions', () {
@@ -991,12 +991,12 @@ git commit -m "feat(engine): backspace respects locked cells and clears marks"
   });
 ```
 
-- [ ] **Step 2: Run to verify failure**
+- [x] **Step 2: Run to verify failure**
 
 Run: `cd packages/crossword_ui && flutter test test/gameplay/presentation/crossword_screen/crossword_engine_test.dart`
 Expected: FAIL — methods undefined.
 
-- [ ] **Step 3: Implement:**
+- [x] **Step 3: Implement:**
 
 ```dart
   /// Mark the active word's wrong letters. Correct and empty cells are left
@@ -1036,12 +1036,12 @@ Expected: FAIL — methods undefined.
   }
 ```
 
-- [ ] **Step 4: Run to verify pass**
+- [x] **Step 4: Run to verify pass**
 
 Run: `cd packages/crossword_ui && flutter test`
 Expected: ALL PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add packages/crossword_ui
@@ -1056,7 +1056,7 @@ git commit -m "feat(engine): on-demand word and puzzle checking"
 - Modify: `packages/crossword_ui/lib/gameplay/presentation/crossword_screen/crossword_engine.dart`
 - Test: `packages/crossword_ui/test/gameplay/presentation/crossword_screen/crossword_engine_test.dart`
 
-- [ ] **Step 1: Write the failing tests:**
+- [x] **Step 1: Write the failing tests:**
 
 ```dart
   group('reveal actions', () {
@@ -1122,12 +1122,12 @@ git commit -m "feat(engine): on-demand word and puzzle checking"
   });
 ```
 
-- [ ] **Step 2: Run to verify failure**
+- [x] **Step 2: Run to verify failure**
 
 Run: `cd packages/crossword_ui && flutter test test/gameplay/presentation/crossword_screen/crossword_engine_test.dart`
 Expected: FAIL — methods undefined.
 
-- [ ] **Step 3: Implement:**
+- [x] **Step 3: Implement:**
 
 ```dart
   /// Fill the selected cell with its solution letter and lock it, advancing
@@ -1183,12 +1183,12 @@ Expected: FAIL — methods undefined.
   }
 ```
 
-- [ ] **Step 4: Run to verify pass**
+- [x] **Step 4: Run to verify pass**
 
 Run: `cd packages/crossword_ui && flutter test`
 Expected: ALL PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add packages/crossword_ui
@@ -1203,7 +1203,7 @@ git commit -m "feat(engine): reveal letter and reveal word with locking"
 - Modify: `packages/crossword_ui/lib/gameplay/presentation/crossword_screen/crossword_engine.dart`
 - Test: `packages/crossword_ui/test/gameplay/presentation/crossword_screen/crossword_engine_test.dart`
 
-- [ ] **Step 1: Write the failing tests:**
+- [x] **Step 1: Write the failing tests:**
 
 ```dart
   group('clearWord & restart', () {
@@ -1256,12 +1256,12 @@ git commit -m "feat(engine): reveal letter and reveal word with locking"
   });
 ```
 
-- [ ] **Step 2: Run to verify failure**
+- [x] **Step 2: Run to verify failure**
 
 Run: `cd packages/crossword_ui && flutter test test/gameplay/presentation/crossword_screen/crossword_engine_test.dart`
 Expected: FAIL — methods undefined.
 
-- [ ] **Step 3: Implement:**
+- [x] **Step 3: Implement:**
 
 ```dart
   /// Clear the active word's letters and marks, leaving seeds and revealed
@@ -1295,12 +1295,12 @@ Expected: FAIL — methods undefined.
   }
 ```
 
-- [ ] **Step 4: Run to verify pass**
+- [x] **Step 4: Run to verify pass**
 
 Run: `cd packages/crossword_ui && flutter test`
 Expected: ALL PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add packages/crossword_ui
@@ -1316,7 +1316,7 @@ git commit -m "feat(engine): clear word and restart"
 - Modify: `packages/crossword_ui/lib/crossword_ui.dart` (add export)
 - Test (create): `packages/crossword_ui/test/gameplay/domain/services/progress_service_test.dart`
 
-- [ ] **Step 1: Write the failing tests:**
+- [x] **Step 1: Write the failing tests:**
 
 ```dart
 import 'package:crossword_ui/crossword_ui.dart';
@@ -1373,12 +1373,12 @@ void main() {
 }
 ```
 
-- [ ] **Step 2: Run to verify failure**
+- [x] **Step 2: Run to verify failure**
 
 Run: `cd packages/crossword_ui && flutter test test/gameplay/domain/services/progress_service_test.dart`
 Expected: FAIL — `ProgressService` doesn't exist.
 
-- [ ] **Step 3: Implement** — create `progress_service.dart`:
+- [x] **Step 3: Implement** — create `progress_service.dart`:
 
 ```dart
 import 'dart:convert';
@@ -1479,12 +1479,12 @@ Add to `packages/crossword_ui/lib/crossword_ui.dart` (after the font_service exp
 export 'gameplay/domain/services/progress_service.dart';
 ```
 
-- [ ] **Step 4: Run to verify pass**
+- [x] **Step 4: Run to verify pass**
 
 Run: `cd packages/crossword_ui && flutter test`
 Expected: ALL PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add packages/crossword_ui
@@ -1500,7 +1500,7 @@ git commit -m "feat: ProgressService persists puzzle fill state locally"
 - Modify: `packages/crossword_ui/lib/crossword_ui.dart` (add export)
 - Test (create): `packages/crossword_ui/test/settings/domain/services/gameplay_settings_service_test.dart`
 
-- [ ] **Step 1: Write the failing tests:**
+- [x] **Step 1: Write the failing tests:**
 
 ```dart
 import 'package:crossword_ui/crossword_ui.dart';
@@ -1538,12 +1538,12 @@ void main() {
 }
 ```
 
-- [ ] **Step 2: Run to verify failure**
+- [x] **Step 2: Run to verify failure**
 
 Run: `cd packages/crossword_ui && flutter test test/settings/domain/services/gameplay_settings_service_test.dart`
 Expected: FAIL — class doesn't exist.
 
-- [ ] **Step 3: Implement** — create `gameplay_settings_service.dart`:
+- [x] **Step 3: Implement** — create `gameplay_settings_service.dart`:
 
 ```dart
 import 'package:flutter/foundation.dart';
@@ -1591,12 +1591,12 @@ Add to `crossword_ui.dart` (next to the font_service export):
 export 'settings/domain/services/gameplay_settings_service.dart';
 ```
 
-- [ ] **Step 4: Run to verify pass**
+- [x] **Step 4: Run to verify pass**
 
 Run: `cd packages/crossword_ui && flutter test`
 Expected: ALL PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add packages/crossword_ui
@@ -1620,7 +1620,7 @@ This task changes the `CrosswordCubit` constructor, so it also updates every con
 - Modify: `apps/web/test/web_smoke_test.dart`
 - Modify (check): `packages/crossword_ui/test/gameplay/presentation/crossword_screen/mobile_input_present_test.dart` and `mobile_input_absent_test.dart` — update any `CrosswordCubit(...)` constructions the same way.
 
-- [ ] **Step 1: Write the failing cubit tests** — in `crossword_cubit_test.dart`, replace the `setUp` block and add a `_buildCubit` helper:
+- [x] **Step 1: Write the failing cubit tests** — in `crossword_cubit_test.dart`, replace the `setUp` block and add a `_buildCubit` helper:
 
 ```dart
   late CrosswordCubit cubit;
@@ -1752,12 +1752,12 @@ Add the new test groups at the end of `main()`:
   });
 ```
 
-- [ ] **Step 2: Run to verify failure**
+- [x] **Step 2: Run to verify failure**
 
 Run: `cd packages/crossword_ui && flutter test test/gameplay/presentation/crossword_screen/cubit/crossword_cubit_test.dart`
 Expected: COMPILE ERROR — constructor has no `settingsService`/`progressService`.
 
-- [ ] **Step 3: Implement the cubit** — replace `crossword_cubit.dart`'s imports, constructor, and action/`_apply` sections (the sentinel/IME/`isTouchPlatform`/`_raiseKeyboard`/`resetView` members stay exactly as they are):
+- [x] **Step 3: Implement the cubit** — replace `crossword_cubit.dart`'s imports, constructor, and action/`_apply` sections (the sentinel/IME/`isTouchPlatform`/`_raiseKeyboard`/`resetView` members stay exactly as they are):
 
 ```dart
 import 'dart:async';
@@ -1921,7 +1921,7 @@ Replace `_apply` (keep its doc comment, extend it) and add the helpers:
   }
 ```
 
-- [ ] **Step 4: Wire the apps.** `apps/mobile/lib/main.dart`:
+- [x] **Step 4: Wire the apps.** `apps/mobile/lib/main.dart`:
 
 ```dart
 import 'package:flutter/material.dart';
@@ -2033,12 +2033,12 @@ Test harness updates — `apps/mobile/test/crossword/mobile_crossword_screen_tes
 
 `apps/web/test/web_smoke_test.dart` gets the same `MultiRepositoryProvider` wrapper. In `mobile_input_present_test.dart` / `mobile_input_absent_test.dart`, update any `CrosswordCubit(...)` constructions with the two extra services built from mock prefs (same pattern as the cubit test).
 
-- [ ] **Step 5: Run everything to verify pass**
+- [x] **Step 5: Run everything to verify pass**
 
 Run: `cd packages/crossword_ui && flutter test && cd ../../apps/mobile && flutter test && cd ../web && flutter test`
 Expected: ALL PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add packages/crossword_ui apps/mobile apps/web
@@ -2055,7 +2055,7 @@ git commit -m "feat(cubit): check/reveal actions, persistence, autocheck, events
 - Modify: `packages/crossword_ui/lib/common/data/constants/app_colors.dart` (add `errorInk`)
 - Test (create): `packages/crossword_ui/test/gameplay/presentation/crossword_screen/widgets/crossword_grid_test.dart`
 
-- [ ] **Step 1: Write the failing tests** — create the grid test file:
+- [x] **Step 1: Write the failing tests** — create the grid test file:
 
 ```dart
 import 'package:flutter/material.dart';
@@ -2159,12 +2159,12 @@ void main() {
 }
 ```
 
-- [ ] **Step 2: Run to verify failure**
+- [x] **Step 2: Run to verify failure**
 
 Run: `cd packages/crossword_ui && flutter test test/gameplay/presentation/crossword_screen/widgets/crossword_grid_test.dart`
 Expected: FAIL — `AppColors.errorInk` undefined; seed letter not rendered.
 
-- [ ] **Step 3: Implement.** Add to `AppColors` (under "Ink"):
+- [x] **Step 3: Implement.** Add to `AppColors` (under "Ink"):
 
 ```dart
   /// Ink for letters marked wrong by a check — brick red, like a teacher's pen.
@@ -2331,12 +2331,12 @@ In `crossword_grid.dart`, replace the `AnswerCell()` branch of `_buildCell` and 
   }
 ```
 
-- [ ] **Step 4: Run to verify pass**
+- [x] **Step 4: Run to verify pass**
 
 Run: `cd packages/crossword_ui && flutter test`
 Expected: ALL PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add packages/crossword_ui
@@ -2353,7 +2353,7 @@ git commit -m "feat(ui): seed letters, error/revealed inks, letter pop, confirm 
 - Modify: `packages/crossword_ui/lib/common/data/constants/app_colors.dart` (add `clueCellActive`)
 - Test: `packages/crossword_ui/test/gameplay/presentation/crossword_screen/widgets/crossword_grid_test.dart`
 
-- [ ] **Step 1: Write the failing test** — add to the grid test file:
+- [x] **Step 1: Write the failing test** — add to the grid test file:
 
 ```dart
   testWidgets('the active word\'s clue cell is highlighted', (tester) async {
@@ -2381,12 +2381,12 @@ git commit -m "feat(ui): seed letters, error/revealed inks, letter pop, confirm 
   });
 ```
 
-- [ ] **Step 2: Run to verify failure**
+- [x] **Step 2: Run to verify failure**
 
 Run: `cd packages/crossword_ui && flutter test test/gameplay/presentation/crossword_screen/widgets/crossword_grid_test.dart`
 Expected: FAIL — `clueCellActive` undefined; widget has no active state.
 
-- [ ] **Step 3: Implement.** Add to `AppColors` (under "Interaction states"):
+- [x] **Step 3: Implement.** Add to `AppColors` (under "Interaction states"):
 
 ```dart
   /// Clue cell of the currently active word — amber-tinted to make the
@@ -2435,12 +2435,12 @@ In `crossword_grid.dart`, the `ClueCell()` branch becomes:
         ),
 ```
 
-- [ ] **Step 4: Run to verify pass**
+- [x] **Step 4: Run to verify pass**
 
 Run: `cd packages/crossword_ui && flutter test`
 Expected: ALL PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add packages/crossword_ui
@@ -2459,7 +2459,7 @@ git commit -m "feat(ui): highlight the active word's clue cell"
 - Modify: `apps/web/lib/crossword/web_crossword_screen.dart` (app bar action)
 - Test (create): `packages/crossword_ui/test/gameplay/presentation/crossword_screen/widgets/crossword_menu_button_test.dart`
 
-- [ ] **Step 1: Write the failing tests:**
+- [x] **Step 1: Write the failing tests:**
 
 ```dart
 import 'package:flutter/material.dart';
@@ -2568,12 +2568,12 @@ void main() {
 }
 ```
 
-- [ ] **Step 2: Run to verify failure**
+- [x] **Step 2: Run to verify failure**
 
 Run: `cd packages/crossword_ui && flutter test test/gameplay/presentation/crossword_screen/widgets/crossword_menu_button_test.dart`
 Expected: FAIL — widget and strings don't exist.
 
-- [ ] **Step 3: Implement.** Add to `Strings`:
+- [x] **Step 3: Implement.** Add to `Strings`:
 
 ```dart
   /// Tooltip for the in-game actions menu.
@@ -2710,12 +2710,12 @@ In both `mobile_crossword_screen.dart` and `web_crossword_screen.dart`, add as t
           const CrosswordMenuButton(),
 ```
 
-- [ ] **Step 4: Run to verify pass**
+- [x] **Step 4: Run to verify pass**
 
 Run: `cd packages/crossword_ui && flutter test && cd ../../apps/mobile && flutter test && cd ../web && flutter test`
 Expected: ALL PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add packages/crossword_ui apps/mobile apps/web
@@ -2731,7 +2731,7 @@ git commit -m "feat(ui): game menu with check, reveal, clear, and restart"
 - Modify: `packages/crossword_ui/lib/common/data/constants/strings.dart`
 - Test (create): `packages/crossword_ui/test/gameplay/presentation/crossword_screen/crossword_player_feedback_test.dart`
 
-- [ ] **Step 1: Write the failing tests:**
+- [x] **Step 1: Write the failing tests:**
 
 ```dart
 import 'package:flutter/material.dart';
@@ -2817,12 +2817,12 @@ void main() {
 }
 ```
 
-- [ ] **Step 2: Run to verify failure**
+- [x] **Step 2: Run to verify failure**
 
 Run: `cd packages/crossword_ui && flutter test test/gameplay/presentation/crossword_screen/crossword_player_feedback_test.dart`
 Expected: FAIL — strings undefined, no listener.
 
-- [ ] **Step 3: Implement.** Add to `Strings`:
+- [x] **Step 3: Implement.** Add to `Strings`:
 
 ```dart
   /// Celebration dialog after solving the puzzle.
@@ -2895,12 +2895,12 @@ class CrosswordPlayer extends StatelessWidget {
 }
 ```
 
-- [ ] **Step 4: Run to verify pass**
+- [x] **Step 4: Run to verify pass**
 
 Run: `cd packages/crossword_ui && flutter test`
 Expected: ALL PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add packages/crossword_ui
@@ -2919,7 +2919,7 @@ git commit -m "feat(ui): celebration dialog and filled-but-wrong nudge"
 - Modify: `apps/mobile/test/settings/presentation/settings_screen/cubit/settings_cubit_test.dart`
 - Modify: `apps/mobile/test/settings/presentation/settings_screen/settings_screen_test.dart`
 
-- [ ] **Step 1: Write the failing tests.** In `settings_cubit_test.dart`, update the setup and add the toggle test:
+- [x] **Step 1: Write the failing tests.** In `settings_cubit_test.dart`, update the setup and add the toggle test:
 
 ```dart
   late FontService fontService;
@@ -2984,12 +2984,12 @@ Future<Widget> _settingsUnderTest() async {
   });
 ```
 
-- [ ] **Step 2: Run to verify failure**
+- [x] **Step 2: Run to verify failure**
 
 Run: `cd apps/mobile && flutter test test/settings`
 Expected: COMPILE ERROR / FAIL.
 
-- [ ] **Step 3: Implement.** Add to `Strings`:
+- [x] **Step 3: Implement.** Add to `Strings`:
 
 ```dart
   /// Section header for gameplay settings.
@@ -3089,12 +3089,12 @@ and append the gameplay section to the `Column` children (after the font tiles):
               ),
 ```
 
-- [ ] **Step 4: Run to verify pass**
+- [x] **Step 4: Run to verify pass**
 
 Run: `cd apps/mobile && flutter test`
 Expected: ALL PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add apps/mobile packages/crossword_ui
@@ -3105,12 +3105,12 @@ git commit -m "feat(settings): autocheck toggle"
 
 ### Task 17: Full-workspace verification
 
-- [ ] **Step 1: Analyze everything**
+- [x] **Step 1: Analyze everything**
 
 Run from the repo root: `flutter analyze`
 Expected: No issues found.
 
-- [ ] **Step 2: Run every test suite**
+- [x] **Step 2: Run every test suite**
 
 ```bash
 (cd packages/crossword_core && flutter test) && \
@@ -3120,7 +3120,7 @@ Expected: No issues found.
 ```
 Expected: ALL PASS.
 
-- [ ] **Step 3: Fix anything surfaced, re-run, then commit any stragglers**
+- [x] **Step 3: Fix anything surfaced, re-run, then commit any stragglers**
 
 ```bash
 git status --short   # should show nothing uncommitted from this plan
