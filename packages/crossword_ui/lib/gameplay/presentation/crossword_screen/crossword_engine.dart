@@ -140,25 +140,40 @@ class CrosswordEngine {
     return (c is AnswerCell && c.isSeed) || state.revealedCells.contains(cell);
   }
 
-  /// Delete the selected cell's letter, or step back and delete the previous
-  /// cell's letter when the selected cell is already empty.
+  /// Delete the selected cell's letter (and its incorrect mark), or step back
+  /// and delete the previous cell's letter when the selected cell is already
+  /// empty. Seeds and revealed cells are never cleared — stepping back onto
+  /// one just moves the selection.
   CrosswordState backspace(CrosswordState state) {
     final sel = state.selectedCell;
     if (sel == null) return state;
 
-    final newInputs = Map<(int, int), String>.from(state.userInputs);
-    if (newInputs.containsKey(sel)) {
-      newInputs.remove(sel);
-      return state.copyWith(userInputs: newInputs);
+    if (!_isLocked(state, sel) && state.userInputs.containsKey(sel)) {
+      return _clearCell(state, sel);
     }
 
     final prev = _step(state, sel, -1);
     if (prev == null) return state;
-    newInputs.remove(prev);
-    return state.copyWith(
-      userInputs: newInputs,
+    if (_isLocked(state, prev)) {
+      return state.copyWith(
+        selectedCell: prev,
+        currentDirection: _axisAt(state, prev),
+      );
+    }
+    return _clearCell(state, prev).copyWith(
       selectedCell: prev,
       currentDirection: _axisAt(state, prev),
+    );
+  }
+
+  /// Remove [cell]'s input and incorrect mark, recomputing solved state.
+  CrosswordState _clearCell(CrosswordState state, (int, int) cell) {
+    final inputs = Map<(int, int), String>.from(state.userInputs)..remove(cell);
+    final incorrect = Set<(int, int)>.from(state.incorrectCells)..remove(cell);
+    return state.copyWith(
+      userInputs: inputs,
+      incorrectCells: incorrect,
+      isSolved: computeSolved(state, inputs),
     );
   }
 

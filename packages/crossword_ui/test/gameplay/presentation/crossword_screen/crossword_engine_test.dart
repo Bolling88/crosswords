@@ -393,6 +393,46 @@ void main() {
 
       expect(engine.backspace(state), state);
     });
+
+    test('clearing a letter also clears its incorrect mark', () {
+      final state = CrosswordState(
+        puzzle: _puzzle(),
+        activeWordId: 'across',
+        selectedCell: (0, 1),
+        userInputs: const {(0, 1): 'X'},
+        incorrectCells: const {(0, 1)},
+      );
+      final next = engine.backspace(state);
+
+      expect(next.userInputs.containsKey((0, 1)), isFalse);
+      expect(next.incorrectCells, isEmpty);
+    });
+
+    test('steps over a revealed cell without clearing it', () {
+      final state = CrosswordState(
+        puzzle: _puzzle(),
+        activeWordId: 'across',
+        selectedCell: (0, 2),
+        userInputs: const {(0, 1): 'A'},
+        revealedCells: const {(0, 1)},
+      );
+      final next = engine.backspace(state);
+
+      expect(next.selectedCell, (0, 1));
+      expect(next.userInputs[(0, 1)], 'A');
+    });
+
+    test('unsolves the puzzle when a correct letter is removed', () {
+      final solved = CrosswordState(
+        puzzle: _puzzle(),
+        activeWordId: 'across',
+        selectedCell: (1, 3),
+        userInputs: const {(0, 1): 'A', (0, 2): 'B', (0, 3): 'C', (1, 3): 'D'},
+        isSolved: true,
+      );
+
+      expect(engine.backspace(solved).isSolved, isFalse);
+    });
   });
 
   group('solved & filled', () {
