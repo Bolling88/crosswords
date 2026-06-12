@@ -153,6 +153,58 @@ class CrosswordEngine {
     return next;
   }
 
+  /// Fill the selected cell with its solution letter and lock it, advancing
+  /// as if the letter had been typed.
+  CrosswordState revealCell(CrosswordState state) {
+    final sel = state.selectedCell;
+    if (sel == null) return state;
+    final cell = state.puzzle.cells[sel];
+    if (cell is! AnswerCell || _isLocked(state, sel)) return state;
+
+    final inputs = Map<(int, int), String>.from(state.userInputs)
+      ..[sel] = cell.value;
+    final revealed = Set<(int, int)>.from(state.revealedCells)..add(sel);
+    final incorrect = Set<(int, int)>.from(state.incorrectCells)..remove(sel);
+    return _advanceAfterInput(state, sel, inputs).copyWith(
+      revealedCells: revealed,
+      incorrectCells: incorrect,
+      isSolved: computeSolved(state, inputs),
+    );
+  }
+
+  /// Fill and lock the whole active word, confirm it for the flash, and move
+  /// on to the next unfinished word.
+  CrosswordState revealWord(CrosswordState state) {
+    final word = state.puzzle.wordById(state.activeWordId ?? '');
+    if (word == null) return state;
+
+    final inputs = Map<(int, int), String>.from(state.userInputs);
+    final revealed = Set<(int, int)>.from(state.revealedCells);
+    final incorrect = Set<(int, int)>.from(state.incorrectCells);
+    for (final pos in word.cells) {
+      final cell = state.puzzle.cells[pos];
+      if (cell is! AnswerCell || cell.isSeed) continue;
+      inputs[pos] = cell.value;
+      revealed.add(pos);
+      incorrect.remove(pos);
+    }
+
+    var next = state
+        .copyWith(
+          userInputs: inputs,
+          revealedCells: revealed,
+          incorrectCells: incorrect,
+          isSolved: computeSolved(state, inputs),
+        )
+        .withConfirmedWord(word.id);
+
+    final nextWord = _nextUnfinishedWord(next, inputs);
+    if (nextWord == null) return next;
+    final target =
+        _firstEmptyCell(next, nextWord, inputs) ?? nextWord.cells.first;
+    return _activateWord(next, nextWord, target);
+  }
+
   /// Whether [word] is fully filled with correct letters under [inputs].
   /// (A missing letter never equals the solution, so this implies filled.)
   bool _isWordCorrect(

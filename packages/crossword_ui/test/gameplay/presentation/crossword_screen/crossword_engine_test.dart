@@ -540,6 +540,68 @@ void main() {
     });
   });
 
+  group('reveal actions', () {
+    test('revealCell fills the solution, locks the cell, and advances', () {
+      final active = engine.selectCell(CrosswordState(puzzle: _puzzle()), 0, 0);
+      final next = engine.revealCell(active);
+
+      expect(next.userInputs[(0, 1)], 'A');
+      expect(next.revealedCells, {(0, 1)});
+      expect(next.selectedCell, (0, 2));
+    });
+
+    test('revealCell replaces a wrong letter and clears its mark', () {
+      final state = CrosswordState(
+        puzzle: _puzzle(),
+        activeWordId: 'across',
+        selectedCell: (0, 1),
+        userInputs: const {(0, 1): 'X'},
+        incorrectCells: const {(0, 1)},
+        highlightedCells: const {(0, 1), (0, 2), (0, 3), (1, 3)},
+      );
+      final next = engine.revealCell(state);
+
+      expect(next.userInputs[(0, 1)], 'A');
+      expect(next.incorrectCells, isEmpty);
+    });
+
+    test('revealCell is a no-op on seeds and without a selection', () {
+      final noSelection = CrosswordState(puzzle: _puzzle());
+      expect(engine.revealCell(noSelection), noSelection);
+
+      final onSeed = CrosswordState(
+        puzzle: _seedPuzzle(),
+        activeWordId: 'w',
+        selectedCell: (0, 1),
+        highlightedCells: const {(0, 1), (0, 2)},
+      );
+      expect(engine.revealCell(onSeed), onSeed);
+    });
+
+    test('revealWord fills and locks the word, confirms it, and moves on', () {
+      final state = CrosswordState(
+        puzzle: _twoWordPuzzle(),
+        activeWordId: 'w1',
+        selectedCell: (0, 1),
+        highlightedCells: const {(0, 1), (0, 2)},
+      );
+      final next = engine.revealWord(state);
+
+      expect(next.userInputs[(0, 1)], 'A');
+      expect(next.userInputs[(0, 2)], 'B');
+      expect(next.revealedCells, {(0, 1), (0, 2)});
+      expect(next.confirmedWordId, 'w1');
+      expect(next.activeWordId, 'w2');
+      expect(next.selectedCell, (1, 1));
+    });
+
+    test('revealing the last word solves the puzzle', () {
+      final active = engine.selectCell(CrosswordState(puzzle: _puzzle()), 0, 0);
+
+      expect(engine.revealWord(active).isSolved, isTrue);
+    });
+  });
+
   group('moveSelection', () {
     test('arrow-right lands on the next answer cell', () {
       final active = engine.selectCell(CrosswordState(puzzle: _puzzle()), 0, 1);
