@@ -10,11 +10,15 @@ class HintCellWidget extends StatelessWidget {
   final VoidCallback onTap;
   final String fontFamily;
 
+  /// Whether this clue starts the currently active word.
+  final bool isActive;
+
   const HintCellWidget({
     required this.cell,
     required this.size,
     required this.onTap,
     required this.fontFamily,
+    this.isActive = false,
     super.key,
   });
 
@@ -22,11 +26,12 @@ class HintCellWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: Container(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
         width: size,
         height: size,
         decoration: BoxDecoration(
-          color: AppColors.clueCell,
+          color: isActive ? AppColors.clueCellActive : AppColors.clueCell,
           border: Border.all(color: AppColors.gridLine, width: 0.5),
         ),
         child: Stack(

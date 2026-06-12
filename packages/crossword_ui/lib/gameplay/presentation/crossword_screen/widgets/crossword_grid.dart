@@ -82,6 +82,7 @@ class CrosswordGrid extends StatelessWidget {
           size: cellSize,
           onTap: () => cubit.selectCell(row, col),
           fontFamily: fontFamily,
+          isActive: state.activeClueCell == (row, col),
         ),
       AnswerCell() => AnswerCellWidget(
           letter: state.userInputs[(row, col)] ??

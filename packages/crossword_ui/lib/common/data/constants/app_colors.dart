@@ -48,6 +48,10 @@ class AppColors {
   /// Cells in the currently active word — pale amber wash.
   static const Color highlight = Color(0xFFFBEFC8);
 
+  /// Clue cell of the currently active word — amber-tinted to make the
+  /// active direction visible.
+  static const Color clueCellActive = Color(0xFFE6D9A8);
+
   // App chrome
   /// App bar / brand surface.
   static const Color brand = Color(0xFF2E2A24);

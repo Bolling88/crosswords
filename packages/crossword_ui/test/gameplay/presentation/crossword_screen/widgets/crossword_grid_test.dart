@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:crossword_core/crossword_core.dart';
 import 'package:crossword_ui/crossword_ui.dart';
+import 'package:crossword_ui/gameplay/presentation/crossword_screen/widgets/hint_cell_widget.dart';
 
 /// 1x3 grid: clue, a seed cell with given letter 'Å', and one normal cell
 /// whose solution is 'B'.
@@ -95,5 +96,28 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(letterColor(tester, 'B'), AppColors.inkMuted);
+  });
+
+  testWidgets('the active word\'s clue cell is highlighted', (tester) async {
+    await tester.pumpWidget(harness());
+    await tester.pumpAndSettle();
+
+    Color? hintColor() {
+      final box = tester.widget<AnimatedContainer>(
+        find.descendant(
+          of: find.byType(HintCellWidget),
+          matching: find.byType(AnimatedContainer),
+        ),
+      );
+      final decoration = box.decoration;
+      return decoration is BoxDecoration ? decoration.color : null;
+    }
+
+    expect(hintColor(), AppColors.clueCell);
+
+    cubit.selectCell(0, 2);
+    await tester.pumpAndSettle();
+
+    expect(hintColor(), AppColors.clueCellActive);
   });
 }
