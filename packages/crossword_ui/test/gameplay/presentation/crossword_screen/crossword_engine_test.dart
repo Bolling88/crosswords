@@ -260,6 +260,103 @@ void main() {
     });
   });
 
+  group('inputLetter correctness', () {
+    test('typing the last correct letter marks the puzzle solved', () {
+      final state = CrosswordState(
+        puzzle: _puzzle(),
+        activeWordId: 'across',
+        selectedCell: (1, 3),
+        userInputs: const {(0, 1): 'A', (0, 2): 'B', (0, 3): 'C'},
+        highlightedCells: const {(0, 1), (0, 2), (0, 3), (1, 3)},
+      );
+
+      expect(engine.inputLetter(state, 'D').isSolved, isTrue);
+      expect(engine.inputLetter(state, 'X').isSolved, isFalse);
+    });
+
+    test('autocheck marks a wrong letter immediately', () {
+      final active = engine.selectCell(CrosswordState(puzzle: _puzzle()), 0, 1);
+      final next = engine.inputLetter(active, 'X', autocheck: true);
+
+      expect(next.incorrectCells, {(0, 1)});
+    });
+
+    test('without autocheck wrong letters enter unmarked', () {
+      final active = engine.selectCell(CrosswordState(puzzle: _puzzle()), 0, 1);
+
+      expect(engine.inputLetter(active, 'X').incorrectCells, isEmpty);
+    });
+
+    test('editing a marked cell clears its mark', () {
+      final marked = CrosswordState(
+        puzzle: _puzzle(),
+        activeWordId: 'across',
+        selectedCell: (0, 1),
+        userInputs: const {(0, 1): 'X'},
+        incorrectCells: const {(0, 1)},
+        highlightedCells: const {(0, 1), (0, 2), (0, 3), (1, 3)},
+      );
+      final next = engine.inputLetter(marked, 'A');
+
+      expect(next.incorrectCells, isEmpty);
+      expect(next.userInputs[(0, 1)], 'A');
+    });
+
+    test('typing on a revealed cell advances without overwriting', () {
+      final state = CrosswordState(
+        puzzle: _puzzle(),
+        activeWordId: 'across',
+        selectedCell: (0, 1),
+        userInputs: const {(0, 1): 'A'},
+        revealedCells: const {(0, 1)},
+        highlightedCells: const {(0, 1), (0, 2), (0, 3), (1, 3)},
+      );
+      final next = engine.inputLetter(state, 'Z');
+
+      expect(next.userInputs[(0, 1)], 'A');
+      expect(next.selectedCell, (0, 2));
+    });
+
+    test('typing on a seed cell advances without writing', () {
+      final state = CrosswordState(
+        puzzle: _seedPuzzle(),
+        activeWordId: 'w',
+        selectedCell: (0, 1),
+        highlightedCells: const {(0, 1), (0, 2)},
+      );
+      final next = engine.inputLetter(state, 'Z');
+
+      expect(next.userInputs.containsKey((0, 1)), isFalse);
+      expect(next.selectedCell, (0, 2));
+    });
+
+    test('autocheck confirms the word when its last letter lands correct', () {
+      final state = CrosswordState(
+        puzzle: _twoWordPuzzle(),
+        activeWordId: 'w1',
+        selectedCell: (0, 2),
+        userInputs: const {(0, 1): 'A'},
+        highlightedCells: const {(0, 1), (0, 2)},
+      );
+      final next = engine.inputLetter(state, 'B', autocheck: true);
+
+      expect(next.confirmedWordId, 'w1');
+      expect(next.confirmedWordToken, 1);
+    });
+
+    test('plain unchecked typing never confirms a word', () {
+      final state = CrosswordState(
+        puzzle: _twoWordPuzzle(),
+        activeWordId: 'w1',
+        selectedCell: (0, 2),
+        userInputs: const {(0, 1): 'A'},
+        highlightedCells: const {(0, 1), (0, 2)},
+      );
+
+      expect(engine.inputLetter(state, 'B').confirmedWordToken, 0);
+    });
+  });
+
   group('backspace', () {
     test('clears the selected cell when it has a letter', () {
       final state = CrosswordState(

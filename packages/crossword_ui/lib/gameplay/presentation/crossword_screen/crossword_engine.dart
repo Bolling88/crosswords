@@ -36,18 +36,55 @@ class CrosswordEngine {
 
   /// Record [letter] at the selected cell and advance: to the next cell of the
   /// active word, back to a skipped gap, or on to the next unfinished word.
-  CrosswordState inputLetter(CrosswordState state, String letter) {
+  /// Seeds and revealed cells are locked — typing on them advances without
+  /// writing. With [autocheck], a wrong letter is marked immediately and a
+  /// word completed correctly is confirmed (driving the grid flash).
+  CrosswordState inputLetter(
+    CrosswordState state,
+    String letter, {
+    bool autocheck = false,
+  }) {
     final sel = state.selectedCell;
     if (sel == null) return state;
 
-    final newInputs = Map<(int, int), String>.from(state.userInputs)
-      ..[sel] = letter;
+    var inputs = state.userInputs;
+    var incorrect = state.incorrectCells;
+    if (!_isLocked(state, sel)) {
+      inputs = Map<(int, int), String>.from(inputs)..[sel] = letter;
+      incorrect = Set<(int, int)>.from(incorrect)..remove(sel);
+      final cell = state.puzzle.cells[sel];
+      if (autocheck && cell is AnswerCell && cell.value != letter) {
+        incorrect.add(sel);
+      }
+    }
 
+    var next = _advanceAfterInput(state, sel, inputs).copyWith(
+      incorrectCells: incorrect,
+      isSolved: computeSolved(state, inputs),
+    );
+
+    if (autocheck) {
+      final word = state.puzzle.wordById(state.activeWordId ?? '');
+      if (word != null && _isWordCorrect(state, word, inputs)) {
+        next = next.withConfirmedWord(word.id);
+      }
+    }
+    return next;
+  }
+
+  /// Advance after [sel] was acted on with [inputs] now in effect: step within
+  /// the active word, jump back to a skipped gap, or move on to the next
+  /// unfinished word — folding [inputs] into every branch.
+  CrosswordState _advanceAfterInput(
+    CrosswordState state,
+    (int, int) sel,
+    Map<(int, int), String> inputs,
+  ) {
     // Still room to advance within the active word: step to the next cell.
     final next = _step(state, sel, 1);
     if (next != null) {
       return state.copyWith(
-        userInputs: newInputs,
+        userInputs: inputs,
         selectedCell: next,
         currentDirection: _axisAt(state, next),
       );
@@ -58,26 +95,49 @@ class CrosswordEngine {
     // so advance to the next unfinished word. With neither, just keep the input.
     final activeWord = state.puzzle.wordById(state.activeWordId ?? '');
     if (activeWord == null) {
-      return state.copyWith(userInputs: newInputs);
+      return state.copyWith(userInputs: inputs);
     }
 
-    final gap = _firstEmptyCell(state, activeWord, newInputs);
+    final gap = _firstEmptyCell(state, activeWord, inputs);
     if (gap != null) {
       return state.copyWith(
-        userInputs: newInputs,
+        userInputs: inputs,
         selectedCell: gap,
         currentDirection: _axisAt(state, gap),
       );
     }
 
-    final nextWord = _nextUnfinishedWord(state, newInputs);
+    final nextWord = _nextUnfinishedWord(state, inputs);
     if (nextWord == null) {
-      return state.copyWith(userInputs: newInputs);
+      return state.copyWith(userInputs: inputs);
     }
 
     final target =
-        _firstEmptyCell(state, nextWord, newInputs) ?? nextWord.cells.first;
-    return _activateWord(state, nextWord, target, userInputs: newInputs);
+        _firstEmptyCell(state, nextWord, inputs) ?? nextWord.cells.first;
+    return _activateWord(state, nextWord, target, userInputs: inputs);
+  }
+
+  /// Whether [word] is fully filled with correct letters under [inputs].
+  /// (A missing letter never equals the solution, so this implies filled.)
+  bool _isWordCorrect(
+    CrosswordState state,
+    Word word,
+    Map<(int, int), String> inputs,
+  ) {
+    for (final pos in word.cells) {
+      final cell = state.puzzle.cells[pos];
+      if (cell is AnswerCell && !cell.isSeed && inputs[pos] != cell.value) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /// Whether [cell] can no longer be edited: seeds are given by the puzzle,
+  /// revealed cells are given by the player asking for them.
+  bool _isLocked(CrosswordState state, (int, int) cell) {
+    final c = state.puzzle.cells[cell];
+    return (c is AnswerCell && c.isSeed) || state.revealedCells.contains(cell);
   }
 
   /// Delete the selected cell's letter, or step back and delete the previous
