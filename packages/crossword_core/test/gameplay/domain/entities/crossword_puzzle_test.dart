@@ -31,4 +31,34 @@ void main() {
     expect(puzzle.wordAt((0, 1), Direction.down), down);
     expect(puzzle.wordAt((1, 1), Direction.right), isNull);
   });
+
+  group('cluePositionOf', () {
+    const word = Word(id: 'w1', direction: Direction.right, cells: [(0, 1), (0, 2)]);
+    const cluedPuzzle = CrosswordPuzzle(
+      rows: 1,
+      cols: 3,
+      cells: {
+        (0, 0): ClueCell(arrows: [
+          ClueArrow(
+            direction: Direction.right,
+            shape: ArrowShape.straightRight,
+            wordId: 'w1',
+          ),
+        ]),
+        (0, 1): AnswerCell(value: 'A'),
+        (0, 2): AnswerCell(value: 'B'),
+      },
+      words: [word],
+      title: 't',
+      languageCode: 'sv',
+    );
+
+    test('returns the clue cell whose arrow starts the word', () {
+      expect(cluedPuzzle.cluePositionOf('w1'), (0, 0));
+    });
+
+    test('returns null for an unknown word id', () {
+      expect(cluedPuzzle.cluePositionOf('nope'), isNull);
+    });
+  });
 }

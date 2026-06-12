@@ -1,0 +1,236 @@
+name: Deploy to TestFlight
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-deploy:
+    runs-on: self-hosted
+    timeout-minutes: 45
+
+    steps:
+      - name: Clean up old artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          CUTOFF=$(date -u -v-7d +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || date -u -d '7 days ago' +%Y-%m-%dT%H:%M:%SZ)
+          gh api repos/${{ github.repository }}/actions/artifacts --paginate --jq ".artifacts[] | select(.created_at < \"$CUTOFF\") | .id" \
+            | xargs -I {} gh api -X DELETE repos/${{ github.repository }}/actions/artifacts/{}
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set build number
+        run: echo "BUILD_NUMBER=$(( ${{ github.run_number }} + 100 ))" >> $GITHUB_ENV
+
+      - name: Auto-increment version from git tags
+        run: |
+          FULL_VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: //' | cut -d'+' -f1)
+          BASE_VERSION=$(echo "$FULL_VERSION" | sed 's/\.[0-9]*$//')
+
+          LATEST_PATCH=$(git tag -l "v${BASE_VERSION}.*" \
+            | sed "s/v${BASE_VERSION}\.//" | cut -d'+' -f1 \
+            | sort -n | tail -1)
+
+          if [ -z "$LATEST_PATCH" ]; then
+            PATCH=0
+          else
+            PATCH=$((LATEST_PATCH + 1))
+          fi
+
+          echo "APP_VERSION=${BASE_VERSION}.${PATCH}" >> $GITHUB_ENV
+          echo "Using version: ${BASE_VERSION}.${PATCH}"
+
+          echo "COMMIT_MESSAGE<<EOFMSG" >> $GITHUB_ENV
+          git log -1 --pretty=%B >> $GITHUB_ENV
+          echo "EOFMSG" >> $GITHUB_ENV
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Run tests
+        run: flutter test
+
+      # --- iOS ---
+
+      - name: Install pods
+        working-directory: ios
+        run: pod install
+
+      - name: Write App Store Connect API key
+        env:
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_API_KEY_BASE64: ${{ secrets.APP_STORE_CONNECT_API_KEY_BASE64 }}
+        run: |
+          mkdir -p ~/.appstoreconnect/private_keys
+          echo -n "$APP_STORE_CONNECT_API_KEY_BASE64" | base64 --decode \
+            -o ~/.appstoreconnect/private_keys/AuthKey_${APP_STORE_CONNECT_API_KEY_ID}.p8
+
+      - name: Flutter prebuild (no codesign)
+        run: |
+          flutter build ios --release --no-codesign \
+            --build-name=${{ env.APP_VERSION }} \
+            --build-number=${{ env.BUILD_NUMBER }}
+
+      - name: Archive with xcodebuild
+        env:
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+        working-directory: ios
+        run: |
+          xcodebuild \
+            -workspace Runner.xcworkspace \
+            -scheme Runner \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -archivePath ../build/ios/archive/Runner.xcarchive \
+            archive \
+            -allowProvisioningUpdates \
+            -authenticationKeyID "$APP_STORE_CONNECT_API_KEY_ID" \
+            -authenticationKeyIssuerID "$APP_STORE_CONNECT_ISSUER_ID" \
+            -authenticationKeyPath "$HOME/.appstoreconnect/private_keys/AuthKey_${APP_STORE_CONNECT_API_KEY_ID}.p8" \
+            FLUTTER_BUILD_NUMBER=${{ env.BUILD_NUMBER }} \
+            FLUTTER_BUILD_NAME=${{ env.APP_VERSION }}
+
+      - name: Export IPA
+        env:
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+        run: |
+          xcodebuild -exportArchive \
+            -archivePath build/ios/archive/Runner.xcarchive \
+            -exportPath build/ios/ipa \
+            -exportOptionsPlist ios/ExportOptions.plist \
+            -allowProvisioningUpdates \
+            -authenticationKeyID "$APP_STORE_CONNECT_API_KEY_ID" \
+            -authenticationKeyIssuerID "$APP_STORE_CONNECT_ISSUER_ID" \
+            -authenticationKeyPath "$HOME/.appstoreconnect/private_keys/AuthKey_${APP_STORE_CONNECT_API_KEY_ID}.p8"
+          IPA_FILE=$(find build/ios/ipa -name '*.ipa' | head -1)
+          if [ -z "$IPA_FILE" ]; then
+            echo "ERROR: No IPA produced."
+            echo "Signing identities:"
+            security find-identity -v -p codesigning 2>/dev/null || echo "None found"
+            exit 1
+          fi
+          echo "IPA_FILE=$IPA_FILE" >> $GITHUB_ENV
+          echo "IPA built successfully: $IPA_FILE"
+
+      - name: Upload to TestFlight
+        env:
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+        run: |
+          xcrun altool --upload-app \
+            --type ios \
+            --file "${{ env.IPA_FILE }}" \
+            --apiKey "$APP_STORE_CONNECT_API_KEY_ID" \
+            --apiIssuer "$APP_STORE_CONNECT_ISSUER_ID"
+
+          rm -rf ~/.appstoreconnect
+
+      # --- Android ---
+
+      - name: Set up Android signing
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          ANDROID_STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
+        run: |
+          echo -n "$ANDROID_KEYSTORE_BASE64" | base64 --decode -o android/upload-keystore.jks
+          cat > android/key.properties << EOF
+          storePassword=$ANDROID_STORE_PASSWORD
+          keyPassword=$ANDROID_KEY_PASSWORD
+          keyAlias=$ANDROID_KEY_ALIAS
+          storeFile=../upload-keystore.jks
+          EOF
+
+      - name: Build Android APK
+        run: |
+          flutter build apk \
+            --release \
+            --build-name=${{ env.APP_VERSION }} \
+            --build-number=${{ env.BUILD_NUMBER }}
+
+      - name: Build Android App Bundle
+        run: |
+          flutter build appbundle \
+            --release \
+            --build-name=${{ env.APP_VERSION }} \
+            --build-number=${{ env.BUILD_NUMBER }}
+
+      - name: Upload AAB artifact
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-v${{ env.APP_VERSION }}+${{ env.BUILD_NUMBER }}
+          path: build/app/outputs/bundle/release/app-release.aab
+
+      # --- Tag release ---
+
+      - name: Create release tag
+        run: |
+          TAG="v${{ env.APP_VERSION }}+${{ env.BUILD_NUMBER }}"
+          git tag "$TAG"
+          git push origin "$TAG"
+
+      # --- Notifications ---
+
+      - name: Notify Slack on success
+        if: success()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          GIPHY_API_KEY: ${{ secrets.GIPHY_API_KEY }}
+        run: |
+          TAGS=("thumbs+up" "success" "celebration" "high+five" "awesome" "well+done")
+          TAG=${TAGS[$RANDOM % ${#TAGS[@]}]}
+          GIF=$(curl -s "https://api.giphy.com/v1/gifs/random?api_key=$GIPHY_API_KEY&tag=$TAG&rating=g" | python3 -c "import sys,json; print(json.load(sys.stdin)['data']['images']['downsized']['url'])")
+
+          PAYLOAD=$(jq -n \
+            --arg version "Crosswords v${{ env.APP_VERSION }}+${{ env.BUILD_NUMBER }} deployed" \
+            --arg commit "$COMMIT_MESSAGE" \
+            --arg gif "$GIF" \
+            '{
+              text: $version,
+              blocks: [
+                {
+                  type: "section",
+                  text: {
+                    type: "mrkdwn",
+                    text: ("*" + $version + "*\n\n" + $commit + "\n\n:apple: TestFlight\n:robot_face: Android APK + AAB")
+                  }
+                },
+                {
+                  type: "image",
+                  image_url: $gif,
+                  alt_text: "success"
+                }
+              ]
+            }')
+
+          curl -s -X POST "$SLACK_WEBHOOK_URL" \
+            -H 'Content-type: application/json' \
+            -d "$PAYLOAD"
+
+      - name: Notify Slack on failure
+        if: failure()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          PAYLOAD=$(jq -n \
+            --arg text "Crosswords build failed: v${{ env.APP_VERSION }}+${{ env.BUILD_NUMBER }}" \
+            --arg url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+            '{text: ($text + "\n" + $url)}')
+
+          curl -s -X POST "$SLACK_WEBHOOK_URL" \
+            -H 'Content-type: application/json' \
+            -d "$PAYLOAD"

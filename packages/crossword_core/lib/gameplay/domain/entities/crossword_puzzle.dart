@@ -47,4 +47,17 @@ class CrosswordPuzzle {
     }
     return null;
   }
+
+  /// The grid position of the clue cell whose arrow starts the word with
+  /// [wordId], or null if no clue points at it. Grids are small, so a linear
+  /// scan at word-activation time is fine.
+  (int, int)? cluePositionOf(String wordId) {
+    for (final entry in cells.entries) {
+      final cell = entry.value;
+      if (cell is ClueCell && cell.arrows.any((a) => a.wordId == wordId)) {
+        return entry.key;
+      }
+    }
+    return null;
+  }
 }
