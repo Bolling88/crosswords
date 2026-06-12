@@ -155,9 +155,36 @@ class CrosswordEngine {
     return _activateWord(state, word, (row, col));
   }
 
+  /// Whether every fillable cell has input — right or wrong.
+  bool isFilled(CrosswordState state) {
+    for (final entry in state.puzzle.cells.entries) {
+      final cell = entry.value;
+      if (cell is AnswerCell &&
+          !cell.isSeed &&
+          !state.userInputs.containsKey(entry.key)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /// Whether [inputs] solve the puzzle: every fillable cell holds its
+  /// solution letter. Seeds are given-correct; separators never affect
+  /// validation (per the JSON format spec).
+  bool computeSolved(CrosswordState state, Map<(int, int), String> inputs) {
+    for (final entry in state.puzzle.cells.entries) {
+      final cell = entry.value;
+      if (cell is AnswerCell && !cell.isSeed && inputs[entry.key] != cell.value) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   /// Make [word] the active word and select [cell] within it, highlighting the
-  /// whole word and pinning the direction to the word's local axis there. Pass
-  /// [userInputs] to fold a just-typed letter into the same result.
+  /// whole word (including its clue cell) and pinning the direction to the
+  /// word's local axis there. Pass [userInputs] to fold a just-typed letter
+  /// into the same result.
   CrosswordState _activateWord(
     CrosswordState state,
     Word word,
@@ -165,12 +192,13 @@ class CrosswordEngine {
     Map<(int, int), String>? userInputs,
   }) {
     final index = word.cells.indexOf(cell);
-    return state.copyWith(
-      userInputs: userInputs,
-      activeWordId: word.id,
+    return state.withActiveWord(
+      wordId: word.id,
       selectedCell: cell,
-      currentDirection: word.axisAt(index < 0 ? 0 : index),
+      direction: word.axisAt(index < 0 ? 0 : index),
       highlightedCells: word.cells.toSet(),
+      clueCell: state.puzzle.cluePositionOf(word.id),
+      userInputs: userInputs,
     );
   }
 

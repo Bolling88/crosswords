@@ -76,6 +76,34 @@ CrosswordPuzzle _twoWordPuzzle() {
   );
 }
 
+/// 1x3 grid: clue, a seed cell with given letter 'A', and one normal cell.
+CrosswordPuzzle _seedPuzzle() {
+  const w = Word(
+    id: 'w',
+    direction: Direction.right,
+    cells: [(0, 1), (0, 2)],
+  );
+  return const CrosswordPuzzle(
+    rows: 1,
+    cols: 3,
+    cells: {
+      (0, 0): ClueCell(arrows: [
+        ClueArrow(
+          direction: Direction.right,
+          shape: ArrowShape.straightRight,
+          wordId: 'w',
+        ),
+      ]),
+      (0, 1): AnswerCell(value: 'A', isSeed: true),
+      (0, 2): AnswerCell(value: 'B'),
+    },
+    words: [w],
+    seedPositions: {(0, 1)},
+    title: 't',
+    languageCode: 'sv',
+  );
+}
+
 /// 1x1 grid with a single answer cell that belongs to no word.
 CrosswordPuzzle _loneCellPuzzle() {
   return const CrosswordPuzzle(
@@ -268,6 +296,53 @@ void main() {
 
       expect(engine.backspace(state), state);
     });
+  });
+
+  group('solved & filled', () {
+    test('computeSolved is true only when every letter matches', () {
+      final solved = CrosswordState(
+        puzzle: _puzzle(),
+        userInputs: const {(0, 1): 'A', (0, 2): 'B', (0, 3): 'C', (1, 3): 'D'},
+      );
+      final wrong = CrosswordState(
+        puzzle: _puzzle(),
+        userInputs: const {(0, 1): 'X', (0, 2): 'B', (0, 3): 'C', (1, 3): 'D'},
+      );
+      final missing = CrosswordState(
+        puzzle: _puzzle(),
+        userInputs: const {(0, 1): 'A'},
+      );
+
+      expect(engine.computeSolved(solved, solved.userInputs), isTrue);
+      expect(engine.computeSolved(wrong, wrong.userInputs), isFalse);
+      expect(engine.computeSolved(missing, missing.userInputs), isFalse);
+    });
+
+    test('seed cells count as given-correct', () {
+      final state = CrosswordState(
+        puzzle: _seedPuzzle(),
+        userInputs: const {(0, 2): 'B'},
+      );
+
+      expect(engine.computeSolved(state, state.userInputs), isTrue);
+      expect(engine.isFilled(state), isTrue);
+    });
+
+    test('isFilled counts any letters, right or wrong', () {
+      final wrongButFull = CrosswordState(
+        puzzle: _puzzle(),
+        userInputs: const {(0, 1): 'X', (0, 2): 'X', (0, 3): 'X', (1, 3): 'X'},
+      );
+
+      expect(engine.isFilled(wrongButFull), isTrue);
+      expect(engine.isFilled(CrosswordState(puzzle: _puzzle())), isFalse);
+    });
+  });
+
+  test('activating a word records its clue cell for highlighting', () {
+    final next = engine.selectCell(CrosswordState(puzzle: _puzzle()), 0, 2);
+
+    expect(next.activeClueCell, (0, 0));
   });
 
   group('moveSelection', () {
