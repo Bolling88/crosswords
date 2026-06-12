@@ -21,4 +21,21 @@ class Strings {
 
   /// Sample glyphs shown under each font option to preview its look.
   static const String fontPreviewSample = 'ABCÅÄÖ';
+
+  /// Tooltip for the in-game actions menu.
+  static const String gameMenuTooltip = 'Spelmeny';
+
+  /// Game menu actions.
+  static const String checkWordAction = 'Kontrollera ord';
+  static const String checkPuzzleAction = 'Kontrollera allt';
+  static const String revealLetterAction = 'Visa bokstav';
+  static const String revealWordAction = 'Visa ord';
+  static const String clearWordAction = 'Rensa ord';
+  static const String restartAction = 'Börja om';
+
+  /// Restart confirmation dialog.
+  static const String restartConfirmTitle = 'Börja om?';
+  static const String restartConfirmBody =
+      'All ifylld text rensas. Detta går inte att ångra.';
+  static const String cancelAction = 'Avbryt';
 }

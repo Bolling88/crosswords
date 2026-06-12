@@ -40,6 +40,7 @@ class _MobileCrosswordView extends StatelessWidget {
         foregroundColor: AppColors.onBrand,
         elevation: 0,
         actions: [
+          const CrosswordMenuButton(),
           IconButton(
             icon: const Icon(Icons.settings),
             tooltip: Strings.settingsTooltip,
