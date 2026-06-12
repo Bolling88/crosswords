@@ -117,6 +117,42 @@ class CrosswordEngine {
     return _activateWord(state, nextWord, target, userInputs: inputs);
   }
 
+  /// Mark the active word's wrong letters. Correct and empty cells are left
+  /// (or become) unmarked; a fully correct word is confirmed for the flash.
+  CrosswordState checkWord(CrosswordState state) {
+    final word = state.puzzle.wordById(state.activeWordId ?? '');
+    if (word == null) return state;
+    return _checkCells(state, word.cells);
+  }
+
+  /// Mark wrong letters across the whole grid.
+  CrosswordState checkPuzzle(CrosswordState state) {
+    return _checkCells(state, state.puzzle.cells.keys);
+  }
+
+  /// Re-mark [cells]: filled wrong letters join `incorrectCells`, everything
+  /// else leaves it. Confirms the active word when it stands fully correct.
+  CrosswordState _checkCells(CrosswordState state, Iterable<(int, int)> cells) {
+    final incorrect = Set<(int, int)>.from(state.incorrectCells);
+    for (final pos in cells) {
+      final cell = state.puzzle.cells[pos];
+      if (cell is! AnswerCell || cell.isSeed) continue;
+      final input = state.userInputs[pos];
+      if (input != null && input != cell.value) {
+        incorrect.add(pos);
+      } else {
+        incorrect.remove(pos);
+      }
+    }
+
+    var next = state.copyWith(incorrectCells: incorrect);
+    final word = state.puzzle.wordById(state.activeWordId ?? '');
+    if (word != null && _isWordCorrect(state, word, state.userInputs)) {
+      next = next.withConfirmedWord(word.id);
+    }
+    return next;
+  }
+
   /// Whether [word] is fully filled with correct letters under [inputs].
   /// (A missing letter never equals the solution, so this implies filled.)
   bool _isWordCorrect(

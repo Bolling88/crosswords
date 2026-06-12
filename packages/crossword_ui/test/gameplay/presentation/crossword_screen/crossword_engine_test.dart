@@ -482,6 +482,64 @@ void main() {
     expect(next.activeClueCell, (0, 0));
   });
 
+  group('check actions', () {
+    test('checkWord marks only the active word\'s wrong letters', () {
+      final state = CrosswordState(
+        puzzle: _twoWordPuzzle(),
+        activeWordId: 'w1',
+        selectedCell: (0, 1),
+        userInputs: const {(0, 1): 'X', (0, 2): 'B', (1, 1): 'X'},
+        highlightedCells: const {(0, 1), (0, 2)},
+      );
+      final next = engine.checkWord(state);
+
+      // (1,1) is wrong too, but belongs to w2 — untouched. Empty cells stay
+      // unmarked.
+      expect(next.incorrectCells, {(0, 1)});
+    });
+
+    test('checkPuzzle marks wrong letters everywhere, skipping empties', () {
+      final state = CrosswordState(
+        puzzle: _twoWordPuzzle(),
+        userInputs: const {(0, 1): 'X', (1, 1): 'X', (1, 2): 'D'},
+      );
+      final next = engine.checkPuzzle(state);
+
+      expect(next.incorrectCells, {(0, 1), (1, 1)});
+    });
+
+    test('a correct letter loses a stale mark on re-check', () {
+      final state = CrosswordState(
+        puzzle: _twoWordPuzzle(),
+        userInputs: const {(0, 1): 'A'},
+        incorrectCells: const {(0, 1)},
+      );
+
+      expect(engine.checkPuzzle(state).incorrectCells, isEmpty);
+    });
+
+    test('checkWord on a fully correct word confirms it for the flash', () {
+      final state = CrosswordState(
+        puzzle: _twoWordPuzzle(),
+        activeWordId: 'w1',
+        selectedCell: (0, 2),
+        userInputs: const {(0, 1): 'A', (0, 2): 'B'},
+        highlightedCells: const {(0, 1), (0, 2)},
+      );
+      final next = engine.checkWord(state);
+
+      expect(next.incorrectCells, isEmpty);
+      expect(next.confirmedWordId, 'w1');
+      expect(next.confirmedWordToken, 1);
+    });
+
+    test('checkWord without an active word is a no-op', () {
+      final state = CrosswordState(puzzle: _twoWordPuzzle());
+
+      expect(engine.checkWord(state), state);
+    });
+  });
+
   group('moveSelection', () {
     test('arrow-right lands on the next answer cell', () {
       final active = engine.selectCell(CrosswordState(puzzle: _puzzle()), 0, 1);
