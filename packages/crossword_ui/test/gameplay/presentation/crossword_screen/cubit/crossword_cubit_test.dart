@@ -130,17 +130,29 @@ void main() {
 
   late CrosswordCubit cubit;
   late FontService fontService;
+  late GameplaySettingsService settingsService;
+  late ProgressService progressService;
+
+  CrosswordCubit buildCubit(CrosswordPuzzle puzzle) => CrosswordCubit(
+        puzzle: puzzle,
+        fontService: fontService,
+        settingsService: settingsService,
+        progressService: progressService,
+      );
 
   setUp(() async {
     SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();
     fontService = FontService(prefs: prefs);
-    cubit = CrosswordCubit(puzzle: _puzzle(), fontService: fontService);
+    settingsService = GameplaySettingsService(prefs: prefs);
+    progressService = ProgressService(prefs: prefs);
+    cubit = buildCubit(_puzzle());
   });
 
   tearDown(() async {
     await cubit.close();
     fontService.dispose();
+    settingsService.dispose();
   });
 
   test('tapping a clue selects the first cell of its word and highlights it',
@@ -223,8 +235,7 @@ void main() {
     });
 
     test('moving down selects the vertical word through a shared cell', () {
-      final overlap =
-          CrosswordCubit(puzzle: _overlapPuzzle(), fontService: fontService);
+      final overlap = buildCubit(_overlapPuzzle());
       addTearDown(overlap.close);
       overlap.selectCell(0, 1); // activates h1 across, at (0,1)
       overlap.moveSelection(0, 1); // to (0,2), shared by h1's vertical run
@@ -274,8 +285,7 @@ void main() {
 
   test('selecting an answer cell in no word clears the active word and does '
       'not teleport on the next keystroke', () {
-    final lone =
-        CrosswordCubit(puzzle: _loneCellPuzzle(), fontService: fontService);
+    final lone = buildCubit(_loneCellPuzzle());
     addTearDown(lone.close);
 
     lone.selectCell(0, 0); // activates word w at (0,1)
@@ -309,7 +319,7 @@ void main() {
     late CrosswordCubit overlap;
 
     setUp(() {
-      overlap = CrosswordCubit(puzzle: _overlapPuzzle(), fontService: fontService);
+      overlap = buildCubit(_overlapPuzzle());
     });
 
     tearDown(() => overlap.close());
@@ -372,5 +382,100 @@ void main() {
       overlap.onLetterInput('C');
       expect(overlap.state.selectedCell, (2, 2));
     });
+  });
+
+  group('persistence', () {
+    test('typed letters are saved and restored by a new cubit', () async {
+      cubit.selectCell(0, 1);
+      cubit.onLetterInput('A');
+      await Future<void>.delayed(Duration.zero); // let the async save land
+
+      final restored = buildCubit(_puzzle());
+      addTearDown(restored.close);
+
+      expect(restored.state.userInputs[(0, 1)], 'A');
+    });
+
+    test('restartPuzzle wipes the grid and the stored progress', () async {
+      cubit.selectCell(0, 1);
+      cubit.onLetterInput('A');
+      await Future<void>.delayed(Duration.zero);
+
+      cubit.restartPuzzle();
+      await Future<void>.delayed(Duration.zero);
+
+      expect(cubit.state.userInputs, isEmpty);
+      final restored = buildCubit(_puzzle());
+      addTearDown(restored.close);
+      expect(restored.state.userInputs, isEmpty);
+    });
+  });
+
+  group('autocheck setting', () {
+    test('wrong letters are marked while the setting is on', () async {
+      await settingsService.setAutocheck(true);
+      cubit.selectCell(0, 1);
+      cubit.onLetterInput('X');
+
+      expect(cubit.state.incorrectCells, {(0, 1)});
+    });
+
+    test('wrong letters enter unmarked while the setting is off', () {
+      cubit.selectCell(0, 1);
+      cubit.onLetterInput('X');
+
+      expect(cubit.state.incorrectCells, isEmpty);
+    });
+  });
+
+  group('one-shot events', () {
+    test('solving the puzzle emits PuzzleSolved exactly once', () async {
+      final events = <CrosswordState>[];
+      final sub = cubit.stream.listen(events.add);
+      addTearDown(sub.cancel);
+
+      cubit.selectCell(0, 1);
+      for (final letter in ['A', 'B', 'C', 'D']) {
+        cubit.onLetterInput(letter);
+      }
+      await Future<void>.delayed(Duration.zero);
+
+      expect(cubit.state.isSolved, isTrue);
+      expect(events.whereType<PuzzleSolved>().length, 1);
+    });
+
+    test('a full but wrong grid emits PuzzleFilledButIncorrect once', () async {
+      final events = <CrosswordState>[];
+      final sub = cubit.stream.listen(events.add);
+      addTearDown(sub.cancel);
+
+      cubit.selectCell(0, 1);
+      for (final letter in ['A', 'B', 'C', 'X']) {
+        cubit.onLetterInput(letter);
+      }
+      await Future<void>.delayed(Duration.zero);
+
+      expect(events.whereType<PuzzleFilledButIncorrect>().length, 1);
+      expect(events.whereType<PuzzleSolved>(), isEmpty);
+    });
+  });
+
+  test('check, reveal, and clear actions work end to end', () {
+    cubit.selectCell(0, 1);
+    cubit.onLetterInput('X'); // wrong letter at (0,1), caret moves to (0,2)
+    cubit.checkPuzzle();
+    expect(cubit.state.incorrectCells, {(0, 1)});
+
+    cubit.selectCell(0, 1);
+    cubit.revealCell();
+    expect(cubit.state.userInputs[(0, 1)], 'A');
+    expect(cubit.state.revealedCells, {(0, 1)});
+    expect(cubit.state.incorrectCells, isEmpty);
+
+    cubit.revealWord();
+    expect(cubit.state.isSolved, isTrue);
+
+    cubit.clearWord(); // revealed letters survive a clear
+    expect(cubit.state.userInputs.length, 4);
   });
 }

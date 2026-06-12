@@ -18,6 +18,8 @@ Future<Widget> _app() async {
         create: (context) => CrosswordCubit(
           puzzle: puzzle,
           fontService: fontService,
+          settingsService: GameplaySettingsService(prefs: prefs),
+          progressService: ProgressService(prefs: prefs),
         ),
         child: const Scaffold(body: CrosswordPlayer()),
       ),

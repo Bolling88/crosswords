@@ -15,8 +15,16 @@ void main() {
     final puzzle = await loadBundledPuzzle();
 
     await tester.pumpWidget(
-      RepositoryProvider<FontService>.value(
-        value: fontService,
+      MultiRepositoryProvider(
+        providers: [
+          RepositoryProvider<FontService>.value(value: fontService),
+          RepositoryProvider<GameplaySettingsService>.value(
+            value: GameplaySettingsService(prefs: prefs),
+          ),
+          RepositoryProvider<ProgressService>.value(
+            value: ProgressService(prefs: prefs),
+          ),
+        ],
         child: MaterialApp(home: WebCrosswordScreen(puzzle: puzzle)),
       ),
     );

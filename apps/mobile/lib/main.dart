@@ -11,24 +11,41 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final prefs = await SharedPreferences.getInstance();
   final fontService = FontService(prefs: prefs);
+  final settingsService = GameplaySettingsService(prefs: prefs);
+  final progressService = ProgressService(prefs: prefs);
   final puzzle = await loadBundledPuzzle();
-  runApp(CrosswordsApp(fontService: fontService, puzzle: puzzle));
+  runApp(CrosswordsApp(
+    fontService: fontService,
+    settingsService: settingsService,
+    progressService: progressService,
+    puzzle: puzzle,
+  ));
 }
 
 class CrosswordsApp extends StatelessWidget {
   final FontService fontService;
+  final GameplaySettingsService settingsService;
+  final ProgressService progressService;
   final CrosswordPuzzle puzzle;
 
   const CrosswordsApp({
     required this.fontService,
+    required this.settingsService,
+    required this.progressService,
     required this.puzzle,
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
-    return RepositoryProvider<FontService>.value(
-      value: fontService,
+    return MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider<FontService>.value(value: fontService),
+        RepositoryProvider<GameplaySettingsService>.value(
+          value: settingsService,
+        ),
+        RepositoryProvider<ProgressService>.value(value: progressService),
+      ],
       child: MaterialApp(
         title: Strings.appTitle,
         theme: ThemeData(

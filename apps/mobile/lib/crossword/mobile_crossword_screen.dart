@@ -17,6 +17,8 @@ class MobileCrosswordScreen extends StatelessWidget {
       create: (context) => CrosswordCubit(
         puzzle: puzzle,
         fontService: context.read<FontService>(),
+        settingsService: context.read<GameplaySettingsService>(),
+        progressService: context.read<ProgressService>(),
       ),
       child: const _MobileCrosswordView(),
     );

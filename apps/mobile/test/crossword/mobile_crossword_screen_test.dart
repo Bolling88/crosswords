@@ -10,17 +10,27 @@ import 'package:crosswords/settings/presentation/settings_screen/settings_screen
 
 void main() {
   late FontService fontService;
+  late GameplaySettingsService settingsService;
+  late ProgressService progressService;
   late CrosswordPuzzle puzzle;
 
   setUp(() async {
     SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();
     fontService = FontService(prefs: prefs);
+    settingsService = GameplaySettingsService(prefs: prefs);
+    progressService = ProgressService(prefs: prefs);
     puzzle = await loadBundledPuzzle();
   });
 
-  Widget harness() => RepositoryProvider<FontService>.value(
-        value: fontService,
+  Widget harness() => MultiRepositoryProvider(
+        providers: [
+          RepositoryProvider<FontService>.value(value: fontService),
+          RepositoryProvider<GameplaySettingsService>.value(
+            value: settingsService,
+          ),
+          RepositoryProvider<ProgressService>.value(value: progressService),
+        ],
         child: MaterialApp(home: MobileCrosswordScreen(puzzle: puzzle)),
       );
 
