@@ -84,10 +84,14 @@ class CrosswordGrid extends StatelessWidget {
           fontFamily: fontFamily,
         ),
       AnswerCell() => AnswerCellWidget(
-          userInput: state.userInputs[(row, col)],
+          letter: state.userInputs[(row, col)] ??
+              (cell.isSeed ? cell.value : null),
           isSelected: state.selectedCell == (row, col),
           isHighlighted: state.highlightedCells.contains((row, col)),
           isSeed: cell.isSeed,
+          isIncorrect: state.incorrectCells.contains((row, col)),
+          isRevealed: state.revealedCells.contains((row, col)),
+          confirmPulseToken: _pulseTokenFor(row, col),
           hasRightSeparator: edges.contains(Direction.right),
           hasBottomSeparator: edges.contains(Direction.down),
           size: cellSize,
@@ -97,6 +101,15 @@ class CrosswordGrid extends StatelessWidget {
       BlockCell() => BlockedCellWidget(size: cellSize),
       ImageCell() => SizedBox(width: cellSize, height: cellSize),
     };
+  }
+
+  /// The flash token for cells of the most recently confirmed word; null for
+  /// all other cells (and before any confirmation has happened).
+  int? _pulseTokenFor(int row, int col) {
+    if (state.confirmedWordToken == 0) return null;
+    final word = state.puzzle.wordById(state.confirmedWordId ?? '');
+    if (word == null || !word.cells.contains((row, col))) return null;
+    return state.confirmedWordToken;
   }
 
   List<Widget> _buildImageOverlays(double cellSize) {

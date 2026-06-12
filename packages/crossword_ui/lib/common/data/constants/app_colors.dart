@@ -35,8 +35,11 @@ class AppColors {
   /// Primary text colour for entered letters and clue text.
   static const Color ink = Color(0xFF1F1B16);
 
-  /// Muted ink for secondary marks (e.g. image label).
+  /// Muted ink for secondary marks (e.g. image label, revealed letters).
   static const Color inkMuted = Color(0xFF6B6557);
+
+  /// Ink for letters marked wrong by a check — brick red, like a teacher's pen.
+  static const Color errorInk = Color(0xFFB3402F);
 
   // Interaction states
   /// Currently selected cell — warm amber, like a highlighter.
