@@ -205,6 +205,36 @@ class CrosswordEngine {
     return _activateWord(next, nextWord, target);
   }
 
+  /// Clear the active word's letters and marks, leaving seeds and revealed
+  /// letters in place, and park the selection on the word's first editable
+  /// gap.
+  CrosswordState clearWord(CrosswordState state) {
+    final word = state.puzzle.wordById(state.activeWordId ?? '');
+    if (word == null) return state;
+
+    final inputs = Map<(int, int), String>.from(state.userInputs);
+    final incorrect = Set<(int, int)>.from(state.incorrectCells);
+    for (final pos in word.cells) {
+      if (_isLocked(state, pos)) continue;
+      inputs.remove(pos);
+      incorrect.remove(pos);
+    }
+
+    final next = state.copyWith(
+      userInputs: inputs,
+      incorrectCells: incorrect,
+      isSolved: computeSolved(state, inputs),
+    );
+    final target = _firstEmptyCell(next, word, inputs) ?? word.cells.first;
+    return _activateWord(next, word, target);
+  }
+
+  /// Wipe all inputs, marks, and selection back to a pristine puzzle. The
+  /// font (a UI concern carried through engine transitions) is preserved.
+  CrosswordState restart(CrosswordState state) {
+    return CrosswordState(puzzle: state.puzzle, font: state.font);
+  }
+
   /// Whether [word] is fully filled with correct letters under [inputs].
   /// (A missing letter never equals the solution, so this implies filled.)
   bool _isWordCorrect(

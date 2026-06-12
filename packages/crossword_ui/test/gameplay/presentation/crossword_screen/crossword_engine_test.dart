@@ -602,6 +602,54 @@ void main() {
     });
   });
 
+  group('clearWord & restart', () {
+    test('clearWord clears letters and marks but keeps revealed letters', () {
+      final state = CrosswordState(
+        puzzle: _puzzle(),
+        activeWordId: 'across',
+        selectedCell: (1, 3),
+        userInputs: const {(0, 1): 'A', (0, 2): 'X', (0, 3): 'C'},
+        incorrectCells: const {(0, 2)},
+        revealedCells: const {(0, 1)},
+        highlightedCells: const {(0, 1), (0, 2), (0, 3), (1, 3)},
+      );
+      final next = engine.clearWord(state);
+
+      expect(next.userInputs, {(0, 1): 'A'});
+      expect(next.incorrectCells, isEmpty);
+      expect(next.revealedCells, {(0, 1)});
+      // Selection parks on the word's first editable gap.
+      expect(next.selectedCell, (0, 2));
+    });
+
+    test('clearWord without an active word is a no-op', () {
+      final state = CrosswordState(puzzle: _puzzle());
+
+      expect(engine.clearWord(state), state);
+    });
+
+    test('restart returns a pristine state, keeping puzzle and font', () {
+      final messy = CrosswordState(
+        puzzle: _puzzle(),
+        activeWordId: 'across',
+        selectedCell: (0, 1),
+        userInputs: const {(0, 1): 'A'},
+        incorrectCells: const {(0, 1)},
+        revealedCells: const {(0, 2)},
+        font: AppFont.values.last,
+      );
+      final fresh = engine.restart(messy);
+
+      expect(fresh.userInputs, isEmpty);
+      expect(fresh.incorrectCells, isEmpty);
+      expect(fresh.revealedCells, isEmpty);
+      expect(fresh.selectedCell, isNull);
+      expect(fresh.activeWordId, isNull);
+      expect(fresh.font, AppFont.values.last);
+      expect(fresh.puzzle, messy.puzzle);
+    });
+  });
+
   group('moveSelection', () {
     test('arrow-right lands on the next answer cell', () {
       final active = engine.selectCell(CrosswordState(puzzle: _puzzle()), 0, 1);
