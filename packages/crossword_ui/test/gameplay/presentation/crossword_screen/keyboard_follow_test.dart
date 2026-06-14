@@ -14,7 +14,7 @@ void main() {
 
   Matrix4 scaled(double s, [double tx = 0, double ty = 0]) =>
       Matrix4.identity()
-        ..scale(s)
+        ..scaleByDouble(s, s, s, 1)
         ..setTranslationRaw(tx, ty, 0);
 
   test('returns null at fit scale (cannot pan)', () {
