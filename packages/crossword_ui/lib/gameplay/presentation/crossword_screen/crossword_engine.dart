@@ -205,6 +205,28 @@ class CrosswordEngine {
     return _activateWord(next, nextWord, target);
   }
 
+  /// Fill every fillable cell with its solution letter and lock them all,
+  /// ending the game. A terminal "give up" action: unlike [revealWord] the
+  /// cubit suppresses the solved celebration for it. Seed cells keep their
+  /// given letters and stay unrevealed; any incorrect marks are cleared since
+  /// the grid now holds only correct letters.
+  CrosswordState revealSolution(CrosswordState state) {
+    final inputs = Map<(int, int), String>.from(state.userInputs);
+    final revealed = Set<(int, int)>.from(state.revealedCells);
+    for (final entry in state.puzzle.cells.entries) {
+      final cell = entry.value;
+      if (cell is! AnswerCell || cell.isSeed) continue;
+      inputs[entry.key] = cell.value;
+      revealed.add(entry.key);
+    }
+    return state.copyWith(
+      userInputs: inputs,
+      revealedCells: revealed,
+      incorrectCells: const <(int, int)>{},
+      isSolved: computeSolved(state, inputs),
+    );
+  }
+
   /// Clear the active word's letters and marks, leaving seeds and revealed
   /// letters in place, and park the selection on the word's first editable
   /// gap.

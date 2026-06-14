@@ -600,6 +600,43 @@ void main() {
 
       expect(engine.revealWord(active).isSolved, isTrue);
     });
+
+    test('revealSolution fills and locks every fillable cell and solves', () {
+      final state = CrosswordState(puzzle: _twoWordPuzzle());
+      final next = engine.revealSolution(state);
+
+      expect(next.userInputs, {
+        (0, 1): 'A',
+        (0, 2): 'B',
+        (1, 1): 'C',
+        (1, 2): 'D',
+      });
+      expect(next.revealedCells, {(0, 1), (0, 2), (1, 1), (1, 2)});
+      expect(next.isSolved, isTrue);
+    });
+
+    test('revealSolution leaves seed cells given and unrevealed', () {
+      final state = CrosswordState(puzzle: _seedPuzzle());
+      final next = engine.revealSolution(state);
+
+      // (0,1) is a seed: not written into inputs and not in revealedCells.
+      expect(next.userInputs.containsKey((0, 1)), isFalse);
+      expect(next.revealedCells, {(0, 2)});
+      expect(next.userInputs[(0, 2)], 'B');
+      expect(next.isSolved, isTrue);
+    });
+
+    test('revealSolution clears any incorrect marks', () {
+      final state = CrosswordState(
+        puzzle: _twoWordPuzzle(),
+        userInputs: const {(0, 1): 'X'},
+        incorrectCells: const {(0, 1)},
+      );
+      final next = engine.revealSolution(state);
+
+      expect(next.userInputs[(0, 1)], 'A');
+      expect(next.incorrectCells, isEmpty);
+    });
   });
 
   group('clearWord & restart', () {
