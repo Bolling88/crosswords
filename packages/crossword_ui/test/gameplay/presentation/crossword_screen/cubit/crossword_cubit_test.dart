@@ -458,6 +458,30 @@ void main() {
       expect(events.whereType<PuzzleFilledButIncorrect>().length, 1);
       expect(events.whereType<PuzzleSolved>(), isEmpty);
     });
+
+    test('revealing the full solution solves without celebrating', () async {
+      final events = <CrosswordState>[];
+      final sub = cubit.stream.listen(events.add);
+      addTearDown(sub.cancel);
+
+      cubit.revealSolution();
+      await Future<void>.delayed(Duration.zero);
+
+      expect(cubit.state.isSolved, isTrue);
+      expect(cubit.state.revealedCells, {(0, 1), (0, 2), (0, 3), (1, 3)});
+      expect(events.whereType<PuzzleSolved>(), isEmpty);
+    });
+  });
+
+  test('a revealed full solution is persisted and restored', () async {
+    cubit.revealSolution();
+    await Future<void>.delayed(Duration.zero);
+
+    final restored = buildCubit(_puzzle());
+    addTearDown(restored.close);
+
+    expect(restored.state.isSolved, isTrue);
+    expect(restored.state.revealedCells, {(0, 1), (0, 2), (0, 3), (1, 3)});
   });
 
   test('check, reveal, and clear actions work end to end', () {

@@ -113,6 +113,15 @@ class CrosswordCubit extends Cubit<CrosswordState> {
 
   void revealWord() => _apply(_engine.revealWord(state), raiseKeyboard: false);
 
+  /// Reveal the entire solution. This fills and locks the grid (making it
+  /// solved) but is a "give up" action, so the celebration is suppressed —
+  /// only genuinely solving the puzzle shows it.
+  void revealSolution() => _apply(
+        _engine.revealSolution(state),
+        raiseKeyboard: false,
+        suppressSolvedEvent: true,
+      );
+
   void clearWord() => _apply(_engine.clearWord(state), raiseKeyboard: false);
 
   void restartPuzzle() => _apply(_engine.restart(state), raiseKeyboard: false);
@@ -128,13 +137,19 @@ class CrosswordCubit extends Cubit<CrosswordState> {
     CrosswordState next, {
     required bool raiseKeyboard,
     bool letterHaptic = false,
+    bool suppressSolvedEvent = false,
   }) {
     final prev = state;
     if (next == prev) return;
     emit(next);
     if (raiseKeyboard) _raiseKeyboard();
     _persistProgress(prev, next);
-    _feedback(prev, next, letterHaptic: letterHaptic);
+    _feedback(
+      prev,
+      next,
+      letterHaptic: letterHaptic,
+      suppressSolvedEvent: suppressSolvedEvent,
+    );
   }
 
   /// Save progress when inputs or revealed letters changed. The engine only
@@ -160,8 +175,12 @@ class CrosswordCubit extends Cubit<CrosswordState> {
     CrosswordState prev,
     CrosswordState next, {
     required bool letterHaptic,
+    bool suppressSolvedEvent = false,
   }) {
     if (next.isSolved && !prev.isSolved) {
+      // Revealing the full solution still flips isSolved, but it isn't a win:
+      // skip the haptic and celebration so they stay reserved for solving.
+      if (suppressSolvedEvent) return;
       _haptic(HapticFeedback.heavyImpact);
       emit(PuzzleSolved(state: next));
       return;
