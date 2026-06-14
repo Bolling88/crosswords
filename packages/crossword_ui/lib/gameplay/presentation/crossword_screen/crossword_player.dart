@@ -119,6 +119,11 @@ class _CrosswordPlayerBody extends StatelessWidget {
                         state.puzzle.rows;
                 final cellSize = min(cellSizeByWidth, cellSizeByHeight);
 
+                cubit.setLayout(
+                  viewport: Size(constraints.maxWidth, constraints.maxHeight),
+                  cellSize: cellSize,
+                );
+
                 return InteractiveViewer(
                   transformationController: cubit.transformationController,
                   minScale: 1.0,
