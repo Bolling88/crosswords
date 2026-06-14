@@ -84,6 +84,26 @@ void main() {
     expect(cubit.state.incorrectCells, {(0, 1)});
   });
 
+  testWidgets('reveal solution confirms, then fills the whole grid',
+      (tester) async {
+    await tester.pumpWidget(harness());
+
+    await openMenuAndTap(tester, Strings.revealSolutionAction);
+    // Confirmation dialog is showing; cancel leaves the grid empty.
+    await tester.tap(find.text(Strings.cancelAction));
+    await tester.pumpAndSettle();
+    expect(cubit.state.userInputs, isEmpty);
+
+    await openMenuAndTap(tester, Strings.revealSolutionAction);
+    expect(find.text(Strings.revealSolutionConfirmBody), findsOneWidget);
+    await tester.tap(find.text(Strings.revealSolutionAction).last);
+    await tester.pumpAndSettle();
+
+    expect(cubit.state.userInputs, {(0, 1): 'A', (0, 2): 'B'});
+    expect(cubit.state.revealedCells, {(0, 1), (0, 2)});
+    expect(cubit.state.isSolved, isTrue);
+  });
+
   testWidgets('restart asks for confirmation before wiping', (tester) async {
     cubit.selectCell(0, 1);
     cubit.onLetterInput('A');

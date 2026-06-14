@@ -30,8 +30,14 @@ class Strings {
   static const String checkPuzzleAction = 'Kontrollera allt';
   static const String revealLetterAction = 'Visa bokstav';
   static const String revealWordAction = 'Visa ord';
+  static const String revealSolutionAction = 'Visa lösning';
   static const String clearWordAction = 'Rensa ord';
   static const String restartAction = 'Börja om';
+
+  /// Reveal-solution confirmation dialog.
+  static const String revealSolutionConfirmTitle = 'Visa lösningen?';
+  static const String revealSolutionConfirmBody =
+      'Hela korsordet fylls i med facit. Detta avslutar spelet.';
 
   /// Restart confirmation dialog.
   static const String restartConfirmTitle = 'Börja om?';

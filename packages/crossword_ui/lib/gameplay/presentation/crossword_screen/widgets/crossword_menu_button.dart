@@ -9,6 +9,7 @@ enum _MenuAction {
   checkPuzzle,
   revealLetter,
   revealWord,
+  revealSolution,
   clearWord,
   restart,
 }
@@ -34,6 +35,8 @@ class CrosswordMenuButton extends StatelessWidget {
             cubit.revealCell();
           case _MenuAction.revealWord:
             cubit.revealWord();
+          case _MenuAction.revealSolution:
+            _confirmRevealSolution(context, cubit);
           case _MenuAction.clearWord:
             cubit.clearWord();
           case _MenuAction.restart:
@@ -58,6 +61,10 @@ class CrosswordMenuButton extends StatelessWidget {
           value: _MenuAction.revealWord,
           child: Text(Strings.revealWordAction),
         ),
+        PopupMenuItem(
+          value: _MenuAction.revealSolution,
+          child: Text(Strings.revealSolutionAction),
+        ),
         PopupMenuDivider(),
         PopupMenuItem(
           value: _MenuAction.clearWord,
@@ -69,6 +76,31 @@ class CrosswordMenuButton extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  /// Revealing the whole solution ends the game, so it confirms first.
+  Future<void> _confirmRevealSolution(
+    BuildContext context,
+    CrosswordCubit cubit,
+  ) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text(Strings.revealSolutionConfirmTitle),
+        content: const Text(Strings.revealSolutionConfirmBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text(Strings.cancelAction),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text(Strings.revealSolutionAction),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true) cubit.revealSolution();
   }
 
   /// Restart is destructive, so it confirms first. View-local dialog flow,
