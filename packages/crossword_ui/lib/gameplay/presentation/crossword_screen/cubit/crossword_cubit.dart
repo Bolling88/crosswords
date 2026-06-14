@@ -11,6 +11,7 @@ import '../../../../settings/domain/services/font_service.dart';
 import '../../../../settings/domain/services/gameplay_settings_service.dart';
 import '../../../domain/services/progress_service.dart';
 import '../crossword_engine.dart';
+import '../keyboard_follow.dart';
 import 'crossword_state.dart';
 
 class CrosswordCubit extends Cubit<CrosswordState> {
@@ -38,6 +39,11 @@ class CrosswordCubit extends Cubit<CrosswordState> {
   final GameplaySettingsService _settingsService;
   final ProgressService _progressService;
   final CrosswordEngine _engine;
+
+  /// Latest grid layout from the player's LayoutBuilder, used to keep the
+  /// selected cell visible. Plain fields — view geometry, never emitted.
+  Size? _viewportSize;
+  double? _cellSize;
 
   CrosswordCubit({
     required CrosswordPuzzle puzzle,
@@ -133,6 +139,42 @@ class CrosswordCubit extends Cubit<CrosswordState> {
   /// [raiseKeyboard] false — the keyboard is already up mid-entry. After
   /// emitting, persist changed progress and fire transition-edged feedback
   /// (haptics and one-shot event states).
+  /// Record the current viewport size and cell size from the player's
+  /// LayoutBuilder. When the viewport changes while a cell is selected (the
+  /// soft keyboard opens and the body resizes), schedule a visibility check
+  /// for after this frame — assigning the transform during build would
+  /// re-enter the InteractiveViewer's listener.
+  void setLayout({required Size viewport, required double cellSize}) {
+    final changed = _viewportSize != viewport || _cellSize != cellSize;
+    _viewportSize = viewport;
+    _cellSize = cellSize;
+    if (changed && state.selectedCell != null) {
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) => _ensureSelectedCellVisible(),
+      );
+    }
+  }
+
+  /// Nudge the grid so the selected cell sits in a comfortable band of the
+  /// visible viewport, if metrics and a selection are known. No-op otherwise.
+  void _ensureSelectedCellVisible() {
+    final viewport = _viewportSize;
+    final cellSize = _cellSize;
+    final sel = state.selectedCell;
+    if (viewport == null || cellSize == null || sel == null) return;
+
+    final next = transformToRevealCell(
+      current: transformationController.value,
+      viewport: viewport,
+      cellSize: cellSize,
+      rows: state.puzzle.rows,
+      cols: state.puzzle.cols,
+      cell: sel,
+      margin: cellSize,
+    );
+    if (next != null) transformationController.value = next;
+  }
+
   void _apply(
     CrosswordState next, {
     required bool raiseKeyboard,
@@ -150,6 +192,7 @@ class CrosswordCubit extends Cubit<CrosswordState> {
       letterHaptic: letterHaptic,
       suppressSolvedEvent: suppressSolvedEvent,
     );
+    if (next.selectedCell != prev.selectedCell) _ensureSelectedCellVisible();
   }
 
   /// Save progress when inputs or revealed letters changed. The engine only

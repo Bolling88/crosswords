@@ -502,4 +502,60 @@ void main() {
     cubit.clearWord(); // revealed letters survive a clear
     expect(cubit.state.userInputs.length, 4);
   });
+
+  group('keyboard-aware auto-pan', () {
+    // viewport 80x40 with 4 cols / 2 rows => fit cellSize 20, so the grid fills
+    // the viewport and cell (r,c) centre is (c*20+10, r*20+10).
+    test('setLayout stores metrics without emitting a new state', () {
+      final emissions = <CrosswordState>[];
+      final sub = cubit.stream.listen(emissions.add);
+      addTearDown(sub.cancel);
+
+      cubit.setLayout(viewport: const Size(80, 40), cellSize: 20);
+
+      expect(emissions, isEmpty);
+    });
+
+    test('selecting an off-screen cell while zoomed pans it into view', () {
+      cubit.setLayout(viewport: const Size(80, 40), cellSize: 20);
+      cubit.transformationController.value =
+          Matrix4.identity()..scaleByDouble(2.0, 2.0, 2.0, 1);
+
+      cubit.selectCell(0, 3); // centre x = 70 -> viewport x = 140, off-screen
+
+      // ty stays 0 (row 0 visible); tx clamps to 80*(1-2) = -80, putting the
+      // cell at the right margin.
+      expect(cubit.transformationController.value.storage[12], closeTo(-80, 0.5));
+    });
+
+    test('selecting a cell at fit scale does not move the view', () {
+      cubit.setLayout(viewport: const Size(80, 40), cellSize: 20);
+
+      cubit.selectCell(0, 1);
+
+      expect(cubit.transformationController.value, Matrix4.identity());
+    });
+
+    testWidgets('the selected cell stays within the viewport across a resize',
+        (tester) async {
+      cubit.setLayout(viewport: const Size(80, 80), cellSize: 20);
+      cubit.transformationController.value =
+          Matrix4.identity()..scaleByDouble(2.0, 2.0, 2.0, 1);
+      cubit.selectCell(0, 3); // revealed against the 80x80 viewport
+
+      // Simulate the keyboard shrinking the body to half height. This is a
+      // viewport change with a cell selected, so setLayout schedules a
+      // post-frame visibility check; tester.pump() flushes it.
+      cubit.setLayout(viewport: const Size(80, 40), cellSize: 20);
+      await tester.pump();
+
+      // Invariant: the selected cell's centre sits inside the 80x40 viewport.
+      final m = cubit.transformationController.value;
+      final scale = m.storage[0];
+      const cx = 70.0; // (80 - 4*20)/2 + 3*20 + 10
+      const cy = 10.0; // (40 - 2*20)/2 + 0*20 + 10
+      expect(scale * cx + m.storage[12], inInclusiveRange(0, 80));
+      expect(scale * cy + m.storage[13], inInclusiveRange(0, 40));
+    });
+  });
 }
