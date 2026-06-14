@@ -46,13 +46,10 @@ class _WebCrosswordView extends StatelessWidget {
           ),
         ],
       ),
-      // Constrain width so the grid stays readable on wide desktop viewports.
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 900),
-          child: const CrosswordPlayer(),
-        ),
-      ),
+      // Full-bleed: the player uses the whole width so a zoomed-in grid can be
+      // panned across the entire screen (the grid still fits-and-centres at
+      // rest via its own LayoutBuilder).
+      body: const CrosswordPlayer(),
     );
   }
 }
