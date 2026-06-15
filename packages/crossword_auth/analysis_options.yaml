@@ -1,0 +1,11 @@
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    - avoid_print
+    - prefer_single_quotes
+    - prefer_const_constructors
+    - prefer_const_declarations
+    - require_trailing_commas
+    - avoid_unnecessary_containers
+    - use_decorated_box
