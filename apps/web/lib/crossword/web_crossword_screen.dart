@@ -32,12 +32,8 @@ class _WebCrosswordView extends StatelessWidget {
     final cubit = context.read<CrosswordCubit>();
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: Text(Strings.appTitle, style: AppTextStyles.appBarTitle()),
-        centerTitle: true,
-        backgroundColor: AppColors.brand,
-        foregroundColor: AppColors.onBrand,
-        elevation: 0,
+      appBar: BrandAppBar(
+        title: Strings.appTitle,
         actions: [
           const CrosswordMenuButton(),
           IconButton(

@@ -6,6 +6,7 @@ import '../../domain/services/gameplay_settings_service.dart';
 import '../../../common/data/constants/app_colors.dart';
 import '../../../common/data/constants/app_text_styles.dart';
 import '../../../common/data/constants/strings.dart';
+import '../../../common/presentation/widgets/brand_app_bar.dart';
 
 import 'cubit/settings_cubit.dart';
 import 'cubit/settings_state.dart';
@@ -47,13 +48,7 @@ class SettingsScreenContent extends StatelessWidget {
     final cubit = context.read<SettingsCubit>();
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: Text(Strings.settingsTitle, style: AppTextStyles.appBarTitle()),
-        centerTitle: true,
-        backgroundColor: AppColors.brand,
-        foregroundColor: AppColors.onBrand,
-        elevation: 0,
-      ),
+      appBar: const BrandAppBar(title: Strings.settingsTitle),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(

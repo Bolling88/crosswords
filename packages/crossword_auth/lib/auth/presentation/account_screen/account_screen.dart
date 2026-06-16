@@ -54,13 +54,7 @@ class AccountScreenContent extends StatelessWidget {
     final email = state.user?.email ?? '';
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: Text(AuthStrings.accountTitle, style: AppTextStyles.appBarTitle()),
-        centerTitle: true,
-        backgroundColor: AppColors.brand,
-        foregroundColor: AppColors.onBrand,
-        elevation: 0,
-      ),
+      appBar: const BrandAppBar(title: AuthStrings.accountTitle),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16),

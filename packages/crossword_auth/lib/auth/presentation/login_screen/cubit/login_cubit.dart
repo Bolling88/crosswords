@@ -41,11 +41,14 @@ class LoginCubit extends Cubit<LoginState> {
       } else {
         await _authService.registerWithEmail(email, password);
       }
-      // Success: AuthGate reacts to currentUser; nothing more to do here.
-      emit(state.copyWith(isSubmitting: false));
+      // Success: AuthGate reacts to currentUser and removes this screen, which
+      // closes the cubit — guard the reset so a late emit can't throw.
+      if (!isClosed) emit(state.copyWith(isSubmitting: false));
     } on AuthFailure catch (failure) {
-      emit(state.copyWith(isSubmitting: false));
-      emit(LoginError(state: state, message: _messageFor(failure)));
+      emit(LoginError(
+        state: state.copyWith(isSubmitting: false),
+        message: _messageFor(failure),
+      ));
     }
   }
 
@@ -71,12 +74,16 @@ class LoginCubit extends Cubit<LoginState> {
     emit(state.copyWith(isSubmitting: true));
     try {
       await action();
-      emit(state.copyWith(isSubmitting: false));
+      if (!isClosed) emit(state.copyWith(isSubmitting: false));
     } on AuthFailure catch (failure) {
-      emit(state.copyWith(isSubmitting: false));
       // A user-cancelled popup/sheet is not an error worth surfacing.
-      if (failure.reason != AuthFailureReason.cancelled) {
-        emit(LoginError(state: state, message: _messageFor(failure)));
+      if (failure.reason == AuthFailureReason.cancelled) {
+        emit(state.copyWith(isSubmitting: false));
+      } else {
+        emit(LoginError(
+          state: state.copyWith(isSubmitting: false),
+          message: _messageFor(failure),
+        ));
       }
     }
   }
