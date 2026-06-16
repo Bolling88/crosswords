@@ -28,7 +28,6 @@ class LoginState extends Equatable {
 /// so identical consecutive messages still trigger the listener.
 class LoginError extends LoginState {
   final String message;
-  @override
   final Key key = UniqueKey();
 
   LoginError({required LoginState state, required this.message})
@@ -40,7 +39,6 @@ class LoginError extends LoginState {
 
 /// Event state: confirmation that a password-reset email was sent.
 class LoginPasswordResetSent extends LoginState {
-  @override
   final Key key = UniqueKey();
 
   LoginPasswordResetSent({required LoginState state}) : super.copy(state);

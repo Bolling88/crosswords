@@ -167,17 +167,17 @@ class _OrDivider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    return const Row(
       children: [
-        const Expanded(child: Divider(color: AppColors.gridLine)),
+        Expanded(child: Divider(color: AppColors.gridLine)),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
+          padding: EdgeInsets.symmetric(horizontal: 12),
           child: Text(
             AuthStrings.socialDivider,
-            style: const TextStyle(color: AppColors.inkMuted),
+            style: TextStyle(color: AppColors.inkMuted),
           ),
         ),
-        const Expanded(child: Divider(color: AppColors.gridLine)),
+        Expanded(child: Divider(color: AppColors.gridLine)),
       ],
     );
   }
