@@ -37,7 +37,6 @@ AuthFailure authFailureFromCode(String code) {
     case 'popup-closed-by-user':
     case 'cancelled-popup-request':
     case 'web-context-cancelled':
-    case 'user-cancelled':
       return const AuthFailure(AuthFailureReason.cancelled);
     default:
       return const AuthFailure(AuthFailureReason.unknown);

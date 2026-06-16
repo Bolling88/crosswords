@@ -27,6 +27,24 @@ void main() {
     service.dispose();
   });
 
+  test('starts in loading while initializing, then resolves on first event', () async {
+    const user = AuthUser(uid: 'u1', email: 'a@b.se', displayName: null, photoUrl: null);
+    final service = FakeAuthService(isInitializing: true);
+    final cubit = AuthGateCubit(authService: service);
+
+    expect(cubit.state, const AuthGateState.loading());
+
+    // First auth event: the user resolves and initialization completes.
+    service.emit(user);
+    service.initializing.value = false;
+    await Future<void>.delayed(Duration.zero);
+
+    expect(cubit.state, const AuthGateState.authenticated(user));
+
+    cubit.close();
+    service.dispose();
+  });
+
   test('reacts to sign-in then sign-out', () async {
     const user = AuthUser(uid: 'u1', email: 'a@b.se', displayName: null, photoUrl: null);
     final service = FakeAuthService();

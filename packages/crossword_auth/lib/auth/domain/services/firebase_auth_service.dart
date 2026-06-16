@@ -36,16 +36,25 @@ class FirebaseAuthService implements AuthService {
   late final StreamSubscription<User?> _authSub;
 
   /// google_sign_in must be initialized exactly once per app lifecycle.
-  bool _googleInitialized = false;
+  /// Memoized so concurrent sign-ins await the same initialization Future
+  /// instead of racing to call `initialize()` twice.
+  Future<void>? _googleInit;
 
   FirebaseAuthService({FirebaseAuth? auth, this.googleServerClientId})
       : _auth = auth ?? FirebaseAuth.instance,
         _currentUser = ValueNotifier<AuthUser?>(null) {
     _currentUser.value = _mapUser(_auth.currentUser);
-    _authSub = _auth.authStateChanges().listen((user) {
-      _currentUser.value = _mapUser(user);
-      if (_isInitializing.value) _isInitializing.value = false;
-    });
+    _authSub = _auth.authStateChanges().listen(
+      (user) {
+        _currentUser.value = _mapUser(user);
+        if (_isInitializing.value) _isInitializing.value = false;
+      },
+      onError: (Object _) {
+        // Resolve the gate even if the first auth event errors, so the app
+        // doesn't hang on the loading spinner.
+        if (_isInitializing.value) _isInitializing.value = false;
+      },
+    );
   }
 
   @override
@@ -107,10 +116,8 @@ class FirebaseAuthService implements AuthService {
     }
     try {
       final signIn = GoogleSignIn.instance;
-      if (!_googleInitialized) {
-        await signIn.initialize(serverClientId: googleServerClientId);
-        _googleInitialized = true;
-      }
+      _googleInit ??= signIn.initialize(serverClientId: googleServerClientId);
+      await _googleInit;
       // authenticate() throws GoogleSignInException on cancellation.
       final account = await signIn.authenticate(
         scopeHint: const ['email'],
