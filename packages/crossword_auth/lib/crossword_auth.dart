@@ -9,3 +9,6 @@ export 'auth/presentation/auth_gate/cubit/auth_gate_state.dart';
 export 'auth/presentation/login_screen/cubit/login_cubit.dart';
 export 'auth/presentation/login_screen/cubit/login_state.dart';
 export 'auth/presentation/login_screen/login_screen.dart';
+export 'auth/presentation/account_screen/account_screen.dart';
+export 'auth/presentation/account_screen/cubit/account_cubit.dart';
+export 'auth/presentation/account_screen/cubit/account_state.dart';

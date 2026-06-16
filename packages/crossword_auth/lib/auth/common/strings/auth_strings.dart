@@ -38,4 +38,12 @@ class AuthStrings {
   static const String errorWeakPassword = 'Lösenordet är för svagt.';
   static const String errorNetwork = 'Nätverksfel. Försök igen.';
   static const String errorGeneric = 'Något gick fel. Försök igen.';
+
+  // Account screen
+  static const String accountTitle = 'Konto';
+  static const String accountTooltip = 'Konto';
+  static const String signedInAs = 'Inloggad som';
+  static const String signOutAction = 'Logga ut';
+  static const String signOutConfirmTitle = 'Logga ut?';
+  static const String signOutConfirmBody = 'Du loggas ut från ditt konto.';
 }
