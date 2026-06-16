@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "905506199750",
+    "project_id": "korsord-crosswords",
+    "storage_bucket": "korsord-crosswords.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:905506199750:android:2f60a5035e7d4477171fc7",
+        "android_client_info": {
+          "package_name": "com.xevenition.crosswords"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDFFZFPwA8QmM9oOyS62orMUOxbkSIadBU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
