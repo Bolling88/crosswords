@@ -53,10 +53,7 @@ class _WebCrosswordView extends StatelessWidget {
             tooltip: AuthStrings.accountTooltip,
             onPressed: () => Navigator.push(
               context,
-              MaterialPageRoute(
-                builder: (_) =>
-                    AccountScreen(authService: context.read<AuthService>()),
-              ),
+              MaterialPageRoute(builder: (_) => const AccountScreen()),
             ),
           ),
           IconButton(

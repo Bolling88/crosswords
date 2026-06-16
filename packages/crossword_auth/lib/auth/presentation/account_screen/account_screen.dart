@@ -9,14 +9,13 @@ import 'cubit/account_cubit.dart';
 import 'cubit/account_state.dart';
 
 class AccountScreen extends StatelessWidget {
-  final AuthService authService;
-
-  const AccountScreen({required this.authService, super.key});
+  const AccountScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => AccountCubit(authService: authService),
+      create: (context) =>
+          AccountCubit(authService: context.read<AuthService>()),
       child: const AccountScreenBuilder(),
     );
   }

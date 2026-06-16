@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 
@@ -27,17 +28,31 @@ class FirebaseAuthService implements AuthService {
   final FirebaseAuth _auth;
   final ValueNotifier<AuthUser?> _currentUser;
 
+  /// True until Firebase reports the first auth state. While true the gate
+  /// shows a spinner instead of flashing the login screen on cold start
+  /// (on web `currentUser` is null until the persisted session is restored).
+  final ValueNotifier<bool> _isInitializing = ValueNotifier<bool>(true);
+
+  late final StreamSubscription<User?> _authSub;
+
+  /// google_sign_in must be initialized exactly once per app lifecycle.
+  bool _googleInitialized = false;
+
   FirebaseAuthService({FirebaseAuth? auth, this.googleServerClientId})
       : _auth = auth ?? FirebaseAuth.instance,
         _currentUser = ValueNotifier<AuthUser?>(null) {
     _currentUser.value = _mapUser(_auth.currentUser);
-    _auth.authStateChanges().listen((user) {
+    _authSub = _auth.authStateChanges().listen((user) {
       _currentUser.value = _mapUser(user);
+      if (_isInitializing.value) _isInitializing.value = false;
     });
   }
 
   @override
   ValueListenable<AuthUser?> get currentUser => _currentUser;
+
+  @override
+  ValueListenable<bool> get isInitializing => _isInitializing;
 
   static AuthUser? _mapUser(User? user) {
     if (user == null) return null;
@@ -92,7 +107,10 @@ class FirebaseAuthService implements AuthService {
     }
     try {
       final signIn = GoogleSignIn.instance;
-      await signIn.initialize(serverClientId: googleServerClientId);
+      if (!_googleInitialized) {
+        await signIn.initialize(serverClientId: googleServerClientId);
+        _googleInitialized = true;
+      }
       // authenticate() throws GoogleSignInException on cancellation.
       final account = await signIn.authenticate(
         scopeHint: const ['email'],
@@ -154,14 +172,18 @@ class FirebaseAuthService implements AuthService {
         // Non-fatal — Firebase sign-out below is what matters.
       }
     }
-    await _auth.signOut();
+    await _guard(() => _auth.signOut());
   }
 
   @override
   Future<String?> getIdToken() async => _auth.currentUser?.getIdToken();
 
   @override
-  void dispose() => _currentUser.dispose();
+  void dispose() {
+    _authSub.cancel();
+    _currentUser.dispose();
+    _isInitializing.dispose();
+  }
 
   Future<void> _guard(Future<void> Function() action) async {
     try {

@@ -32,6 +32,13 @@ AuthFailure authFailureFromCode(String code) {
       return const AuthFailure(AuthFailureReason.weakPassword);
     case 'network-request-failed':
       return const AuthFailure(AuthFailureReason.network);
+    // Web popup/redirect dismissals — a user who closes the Google/Apple
+    // popup is cancelling, not hitting an error.
+    case 'popup-closed-by-user':
+    case 'cancelled-popup-request':
+    case 'web-context-cancelled':
+    case 'user-cancelled':
+      return const AuthFailure(AuthFailureReason.cancelled);
     default:
       return const AuthFailure(AuthFailureReason.unknown);
   }

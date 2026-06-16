@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:crossword_auth/auth/common/strings/auth_strings.dart';
 import 'package:crossword_auth/auth/domain/entities/auth_user.dart';
+import 'package:crossword_auth/auth/domain/services/auth_service.dart';
 import 'package:crossword_auth/auth/presentation/account_screen/account_screen.dart';
 
 import '../../support/fake_auth_service.dart';
 
 Widget _harness(FakeAuthService service) {
   return MaterialApp(
-    home: AccountScreen(authService: service),
+    home: RepositoryProvider<AuthService>.value(
+      value: service,
+      child: const AccountScreen(),
+    ),
   );
 }
 

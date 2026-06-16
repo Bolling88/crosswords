@@ -10,6 +10,11 @@ abstract class AuthService {
   /// The signed-in user, or null when signed out. Cubits listen to this.
   ValueListenable<AuthUser?> get currentUser;
 
+  /// True until the backing provider reports its first auth state. The gate
+  /// shows a loading state while this is true, avoiding a login-screen flash
+  /// on cold start for an already-signed-in user.
+  ValueListenable<bool> get isInitializing;
+
   Future<void> signInWithEmail(String email, String password);
 
   Future<void> registerWithEmail(String email, String password);

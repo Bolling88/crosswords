@@ -9,15 +9,24 @@ import 'package:crossword_auth/auth/domain/services/auth_service.dart';
 /// set to throw.
 class FakeAuthService implements AuthService {
   final ValueNotifier<AuthUser?> user;
+
+  /// Defaults to false (already resolved) so the gate settles immediately in
+  /// tests; flip via [initializing] to exercise the loading state.
+  final ValueNotifier<bool> initializing;
   AuthFailure? throwOnNextCall;
 
   final List<String> calls = <String>[];
   String? lastEmail;
   String? lastPassword;
 
-  FakeAuthService({AuthUser? initial}) : user = ValueNotifier<AuthUser?>(initial);
+  FakeAuthService({AuthUser? initial, bool isInitializing = false})
+      : user = ValueNotifier<AuthUser?>(initial),
+        initializing = ValueNotifier<bool>(isInitializing);
 
   void emit(AuthUser? value) => user.value = value;
+
+  @override
+  ValueListenable<bool> get isInitializing => initializing;
 
   void _maybeThrow(String call) {
     calls.add(call);
@@ -67,5 +76,8 @@ class FakeAuthService implements AuthService {
   }
 
   @override
-  void dispose() => user.dispose();
+  void dispose() {
+    user.dispose();
+    initializing.dispose();
+  }
 }
