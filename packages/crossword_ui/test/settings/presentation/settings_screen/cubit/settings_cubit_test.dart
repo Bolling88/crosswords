@@ -1,5 +1,4 @@
 import 'package:crossword_ui/crossword_ui.dart';
-import 'package:crosswords/settings/presentation/settings_screen/cubit/settings_cubit.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

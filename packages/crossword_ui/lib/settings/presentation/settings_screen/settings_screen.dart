@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:crossword_ui/crossword_ui.dart';
+import '../../domain/services/font_service.dart';
+import '../../domain/services/gameplay_settings_service.dart';
+import '../../../common/data/constants/app_colors.dart';
+import '../../../common/data/constants/app_text_styles.dart';
+import '../../../common/data/constants/strings.dart';
 
 import 'cubit/settings_cubit.dart';
 import 'cubit/settings_state.dart';

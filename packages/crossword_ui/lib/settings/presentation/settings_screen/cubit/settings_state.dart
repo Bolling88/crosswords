@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-import 'package:crossword_ui/crossword_ui.dart';
+import '../../../domain/entities/app_font.dart';
 
 class SettingsState extends Equatable {
   final List<AppFont> fonts;

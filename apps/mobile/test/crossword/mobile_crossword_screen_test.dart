@@ -6,7 +6,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:crossword_core/crossword_core.dart';
 import 'package:crossword_ui/crossword_ui.dart';
 import 'package:crosswords/crossword/mobile_crossword_screen.dart';
-import 'package:crosswords/settings/presentation/settings_screen/settings_screen.dart';
 
 void main() {
   late FontService fontService;

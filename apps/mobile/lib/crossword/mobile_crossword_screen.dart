@@ -4,8 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:crossword_core/crossword_core.dart';
 import 'package:crossword_ui/crossword_ui.dart';
 
-import '../settings/presentation/settings_screen/settings_screen.dart';
-
 class MobileCrosswordScreen extends StatelessWidget {
   final CrosswordPuzzle puzzle;
 

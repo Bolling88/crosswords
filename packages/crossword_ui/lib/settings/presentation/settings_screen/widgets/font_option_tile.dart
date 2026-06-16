@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'package:crossword_ui/crossword_ui.dart';
+import '../../../domain/entities/app_font.dart';
+import '../../../../common/data/constants/app_colors.dart';
+import '../../../../common/data/constants/strings.dart';
 
 /// A single selectable font row that previews itself in its own font.
 class FontOptionTile extends StatelessWidget {

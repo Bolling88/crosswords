@@ -1,6 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:crossword_ui/crossword_ui.dart';
+import '../../../domain/services/font_service.dart';
+import '../../../domain/services/gameplay_settings_service.dart';
+import '../../../domain/entities/app_font.dart';
 
 import 'settings_state.dart';
 
