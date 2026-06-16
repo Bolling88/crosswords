@@ -12,7 +12,20 @@
           "package_name": "com.xevenition.crosswords"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "905506199750-lo2vsek10a165uvgm6ut9slav3rmhv8d.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.xevenition.crosswords",
+            "certificate_hash": "8de2d51d1c3f7cae773201aeb24fdd615e7d7af0"
+          }
+        },
+        {
+          "client_id": "905506199750-up9vmj0qgh31fhm8eejf83vjsvuf5iee.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDFFZFPwA8QmM9oOyS62orMUOxbkSIadBU"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "905506199750-up9vmj0qgh31fhm8eejf83vjsvuf5iee.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "905506199750-uh0545oo0r06tm58u2ohf7oq7nurml4m.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.xevenition.crosswords"
+              }
+            }
+          ]
         }
       }
     }

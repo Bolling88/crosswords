@@ -63,6 +63,9 @@ class DefaultFirebaseOptions {
     messagingSenderId: '905506199750',
     projectId: 'korsord-crosswords',
     storageBucket: 'korsord-crosswords.firebasestorage.app',
+    androidClientId: '905506199750-lo2vsek10a165uvgm6ut9slav3rmhv8d.apps.googleusercontent.com',
+    iosClientId: '905506199750-uh0545oo0r06tm58u2ohf7oq7nurml4m.apps.googleusercontent.com',
     iosBundleId: 'com.xevenition.crosswords',
   );
+
 }

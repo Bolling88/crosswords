@@ -19,7 +19,12 @@ Future<void> main() async {
   final fontService = FontService(prefs: prefs);
   final settingsService = GameplaySettingsService(prefs: prefs);
   final progressService = ProgressService(prefs: prefs);
-  final authService = FirebaseAuthService();
+  // The web OAuth client id; google_sign_in needs it as serverClientId on
+  // Android so the minted ID token's audience is one Firebase accepts.
+  final authService = FirebaseAuthService(
+    googleServerClientId:
+        '905506199750-up9vmj0qgh31fhm8eejf83vjsvuf5iee.apps.googleusercontent.com',
+  );
   final puzzle = await loadBundledPuzzle();
   runApp(CrosswordsApp(
     fontService: fontService,
