@@ -59,6 +59,7 @@ void main() {
     final sub = cubit.stream.listen(states.add);
 
     await cubit.submit();
+    await Future<void>.delayed(Duration.zero);
 
     expect(service.calls, isEmpty);
     expect(states.whereType<LoginError>().single.message,
@@ -76,6 +77,7 @@ void main() {
     final sub = cubit.stream.listen(states.add);
 
     await cubit.submit();
+    await Future<void>.delayed(Duration.zero);
 
     expect(states.whereType<LoginError>().single.message,
         AuthStrings.errorInvalidCredentials);
@@ -89,6 +91,7 @@ void main() {
     final sub = cubit.stream.listen(states.add);
 
     await cubit.sendPasswordReset();
+    await Future<void>.delayed(Duration.zero);
 
     expect(service.calls, isEmpty);
     expect(states.whereType<LoginError>().single.message, AuthStrings.emailRequired);
@@ -103,6 +106,7 @@ void main() {
     final sub = cubit.stream.listen(states.add);
 
     await cubit.sendPasswordReset();
+    await Future<void>.delayed(Duration.zero);
 
     expect(service.calls, contains('sendPasswordReset'));
     expect(states.whereType<LoginPasswordResetSent>(), isNotEmpty);
@@ -122,6 +126,7 @@ void main() {
     final sub = cubit.stream.listen(states.add);
 
     await cubit.signInWithApple();
+    await Future<void>.delayed(Duration.zero);
 
     expect(states.whereType<LoginError>(), isEmpty);
     await sub.cancel();

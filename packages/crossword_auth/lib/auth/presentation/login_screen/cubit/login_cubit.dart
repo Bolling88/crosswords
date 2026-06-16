@@ -1,58 +1,27 @@
-import 'dart:async';
-
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../common/strings/auth_strings.dart';
 import '../../../domain/entities/auth_failure.dart';
 import '../../../domain/services/auth_service.dart';
 import 'login_state.dart';
 
-/// A Cubit-equivalent for the login screen that uses a synchronous broadcast
-/// stream so that tests can observe emitted states without an extra microtask
-/// flush after awaiting async methods.
-class LoginCubit implements StateStreamableSource<LoginState> {
+class LoginCubit extends Cubit<LoginState> {
   final AuthService _authService;
-
-  // Synchronous broadcast: listeners are called inline on emit(),
-  // which lets tests verify states immediately after `await cubit.method()`.
-  final _controller = StreamController<LoginState>.broadcast(sync: true);
-
-  LoginState _state = const LoginState();
-  bool _emitted = false;
-  bool _closed = false;
 
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final FocusNode emailFocus = FocusNode();
   final FocusNode passwordFocus = FocusNode();
 
-  LoginCubit({required AuthService authService}) : _authService = authService;
-
-  @override
-  LoginState get state => _state;
-
-  @override
-  Stream<LoginState> get stream => _controller.stream;
-
-  @override
-  bool get isClosed => _closed;
-
-  @protected
-  void emit(LoginState state) {
-    if (_closed) {
-      throw StateError('Cannot emit new states after calling close');
-    }
-    if (state == _state && _emitted) return;
-    _state = state;
-    _controller.add(_state);
-    _emitted = true;
-  }
+  LoginCubit({required AuthService authService})
+      : _authService = authService,
+        super(const LoginState());
 
   void toggleMode() {
     final next =
-        _state.mode == LoginMode.signIn ? LoginMode.register : LoginMode.signIn;
-    emit(_state.copyWith(mode: next));
+        state.mode == LoginMode.signIn ? LoginMode.register : LoginMode.signIn;
+    emit(state.copyWith(mode: next));
   }
 
   Future<void> submit() async {
@@ -61,36 +30,36 @@ class LoginCubit implements StateStreamableSource<LoginState> {
 
     final validation = _validate(email, password);
     if (validation != null) {
-      emit(LoginError(state: _state, message: validation));
+      emit(LoginError(state: state, message: validation));
       return;
     }
 
-    emit(_state.copyWith(isSubmitting: true));
+    emit(state.copyWith(isSubmitting: true));
     try {
-      if (_state.mode == LoginMode.signIn) {
+      if (state.mode == LoginMode.signIn) {
         await _authService.signInWithEmail(email, password);
       } else {
         await _authService.registerWithEmail(email, password);
       }
       // Success: AuthGate reacts to currentUser; nothing more to do here.
-      emit(_state.copyWith(isSubmitting: false));
+      emit(state.copyWith(isSubmitting: false));
     } on AuthFailure catch (failure) {
-      emit(_state.copyWith(isSubmitting: false));
-      emit(LoginError(state: _state, message: _messageFor(failure)));
+      emit(state.copyWith(isSubmitting: false));
+      emit(LoginError(state: state, message: _messageFor(failure)));
     }
   }
 
   Future<void> sendPasswordReset() async {
     final email = emailController.text.trim();
     if (email.isEmpty) {
-      emit(LoginError(state: _state, message: AuthStrings.emailRequired));
+      emit(LoginError(state: state, message: AuthStrings.emailRequired));
       return;
     }
     try {
       await _authService.sendPasswordReset(email);
-      emit(LoginPasswordResetSent(state: _state));
+      emit(LoginPasswordResetSent(state: state));
     } on AuthFailure catch (failure) {
-      emit(LoginError(state: _state, message: _messageFor(failure)));
+      emit(LoginError(state: state, message: _messageFor(failure)));
     }
   }
 
@@ -99,15 +68,15 @@ class LoginCubit implements StateStreamableSource<LoginState> {
   Future<void> signInWithApple() => _social(_authService.signInWithApple);
 
   Future<void> _social(Future<void> Function() action) async {
-    emit(_state.copyWith(isSubmitting: true));
+    emit(state.copyWith(isSubmitting: true));
     try {
       await action();
-      emit(_state.copyWith(isSubmitting: false));
+      emit(state.copyWith(isSubmitting: false));
     } on AuthFailure catch (failure) {
-      emit(_state.copyWith(isSubmitting: false));
+      emit(state.copyWith(isSubmitting: false));
       // A user-cancelled popup/sheet is not an error worth surfacing.
       if (failure.reason != AuthFailureReason.cancelled) {
-        emit(LoginError(state: _state, message: _messageFor(failure)));
+        emit(LoginError(state: state, message: _messageFor(failure)));
       }
     }
   }
@@ -138,12 +107,11 @@ class LoginCubit implements StateStreamableSource<LoginState> {
   }
 
   @override
-  Future<void> close() async {
-    _closed = true;
+  Future<void> close() {
     emailController.dispose();
     passwordController.dispose();
     emailFocus.dispose();
     passwordFocus.dispose();
-    await _controller.close();
+    return super.close();
   }
 }
