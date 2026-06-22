@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:crossword_auth/crossword_auth.dart';
 
-import 'package:crossword_core/crossword_core.dart';
+import 'package:crossword_api/crossword_api.dart';
 import 'package:crossword_ui/crossword_ui.dart';
 
 import 'crossword/mobile_crossword_screen.dart';
@@ -25,13 +25,17 @@ Future<void> main() async {
     googleServerClientId:
         '905506199750-up9vmj0qgh31fhm8eejf83vjsvuf5iee.apps.googleusercontent.com',
   );
-  final puzzle = await loadBundledPuzzle();
+  final generationService = PuzzleGenerationService(
+    repository: CrosswordGenerationRepository(
+      remoteDataSource: CrosswordGenerationRemoteDataSource(),
+    ),
+  );
   runApp(CrosswordsApp(
     fontService: fontService,
     settingsService: settingsService,
     progressService: progressService,
     authService: authService,
-    puzzle: puzzle,
+    generationService: generationService,
   ));
 }
 
@@ -40,14 +44,14 @@ class CrosswordsApp extends StatelessWidget {
   final GameplaySettingsService settingsService;
   final ProgressService progressService;
   final AuthService authService;
-  final CrosswordPuzzle puzzle;
+  final PuzzleGenerationService generationService;
 
   const CrosswordsApp({
     required this.fontService,
     required this.settingsService,
     required this.progressService,
     required this.authService,
-    required this.puzzle,
+    required this.generationService,
     super.key,
   });
 
@@ -74,7 +78,11 @@ class CrosswordsApp extends StatelessWidget {
         ),
         home: AuthGate(
           authService: authService,
-          child: MobileCrosswordScreen(puzzle: puzzle),
+          child: GenerateScreen(
+            service: generationService,
+            gameplayBuilder: (context, puzzle) =>
+                MobileCrosswordScreen(puzzle: puzzle),
+          ),
         ),
       ),
     );

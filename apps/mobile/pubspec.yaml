@@ -23,6 +23,8 @@ dependencies:
     path: ../../packages/crossword_core
   crossword_ui:
     path: ../../packages/crossword_ui
+  crossword_api:
+    path: ../../packages/crossword_api
 
 dev_dependencies:
   flutter_test:
