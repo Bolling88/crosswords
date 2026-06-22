@@ -16,3 +16,5 @@ export 'gameplay/presentation/crossword_screen/cubit/crossword_cubit.dart';
 export 'gameplay/presentation/crossword_screen/cubit/crossword_state.dart';
 export 'gameplay/presentation/crossword_screen/widgets/crossword_grid.dart';
 export 'gameplay/presentation/crossword_screen/widgets/crossword_menu_button.dart';
+export 'gameplay/presentation/generate_screen/cubit/generate_cubit.dart';
+export 'gameplay/presentation/generate_screen/cubit/generate_state.dart';
