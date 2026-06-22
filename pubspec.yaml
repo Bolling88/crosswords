@@ -8,6 +8,7 @@ environment:
 workspace:
   - apps/mobile
   - apps/web
+  - packages/crossword_api
   - packages/crossword_auth
   - packages/crossword_core
   - packages/crossword_ui

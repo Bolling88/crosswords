@@ -1,5 +1,5 @@
-name: crossword_ui
-description: Shared crossword play engine — grid widgets, cubit, theme, CrosswordPlayer.
+name: crossword_api
+description: Backend API client for crossword generation (ikors.se).
 publish_to: 'none'
 version: 0.0.1
 
@@ -11,12 +11,8 @@ resolution: workspace
 dependencies:
   flutter:
     sdk: flutter
-  flutter_bloc: ^9.1.1
+  http: ^1.2.2
   equatable: ^2.0.7
-  google_fonts: ^6.2.1
-  shared_preferences: ^2.5.3
-  crossword_api:
-    path: ../crossword_api
   crossword_core:
     path: ../crossword_core
 
@@ -24,6 +20,3 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
-
-flutter:
-  uses-material-design: true
