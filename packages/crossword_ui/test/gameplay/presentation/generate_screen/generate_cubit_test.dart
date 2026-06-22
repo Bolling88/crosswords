@@ -16,14 +16,20 @@ class _FakeService implements PuzzleGenerationService {
     required String title,
     List<String> seedWords = const [],
   }) async {
-    if (error != null) throw error!;
-    return puzzle!;
+    final err = error;
+    if (err != null) throw err;
+    final p = puzzle;
+    if (p == null) throw StateError('puzzle not set');
+    return p;
   }
 
   @override
   Future<CrosswordPuzzle> loadTestPuzzle() async {
-    if (error != null) throw error!;
-    return puzzle!;
+    final err = error;
+    if (err != null) throw err;
+    final p = puzzle;
+    if (p == null) throw StateError('puzzle not set');
+    return p;
   }
 }
 
