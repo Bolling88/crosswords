@@ -16,15 +16,11 @@ class GeneratedPuzzleMapper {
   }) {
     final gridCells = response.gridCells ?? const [];
     final slots = response.slots ?? const [];
-    final assignments = response.assignments ?? const [];
     final seedCells = response.seedCells ?? const [];
 
     final rows = gridCells.length;
     final cols = rows == 0 ? 0 : gridCells.first.length;
 
-    // Reserved for future clue-text population when the backend provides prose.
-    // ignore: unused_local_variable
-    final wordBySlot = {for (final a in assignments) a.slotId: a.word};
     final slotById = {for (final s in slots) s.slotId: s};
 
     final cells = <(int, int), Cell>{};
@@ -106,6 +102,11 @@ class GeneratedPuzzleMapper {
     );
   }
 
-  static Direction _direction(String raw) =>
-      raw == 'down' ? Direction.down : Direction.right;
+  static Direction _direction(String raw) {
+    assert(
+      raw == 'right' || raw == 'down',
+      'Unexpected slot direction: $raw',
+    );
+    return raw == 'down' ? Direction.down : Direction.right;
+  }
 }
