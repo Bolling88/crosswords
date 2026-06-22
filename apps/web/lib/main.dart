@@ -3,8 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:crossword_api/crossword_api.dart';
 import 'package:crossword_auth/crossword_auth.dart';
-import 'package:crossword_core/crossword_core.dart';
 import 'package:crossword_ui/crossword_ui.dart';
 
 import 'crossword/web_crossword_screen.dart';
@@ -20,13 +20,17 @@ Future<void> main() async {
   final settingsService = GameplaySettingsService(prefs: prefs);
   final progressService = ProgressService(prefs: prefs);
   final authService = FirebaseAuthService();
-  final puzzle = await loadBundledPuzzle();
+  final generationService = PuzzleGenerationService(
+    repository: CrosswordGenerationRepository(
+      remoteDataSource: CrosswordGenerationRemoteDataSource(),
+    ),
+  );
   runApp(CrosswordsWebApp(
     fontService: fontService,
     settingsService: settingsService,
     progressService: progressService,
     authService: authService,
-    puzzle: puzzle,
+    generationService: generationService,
   ));
 }
 
@@ -35,14 +39,14 @@ class CrosswordsWebApp extends StatelessWidget {
   final GameplaySettingsService settingsService;
   final ProgressService progressService;
   final AuthService authService;
-  final CrosswordPuzzle puzzle;
+  final PuzzleGenerationService generationService;
 
   const CrosswordsWebApp({
     required this.fontService,
     required this.settingsService,
     required this.progressService,
     required this.authService,
-    required this.puzzle,
+    required this.generationService,
     super.key,
   });
 
@@ -69,7 +73,11 @@ class CrosswordsWebApp extends StatelessWidget {
         ),
         home: AuthGate(
           authService: authService,
-          child: WebCrosswordScreen(puzzle: puzzle),
+          child: GenerateScreen(
+            service: generationService,
+            gameplayBuilder: (context, puzzle) =>
+                WebCrosswordScreen(puzzle: puzzle),
+          ),
         ),
       ),
     );
