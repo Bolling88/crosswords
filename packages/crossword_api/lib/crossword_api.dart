@@ -6,3 +6,4 @@ export 'src/generated_puzzle_mapper.dart';
 export 'src/crossword_generation_exception.dart';
 export 'src/crossword_generation_remote_data_source.dart';
 export 'src/crossword_generation_repository.dart';
+export 'src/puzzle_generation_service.dart';
