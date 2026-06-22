@@ -34,8 +34,8 @@ void main() {
   test('throws on non-200', () async {
     final client = MockClient((req) async => http.Response('nope', 500));
     final source = CrosswordGenerationRemoteDataSource(client: client);
-    expect(
-      () => source.generate(request),
+    await expectLater(
+      source.generate(request),
       throwsA(isA<CrosswordGenerationException>()),
     );
   });
@@ -45,8 +45,8 @@ void main() {
         jsonEncode({'success': false, 'failure_reason': 'no fit', 'random_seed': 1, 'stats': {}}),
         200));
     final source = CrosswordGenerationRemoteDataSource(client: client);
-    expect(
-      () => source.generate(request),
+    await expectLater(
+      source.generate(request),
       throwsA(predicate((e) =>
           e is CrosswordGenerationException && e.message.contains('no fit'))),
     );
