@@ -1,9 +1,9 @@
-import '../domain/entities/arrow_shape.dart';
 import '../domain/entities/cell.dart';
 import '../domain/entities/clue_arrow.dart';
 import '../domain/entities/crossword_puzzle.dart';
 import '../domain/entities/direction.dart';
 import '../domain/entities/word.dart';
+import '../domain/services/arrow_shape_resolver.dart';
 import 'entities/dto/grid_cell_dto.dart';
 import 'entities/dto/position_dto.dart';
 import 'entities/dto/puzzle_dto.dart';
@@ -54,7 +54,13 @@ class PuzzleResolver {
               ));
               arrows.add(ClueArrow(
                 direction: Direction.right,
-                shape: _arrowShape(r, c, cell.rightStart!, Direction.right),
+                shape: ArrowShapeResolver.resolve(
+                  clueRow: r,
+                  clueCol: c,
+                  startRow: cell.rightStart!.row,
+                  startCol: cell.rightStart!.col,
+                  base: Direction.right,
+                ),
                 wordId: cell.rightWordId!,
               ));
             }
@@ -71,7 +77,13 @@ class PuzzleResolver {
               ));
               arrows.add(ClueArrow(
                 direction: Direction.down,
-                shape: _arrowShape(r, c, cell.downStart!, Direction.down),
+                shape: ArrowShapeResolver.resolve(
+                  clueRow: r,
+                  clueCol: c,
+                  startRow: cell.downStart!.row,
+                  startCol: cell.downStart!.col,
+                  base: Direction.down,
+                ),
                 wordId: cell.downWordId!,
               ));
             }
@@ -147,29 +159,5 @@ class PuzzleResolver {
       cells: cells,
       separators: separators,
     );
-  }
-
-  /// Picks the arrow glyph from where the word starts relative to the clue.
-  ///
-  /// The start cell is adjacent to the clue on one side; the word then travels
-  /// in [base]. A start on the same axis as travel is a straight arrow; a start
-  /// on the perpendicular side is a bent (L-shaped) arrow that leaves the clue
-  /// toward the start and then turns to follow the word.
-  static ArrowShape _arrowShape(
-    int clueRow,
-    int clueCol,
-    PositionDto start,
-    Direction base,
-  ) {
-    final dr = start.row - clueRow;
-    final dc = start.col - clueCol;
-    if (base == Direction.right) {
-      if (dr == 0 && dc == 1) return ArrowShape.straightRight;
-      if (dr == -1 && dc == 0) return ArrowShape.bentUpThenRight;
-      return ArrowShape.bentDownThenRight; // start below (or fallback)
-    }
-    if (dr == 1 && dc == 0) return ArrowShape.straightDown;
-    if (dr == 0 && dc == -1) return ArrowShape.bentLeftThenDown;
-    return ArrowShape.bentRightThenDown; // start to the right (or fallback)
   }
 }

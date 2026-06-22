@@ -12,4 +12,5 @@ export 'gameplay/data/entities/dto/position_dto.dart';
 export 'gameplay/data/entities/dto/puzzle_dto.dart';
 export 'gameplay/data/local_puzzle_data_source.dart';
 export 'gameplay/data/puzzle_resolver.dart';
+export 'gameplay/domain/services/arrow_shape_resolver.dart';
 export 'load_bundled_puzzle.dart';
