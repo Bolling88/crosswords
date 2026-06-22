@@ -41,7 +41,7 @@ class CrosswordGenerationRemoteDataSource {
     }
 
     final parsed = CrosswordGenerationResponse.fromJson(
-      jsonDecode(response.body) as Map<String, dynamic>,
+      jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>,
     );
     if (!parsed.success) {
       throw CrosswordGenerationException(

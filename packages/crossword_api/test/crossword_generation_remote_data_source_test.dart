@@ -17,8 +17,12 @@ void main() {
     late http.Request captured;
     final client = MockClient((req) async {
       captured = req;
-      return http.Response(body, 200,
-          headers: {'content-type': 'application/json'});
+      // Simulate real API: UTF-8 bytes with no charset in content-type header.
+      return http.Response.bytes(
+        utf8.encode(body),
+        200,
+        headers: {'content-type': 'application/json'},
+      );
     });
 
     final source = CrosswordGenerationRemoteDataSource(client: client);
@@ -29,6 +33,20 @@ void main() {
         'https://api.ikors.se/crossword-puzzles/generate');
     expect((jsonDecode(captured.body) as Map)['width'], 9);
     expect(res.success, isTrue);
+
+    // Verify Swedish characters survive decoding (Å/Ä/Ö must not be corrupted).
+    final words = res.assignments ?? const [];
+    expect(words, isNotEmpty);
+    expect(
+      words.any((a) => a.word.contains(RegExp('[ÅÄÖ]'))),
+      isTrue,
+      reason: 'fixture should contain Swedish letters intact',
+    );
+    expect(
+      words.any((a) => a.word.contains('Ã')),
+      isFalse,
+      reason: 'no latin-1 mojibake',
+    );
   });
 
   test('throws on non-200', () async {
