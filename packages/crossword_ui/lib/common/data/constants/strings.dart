@@ -61,4 +61,17 @@ class Strings {
   static const String autocheckLabel = 'Automatisk kontroll';
   static const String autocheckDescription =
       'Markera felaktiga bokstäver direkt';
+
+  /// Generate screen.
+  static const String generateTitle = 'Skapa korsord';
+  static const String generateSizeLabel = 'Storlek';
+  static const String generateMaxWordLenLabel = 'Längsta ord';
+  static const String generateSeedWordsLabel = 'Egna ord';
+  static const String generateSeedWordsHint = 'Skilj orden med komma';
+  static const String generateAction = 'Skapa';
+  static const String generatingLabel = 'Skapar…';
+  static const String generateTestPuzzleAction = 'Testkorsord';
+  static const String generatedPuzzleTitle = 'Korsord';
+  static const String generationErrorMessage =
+      'Kunde inte skapa korsordet. Försök igen.';
 }
