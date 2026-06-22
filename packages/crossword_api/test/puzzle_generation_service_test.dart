@@ -35,11 +35,11 @@ void main() {
   });
 
   test('loadTestPuzzle uses the injected loader', () async {
-    final fake = CrosswordPuzzle(
+    const fake = CrosswordPuzzle(
       rows: 1,
       cols: 1,
-      cells: const {},
-      words: const [],
+      cells: {},
+      words: [],
       title: 'bundled',
       languageCode: 'sv',
     );
