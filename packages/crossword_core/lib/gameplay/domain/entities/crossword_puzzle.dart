@@ -13,6 +13,10 @@ class CrosswordPuzzle {
   /// means a divider on that cell's right edge; [Direction.down] its bottom.
   final Map<(int, int), Set<Direction>> separatorEdges;
 
+  /// Stable unique key for persistence; null for the bundled puzzle, which
+  /// falls back to [title].
+  final String? id;
+
   final String title;
   final String languageCode;
 
@@ -25,6 +29,7 @@ class CrosswordPuzzle {
     required this.languageCode,
     this.seedPositions = const {},
     this.separatorEdges = const {},
+    this.id,
   });
 
   /// The word with [id], or null if none.

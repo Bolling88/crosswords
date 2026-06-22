@@ -59,9 +59,14 @@ class CrosswordCubit extends Cubit<CrosswordState> {
     _fontService.selectedFont.addListener(_onFontChanged);
   }
 
-  /// The key progress is stored under. The format has no stable puzzle id
-  /// yet, so the title stands in while puzzles are bundled.
-  String get _progressKey => state.puzzle.title;
+  /// Returns the progress storage key for [puzzle]. Generated puzzles carry a
+  /// stable [CrosswordPuzzle.id] derived from their grid content; the bundled
+  /// puzzle has no id and falls back to [CrosswordPuzzle.title].
+  static String _keyFor(CrosswordPuzzle puzzle) => puzzle.id ?? puzzle.title;
+
+  /// The key progress is stored under: the puzzle's unique id when available,
+  /// or its title for the bundled puzzle.
+  String get _progressKey => _keyFor(state.puzzle);
 
   /// Initial state with any locally saved progress folded back in. A puzzle
   /// restored already-solved sets [CrosswordState.isSolved] without firing
@@ -76,7 +81,7 @@ class CrosswordCubit extends Cubit<CrosswordState> {
       puzzle: puzzle,
       font: fontService.selectedFont.value,
     );
-    final snapshot = progressService.read(puzzle.title);
+    final snapshot = progressService.read(_keyFor(puzzle));
     if (snapshot == null) return base;
     final restored = base.copyWith(
       userInputs: snapshot.userInputs,

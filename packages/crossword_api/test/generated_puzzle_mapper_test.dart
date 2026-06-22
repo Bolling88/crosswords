@@ -51,4 +51,19 @@ void main() {
     expect(arrow.direction, Direction.right);
     expect(arrow.shape, ArrowShape.bentDownThenRight);
   });
+
+  test('puzzle.id is non-null and starts with the grid dimensions prefix', () {
+    expect(puzzle.id, isNotNull);
+    expect(puzzle.id, startsWith('gen-9x9-'));
+  });
+
+  test('mapping the same response twice produces the same id (deterministic)',
+      () {
+    final raw =
+        File('test/fixtures/generation_response_9x9.json').readAsStringSync();
+    final res = CrosswordGenerationResponse.fromJson(
+        jsonDecode(raw) as Map<String, dynamic>);
+    final puzzle2 = GeneratedPuzzleMapper.map(res, title: 'Test');
+    expect(puzzle2.id, equals(puzzle.id));
+  });
 }

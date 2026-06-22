@@ -409,6 +409,91 @@ void main() {
       addTearDown(restored.close);
       expect(restored.state.userInputs, isEmpty);
     });
+
+    test(
+        'two generated puzzles with the same title but different ids '
+        'do not bleed progress into each other', () async {
+      // Puzzle A and B share the title 'Korsord' (as the mapper stamps them)
+      // but have distinct ids, so progress saved under key 'a' must NOT be
+      // restored into a cubit opened for puzzle B (key 'b').
+      const puzzleA = CrosswordPuzzle(
+        rows: 2,
+        cols: 4,
+        cells: {
+          (0, 0): ClueCell(arrows: [
+            ClueArrow(
+              direction: Direction.right,
+              shape: ArrowShape.straightRight,
+              wordId: 'across',
+            ),
+          ]),
+          (0, 1): AnswerCell(value: 'A'),
+          (0, 2): AnswerCell(value: 'B'),
+          (0, 3): AnswerCell(value: 'C'),
+          (1, 0): BlockCell(),
+          (1, 1): BlockCell(),
+          (1, 2): BlockCell(),
+          (1, 3): AnswerCell(value: 'D'),
+        },
+        words: [
+          Word(
+            id: 'across',
+            direction: Direction.right,
+            cells: [(0, 1), (0, 2), (0, 3), (1, 3)],
+          ),
+        ],
+        id: 'a',
+        title: 'Korsord',
+        languageCode: 'sv',
+      );
+      const puzzleB = CrosswordPuzzle(
+        rows: 2,
+        cols: 4,
+        cells: {
+          (0, 0): ClueCell(arrows: [
+            ClueArrow(
+              direction: Direction.right,
+              shape: ArrowShape.straightRight,
+              wordId: 'across',
+            ),
+          ]),
+          (0, 1): AnswerCell(value: 'W'),
+          (0, 2): AnswerCell(value: 'X'),
+          (0, 3): AnswerCell(value: 'Y'),
+          (1, 0): BlockCell(),
+          (1, 1): BlockCell(),
+          (1, 2): BlockCell(),
+          (1, 3): AnswerCell(value: 'Z'),
+        },
+        words: [
+          Word(
+            id: 'across',
+            direction: Direction.right,
+            cells: [(0, 1), (0, 2), (0, 3), (1, 3)],
+          ),
+        ],
+        id: 'b',
+        title: 'Korsord',
+        languageCode: 'sv',
+      );
+
+      // Enter a letter in puzzle A so it saves under key 'a'.
+      final cubitA = buildCubit(puzzleA);
+      addTearDown(cubitA.close);
+      cubitA.selectCell(0, 1);
+      cubitA.onLetterInput('A');
+      await Future<void>.delayed(Duration.zero); // let the async save land
+
+      // Construct a NEW cubit for puzzle B and assert no cross-contamination.
+      final cubitB = buildCubit(puzzleB);
+      addTearDown(cubitB.close);
+
+      expect(
+        cubitB.state.userInputs,
+        isNot(contains((0, 1))),
+        reason: 'Puzzle B must not restore letters saved under puzzle A\'s key',
+      );
+    });
   });
 
   group('autocheck setting', () {

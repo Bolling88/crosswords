@@ -29,6 +29,12 @@ class GeneratedPuzzleMapper {
       for (final s in seedCells) (s.row, s.col),
     };
 
+    // Build a row-major solution signature for a deterministic, content-based
+    // id: answer cells contribute their letter (space if null), all other
+    // kinds contribute '#'. This keeps the id stable across app launches
+    // (String.hashCode is not stable).
+    final solutionBuffer = StringBuffer();
+
     for (final row in gridCells) {
       for (final c in row) {
         final pos = (c.row, c.col);
@@ -48,6 +54,7 @@ class GeneratedPuzzleMapper {
                   .putIfAbsent(pos, () => <Direction>{})
                   .add(Direction.down);
             }
+            solutionBuffer.write(c.letter ?? ' ');
           case 'clue':
             cells[pos] = ClueCell(
               arrows: [
@@ -66,13 +73,17 @@ class GeneratedPuzzleMapper {
                     ),
               ],
             );
+            solutionBuffer.write('#');
           default:
             // 'picture' / 'arrow' kinds are not produced with pictures off;
             // treat anything else as an inert block.
             cells[pos] = const BlockCell();
+            solutionBuffer.write('#');
         }
       }
     }
+
+    final id = 'gen-${rows}x$cols-${solutionBuffer.toString()}';
 
     final words = <Word>[];
     for (final slot in slots) {
@@ -97,6 +108,7 @@ class GeneratedPuzzleMapper {
       words: words,
       seedPositions: seedPositions,
       separatorEdges: separatorEdges,
+      id: id,
       title: title,
       languageCode: 'sv',
     );
