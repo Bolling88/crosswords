@@ -93,9 +93,10 @@ void main() {
     await cubit.close();
   });
 
-  test('openTestPuzzle emits GenerationSucceeded', () async {
+  test('openTestPuzzle emits isGenerating then GenerationSucceeded', () async {
     final cubit = GeneratePuzzleCubit(service: _FakeService(puzzle: _puzzle()));
     final states = await _collect(cubit, cubit.openTestPuzzle);
+    expect(states.first.isGenerating, isTrue);
     expect(states.last, isA<GenerationSucceeded>());
     await cubit.close();
   });

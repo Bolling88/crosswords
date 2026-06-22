@@ -43,12 +43,16 @@ class GeneratePuzzleCubit extends Cubit<GenerateState> {
   }
 
   Future<void> openTestPuzzle() async {
+    emit(state.copyWith(isGenerating: true));
     try {
       final puzzle = await _service.loadTestPuzzle();
-      emit(GenerationSucceeded(state: state, puzzle: puzzle));
+      emit(GenerationSucceeded(
+        state: state.copyWith(isGenerating: false),
+        puzzle: puzzle,
+      ));
     } catch (_) {
       emit(ShowGenerationError(
-        state: state,
+        state: state.copyWith(isGenerating: false),
         message: Strings.generationErrorMessage,
       ));
     }

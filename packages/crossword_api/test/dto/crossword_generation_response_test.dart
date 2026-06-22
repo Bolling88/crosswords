@@ -13,25 +13,30 @@ void main() {
 
     expect(res.success, isTrue);
     expect(res.failureReason, isNull);
-    expect(res.gridCells, isNotNull);
-    expect(res.gridCells!.length, 9);
-    expect(res.gridCells!.first.length, 9);
-    expect(res.slots!.length, 26);
-    expect(res.assignments!.length, 26);
 
-    final slot0 = res.slots!.firstWhere((s) => s.slotId == 0);
-    expect(slot0.direction, 'right');
-    expect(slot0.length, 5);
-    expect(slot0.startRow, 1);
-    expect(slot0.startCol, 0);
+    final grid = res.gridCells;
+    expect(grid, isNotNull);
+    expect(grid?.length, 9);
+    expect(grid?.first.length, 9);
 
-    final word0 =
-        res.assignments!.firstWhere((a) => a.slotId == 0).word;
+    final slots = res.slots;
+    expect(slots?.length, 26);
+
+    final assignments = res.assignments;
+    expect(assignments?.length, 26);
+
+    final slot0 = slots?.firstWhere((s) => s.slotId == 0);
+    expect(slot0?.direction, 'right');
+    expect(slot0?.length, 5);
+    expect(slot0?.startRow, 1);
+    expect(slot0?.startCol, 0);
+
+    final word0 = assignments?.firstWhere((a) => a.slotId == 0).word;
     expect(word0, 'ÅSIKT');
 
-    final clueCell = res.gridCells![0][0];
-    expect(clueCell.kind, 'clue');
-    expect(clueCell.clueTags.single.id, 0);
-    expect(clueCell.clueTags.single.arrow, '→');
+    final clueCell = grid?[0][0];
+    expect(clueCell?.kind, 'clue');
+    expect(clueCell?.clueTags.single.id, 0);
+    expect(clueCell?.clueTags.single.arrow, '→');
   });
 }

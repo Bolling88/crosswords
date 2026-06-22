@@ -1,5 +1,6 @@
 import 'package:crossword_core/crossword_core.dart';
 
+import 'crossword_generation_exception.dart';
 import 'dto/crossword_generation_response.dart';
 
 /// Converts a successful [CrosswordGenerationResponse] into a playable
@@ -21,6 +22,11 @@ class GeneratedPuzzleMapper {
     final rows = gridCells.length;
     final cols = rows == 0 ? 0 : gridCells.first.length;
 
+    // FIX 3: reject empty grid early so callers get a clear error.
+    if (rows == 0 || cols == 0) {
+      throw const CrosswordGenerationException('Generated puzzle has an empty grid');
+    }
+
     final slotById = {for (final s in slots) s.slotId: s};
 
     final cells = <(int, int), Cell>{};
@@ -29,10 +35,10 @@ class GeneratedPuzzleMapper {
       for (final s in seedCells) (s.row, s.col),
     };
 
-    // Build a row-major solution signature for a deterministic, content-based
-    // id: answer cells contribute their letter (space if null), all other
-    // kinds contribute '#'. This keeps the id stable across app launches
-    // (String.hashCode is not stable).
+    // Build a row-major solution signature that feeds a stable hash for the
+    // puzzle id: answer cells contribute their letter, all other kinds
+    // contribute '#'. FNV-1a is used so the id is deterministic across app
+    // launches (String.hashCode is not stable).
     final solutionBuffer = StringBuffer();
 
     for (final row in gridCells) {
@@ -40,8 +46,15 @@ class GeneratedPuzzleMapper {
         final pos = (c.row, c.col);
         switch (c.kind) {
           case 'answer':
+            // FIX 2: a null letter in an answer cell is a malformed response.
+            final letter = c.letter;
+            if (letter == null) {
+              throw CrosswordGenerationException(
+                'Answer cell at (${c.row}, ${c.col}) has no letter',
+              );
+            }
             cells[pos] = AnswerCell(
-              value: c.letter ?? '',
+              value: letter,
               isSeed: seedPositions.contains(pos),
             );
             if (c.sepRight.isNotEmpty) {
@@ -54,25 +67,11 @@ class GeneratedPuzzleMapper {
                   .putIfAbsent(pos, () => <Direction>{})
                   .add(Direction.down);
             }
-            solutionBuffer.write(c.letter ?? ' ');
+            solutionBuffer.write(letter);
           case 'clue':
-            cells[pos] = ClueCell(
-              arrows: [
-                for (final tag in c.clueTags)
-                  if (slotById[tag.id] case final slot?)
-                    ClueArrow(
-                      direction: _direction(slot.direction),
-                      shape: ArrowShapeResolver.resolve(
-                        clueRow: slot.clueRow,
-                        clueCol: slot.clueCol,
-                        startRow: slot.startRow,
-                        startCol: slot.startCol,
-                        base: _direction(slot.direction),
-                      ),
-                      wordId: slot.slotId.toString(),
-                    ),
-              ],
-            );
+            // FIX 5: a missing slot referenced by a clue tag is a malformed
+            // response — throw rather than silently dropping the arrow.
+            cells[pos] = ClueCell(arrows: _arrowsFor(c, slotById));
             solutionBuffer.write('#');
           default:
             // 'picture' / 'arrow' kinds are not produced with pictures off;
@@ -83,7 +82,9 @@ class GeneratedPuzzleMapper {
       }
     }
 
-    final id = 'gen-${rows}x$cols-${solutionBuffer.toString()}';
+    // FIX 9: hash the solution so the id is compact and does not embed answers
+    // in plaintext (e.g. as a SharedPreferences key).
+    final id = 'gen-${rows}x$cols-${_stableHash(solutionBuffer.toString())}';
 
     final words = <Word>[];
     for (final slot in slots) {
@@ -114,11 +115,56 @@ class GeneratedPuzzleMapper {
     );
   }
 
+  /// FIX 5: builds [ClueArrow]s for a clue cell, throwing on a missing slot.
+  static List<ClueArrow> _arrowsFor(
+    GenerationGridCellDto cell,
+    Map<int, GenerationSlotDto> slotById,
+  ) {
+    final arrows = <ClueArrow>[];
+    for (final tag in cell.clueTags) {
+      final slot = slotById[tag.id];
+      if (slot == null) {
+        throw CrosswordGenerationException(
+          'Clue tag ${tag.id} references a missing slot',
+        );
+      }
+      final dir = _direction(slot.direction);
+      arrows.add(ClueArrow(
+        direction: dir,
+        shape: ArrowShapeResolver.resolve(
+          clueRow: slot.clueRow,
+          clueCol: slot.clueCol,
+          startRow: slot.startRow,
+          startCol: slot.startCol,
+          base: dir,
+        ),
+        wordId: slot.slotId.toString(),
+      ));
+    }
+    return arrows;
+  }
+
+  /// FIX 4: unknown directions throw instead of assert-then-default.
   static Direction _direction(String raw) {
-    assert(
-      raw == 'right' || raw == 'down',
-      'Unexpected slot direction: $raw',
-    );
-    return raw == 'down' ? Direction.down : Direction.right;
+    switch (raw) {
+      case 'right':
+        return Direction.right;
+      case 'down':
+        return Direction.down;
+      default:
+        throw CrosswordGenerationException('Unknown slot direction: $raw');
+    }
+  }
+
+  /// FNV-1a 32-bit hash — deterministic across app launches (unlike
+  /// String.hashCode), so a generated puzzle maps to the same persistence key
+  /// every run without embedding the solution in cleartext.
+  static String _stableHash(String input) {
+    var hash = 0x811c9dc5;
+    for (final unit in input.codeUnits) {
+      hash = (hash ^ unit) & 0xFFFFFFFF;
+      hash = (hash * 0x01000193) & 0xFFFFFFFF;
+    }
+    return hash.toRadixString(16).padLeft(8, '0');
   }
 }

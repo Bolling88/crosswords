@@ -2,6 +2,7 @@ import 'package:crossword_api/crossword_api.dart';
 import 'package:crossword_core/crossword_core.dart';
 import 'package:crossword_ui/crossword_ui.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 class _FakeService implements PuzzleGenerationService {
@@ -27,10 +28,12 @@ class _FakeService implements PuzzleGenerationService {
 void main() {
   testWidgets('shows controls and navigates on generate', (tester) async {
     await tester.pumpWidget(MaterialApp(
-      home: GenerateScreen(
-        service: _FakeService(),
-        gameplayBuilder: (_, puzzle) =>
-            Scaffold(body: Text('PLAYING ${puzzle.title}')),
+      home: RepositoryProvider<PuzzleGenerationService>.value(
+        value: _FakeService(),
+        child: GenerateScreen(
+          gameplayBuilder: (_, puzzle) =>
+              Scaffold(body: Text('PLAYING ${puzzle.title}')),
+        ),
       ),
     ));
 

@@ -65,6 +65,9 @@ class CrosswordsApp extends StatelessWidget {
         ),
         RepositoryProvider<ProgressService>.value(value: progressService),
         RepositoryProvider<AuthService>.value(value: authService),
+        RepositoryProvider<PuzzleGenerationService>.value(
+          value: generationService,
+        ),
       ],
       child: MaterialApp(
         title: Strings.appTitle,
@@ -79,7 +82,6 @@ class CrosswordsApp extends StatelessWidget {
         home: AuthGate(
           authService: authService,
           child: GenerateScreen(
-            service: generationService,
             gameplayBuilder: (context, puzzle) =>
                 MobileCrosswordScreen(puzzle: puzzle),
           ),

@@ -18,14 +18,13 @@ typedef GameplayBuilder = Widget Function(
 
 /// Landing screen for generating a crossword puzzle.
 ///
-/// Provides [GeneratePuzzleCubit] and delegates rendering to
+/// Provides [GeneratePuzzleCubit] (reading [PuzzleGenerationService] from the
+/// nearest [RepositoryProvider]) and delegates rendering to
 /// [_GenerateScreenBuilder].
 class GenerateScreen extends StatelessWidget {
-  final PuzzleGenerationService service;
   final GameplayBuilder gameplayBuilder;
 
   const GenerateScreen({
-    required this.service,
     required this.gameplayBuilder,
     super.key,
   });
@@ -33,7 +32,8 @@ class GenerateScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => GeneratePuzzleCubit(service: service),
+      create: (context) =>
+          GeneratePuzzleCubit(service: context.read<PuzzleGenerationService>()),
       child: _GenerateScreenBuilder(gameplayBuilder: gameplayBuilder),
     );
   }
