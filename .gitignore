@@ -51,3 +51,6 @@ android/upload-keystore.jks
 
 # Superpowers brainstorming companion
 .superpowers/
+
+# Firebase Hosting local deploy cache
+.firebase/
