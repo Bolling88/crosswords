@@ -69,4 +69,45 @@ void main() {
       findsOneWidget,
     );
   });
+
+  testWidgets('single clue renders its (mock) clue text', (tester) async {
+    await tester.pumpWidget(_host(const ClueCell(arrows: [
+      ClueArrow(
+        direction: Direction.right,
+        shape: ArrowShape.straightRight,
+        wordId: 'w1',
+      ),
+    ])));
+    final text = tester.widget<Text>(
+      find.descendant(
+        of: find.byType(HintCellWidget),
+        matching: find.byType(Text),
+      ),
+    );
+    expect(text.data, isNotNull);
+    expect(text.data, isNotEmpty);
+  });
+
+  testWidgets('two-clue cell renders one clue text per compartment',
+      (tester) async {
+    await tester.pumpWidget(_host(const ClueCell(arrows: [
+      ClueArrow(
+        direction: Direction.right,
+        shape: ArrowShape.straightRight,
+        wordId: 'top',
+      ),
+      ClueArrow(
+        direction: Direction.down,
+        shape: ArrowShape.straightDown,
+        wordId: 'bottom',
+      ),
+    ])));
+    expect(
+      find.descendant(
+        of: find.byType(HintCellWidget),
+        matching: find.byType(Text),
+      ),
+      findsNWidgets(2),
+    );
+  });
 }

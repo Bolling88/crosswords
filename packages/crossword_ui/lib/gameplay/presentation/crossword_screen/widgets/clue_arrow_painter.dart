@@ -38,6 +38,15 @@ import 'package:crossword_core/crossword_core.dart';
   }
 }
 
+/// Cell edge/corner the small arrow hugs, derived from where the word starts
+/// relative to the clue cell. Lets the widget snap the arrow onto the cell
+/// border ("on the line"), the way printed korsord arrows sit. The entry unit
+/// vector (-1/0/1 per axis) maps directly onto [Alignment]'s (-1..1) space.
+Alignment clueArrowAlignment(ArrowShape shape) {
+  final entry = clueArrowVectors(shape).entry;
+  return Alignment(entry.dx, entry.dy);
+}
+
 // 8% inner margin keeps the arrowhead tip off the cell edge.
 Offset _clampUnit(Offset o) =>
     Offset(o.dx.clamp(0.08, 0.92), o.dy.clamp(0.08, 0.92));

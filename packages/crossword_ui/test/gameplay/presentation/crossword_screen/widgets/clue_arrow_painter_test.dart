@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:crossword_core/crossword_core.dart';
@@ -64,6 +65,27 @@ void main() {
           expect(p.dx, inInclusiveRange(0.0, 1.0));
           expect(p.dy, inInclusiveRange(0.0, 1.0));
         }
+      }
+    });
+  });
+
+  group('clueArrowAlignment', () {
+    test('straightRight snaps to the right edge', () {
+      expect(clueArrowAlignment(ArrowShape.straightRight), Alignment.centerRight);
+    });
+
+    test('straightDown snaps to the bottom edge', () {
+      expect(clueArrowAlignment(ArrowShape.straightDown), Alignment.bottomCenter);
+    });
+
+    test('diagonalNwThenDown snaps to the top-left corner', () {
+      expect(clueArrowAlignment(ArrowShape.diagonalNwThenDown), Alignment.topLeft);
+    });
+
+    test('every alignment sits on an edge or corner (no centre)', () {
+      for (final shape in ArrowShape.values) {
+        final a = clueArrowAlignment(shape);
+        expect(a.x.abs() == 1 || a.y.abs() == 1, isTrue, reason: '$shape');
       }
     });
   });

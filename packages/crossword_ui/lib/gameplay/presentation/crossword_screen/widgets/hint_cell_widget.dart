@@ -4,6 +4,7 @@ import 'package:crossword_core/crossword_core.dart';
 
 import '../../../../common/data/constants/app_colors.dart';
 import 'clue_arrow_painter.dart';
+import 'mock_clue_text.dart';
 
 class HintCellWidget extends StatelessWidget {
   final ClueCell cell;
@@ -46,23 +47,69 @@ class HintCellWidget extends StatelessWidget {
       return const SizedBox.expand();
     }
     if (arrows.length == 1) {
-      return _arrowPaint(arrows.first);
+      return _compartment(arrows.first, isSplit: false);
     }
     // Two clues share this box: split it into top and bottom compartments.
     // arrows are ordered top-first by the mapper/resolver.
     return Column(
       children: [
-        Expanded(child: _arrowPaint(arrows[0])),
+        Expanded(child: _compartment(arrows[0], isSplit: true)),
         Container(height: 0.5, color: AppColors.gridLine),
-        Expanded(child: _arrowPaint(arrows[1])),
+        Expanded(child: _compartment(arrows[1], isSplit: true)),
       ],
     );
   }
 
-  Widget _arrowPaint(ClueArrow arrow) {
-    return CustomPaint(
-      painter: ClueArrowPainter(shape: arrow.shape, color: AppColors.ink),
-      child: const SizedBox.expand(),
+  /// One clue: mock prose filling the box, with a small arrow snapped onto the
+  /// cell border toward the word's start. Text is padded away from the arrow.
+  Widget _compartment(ClueArrow arrow, {required bool isSplit}) {
+    final entry = clueArrowVectors(arrow.shape).entry;
+    final arrowExtent = size * (isSplit ? 0.22 : 0.28);
+    final fontSize = size * (isSplit ? 0.13 : 0.155);
+
+    return Stack(
+      children: [
+        Padding(
+          padding: _textPadding(entry, isSplit: isSplit),
+          child: Center(
+            child: Text(
+              mockClueText(arrow.wordId),
+              textAlign: TextAlign.center,
+              maxLines: isSplit ? 2 : 3,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontFamily: fontFamily,
+                color: AppColors.ink,
+                fontSize: fontSize,
+                height: 1.05,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ),
+        Align(
+          alignment: clueArrowAlignment(arrow.shape),
+          child: SizedBox(
+            width: arrowExtent,
+            height: arrowExtent,
+            child: CustomPaint(
+              painter: ClueArrowPainter(shape: arrow.shape, color: AppColors.ink),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Extra inset on the side the arrow sits, so prose doesn't crowd the glyph.
+  EdgeInsets _textPadding(Offset entry, {required bool isSplit}) {
+    final base = size * 0.05;
+    final extra = size * (isSplit ? 0.16 : 0.2);
+    return EdgeInsets.only(
+      left: base + (entry.dx < 0 ? extra : 0),
+      right: base + (entry.dx > 0 ? extra : 0),
+      top: base + (entry.dy < 0 ? extra : 0),
+      bottom: base + (entry.dy > 0 ? extra : 0),
     );
   }
 }
