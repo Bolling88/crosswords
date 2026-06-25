@@ -42,5 +42,46 @@ void main() {
         ArrowShape.bentLeftThenDown,
       );
     });
+
+    // Diagonal-entry cases taken from the real 9x9 generation fixture.
+    test('start diagonally SW of clue, running right → diagonalSwThenRight', () {
+      expect(
+        ArrowShapeResolver.resolve(
+          clueRow: 0, clueCol: 7, startRow: 1, startCol: 6,
+          base: Direction.right,
+        ),
+        ArrowShape.diagonalSwThenRight,
+      );
+    });
+
+    test('start diagonally SW of clue, running down → diagonalSwThenDown', () {
+      expect(
+        ArrowShapeResolver.resolve(
+          clueRow: 0, clueCol: 4, startRow: 1, startCol: 3,
+          base: Direction.down,
+        ),
+        ArrowShape.diagonalSwThenDown,
+      );
+    });
+
+    test('start diagonally NW of clue, running down → diagonalNwThenDown', () {
+      expect(
+        ArrowShapeResolver.resolve(
+          clueRow: 5, clueCol: 7, startRow: 4, startCol: 6,
+          base: Direction.down,
+        ),
+        ArrowShape.diagonalNwThenDown,
+      );
+    });
+
+    test('non-adjacent, non-diagonal start throws ArgumentError', () {
+      expect(
+        () => ArrowShapeResolver.resolve(
+          clueRow: 0, clueCol: 0, startRow: 2, startCol: 0,
+          base: Direction.right,
+        ),
+        throwsArgumentError,
+      );
+    });
   });
 }

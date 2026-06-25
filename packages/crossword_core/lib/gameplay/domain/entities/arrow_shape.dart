@@ -18,4 +18,28 @@ enum ArrowShape {
 
   /// Word starts in the cell to the left, then runs down (L-shaped, left→down).
   bentLeftThenDown,
+
+  /// Word starts in the diagonally below-left cell, then runs right.
+  diagonalSwThenRight,
+
+  /// Word starts in the diagonally above-left cell, then runs right.
+  diagonalNwThenRight,
+
+  /// Word starts in the diagonally below-right cell, then runs right.
+  diagonalSeThenRight,
+
+  /// Word starts in the diagonally above-right cell, then runs right.
+  diagonalNeThenRight,
+
+  /// Word starts in the diagonally below-left cell, then runs down.
+  diagonalSwThenDown,
+
+  /// Word starts in the diagonally above-left cell, then runs down.
+  diagonalNwThenDown,
+
+  /// Word starts in the diagonally below-right cell, then runs down.
+  diagonalSeThenDown,
+
+  /// Word starts in the diagonally above-right cell, then runs down.
+  diagonalNeThenDown,
 }
