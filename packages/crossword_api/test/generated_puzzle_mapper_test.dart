@@ -216,4 +216,56 @@ void main() {
     final arrow = clue.arrows.firstWhere((a) => a.wordId == '1');
     expect(arrow.shape, ArrowShape.diagonalSwThenRight);
   });
+
+  // Guards the sort itself: the clue tags are emitted BOTTOM-first (slot 100
+  // starts at row 2, below the clue) then TOP (slot 200 starts at row 0,
+  // above the clue). Without the top-first sort in _arrowsFor the arrows would
+  // keep emission order and arrows.first would be slot 100; the sort must
+  // reorder so arrows.first is the smaller-startRow slot 200.
+  test('arrows are re-sorted top-first when tags arrive bottom-first', () {
+    const response = CrosswordGenerationResponse(
+      success: true,
+      gridCells: [
+        [
+          GenerationGridCellDto(
+            kind: 'clue',
+            row: 1,
+            col: 1,
+            clueTags: [
+              GenerationClueTagDto(id: 100, arrow: '↓'), // bottom word, FIRST
+              GenerationClueTagDto(id: 200, arrow: '→'), // top word, SECOND
+            ],
+          ),
+        ],
+      ],
+      slots: [
+        // Below the clue (start (2,1)): down word, larger startRow.
+        GenerationSlotDto(
+          slotId: 100,
+          startRow: 2,
+          startCol: 1,
+          direction: 'down',
+          length: 1,
+          clueRow: 1,
+          clueCol: 1,
+        ),
+        // Above the clue (start (0,1)): right word, smaller startRow.
+        GenerationSlotDto(
+          slotId: 200,
+          startRow: 0,
+          startCol: 1,
+          direction: 'right',
+          length: 1,
+          clueRow: 1,
+          clueCol: 1,
+        ),
+      ],
+    );
+    final localPuzzle = GeneratedPuzzleMapper.map(response, title: 'X');
+    final clue = localPuzzle.cells[(1, 1)] as ClueCell;
+    expect(clue.arrows.length, 2);
+    // Top word (slot 200) comes first despite being emitted second.
+    expect(clue.arrows.first.wordId, '200');
+    expect(clue.arrows.last.wordId, '100');
+  });
 }
