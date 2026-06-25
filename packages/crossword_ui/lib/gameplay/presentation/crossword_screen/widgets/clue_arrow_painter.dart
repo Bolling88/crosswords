@@ -1,7 +1,8 @@
 import 'dart:math' as math;
 
-import 'package:crossword_core/crossword_core.dart';
 import 'package:flutter/material.dart';
+
+import 'package:crossword_core/crossword_core.dart';
 
 /// Direction from the clue cell toward the word's start (entry) and the
 /// direction the word then reads (travel), in screen coords (+x right, +y down).
@@ -38,6 +39,7 @@ import 'package:flutter/material.dart';
   }
 }
 
+// 8% inner margin keeps the arrowhead tip off the cell edge.
 Offset _clampUnit(Offset o) =>
     Offset(o.dx.clamp(0.08, 0.92), o.dy.clamp(0.08, 0.92));
 

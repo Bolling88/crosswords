@@ -169,6 +169,54 @@ void main() {
     );
   });
 
+  // ── Fix 1: null-letter cell covered by a word path is a corrupt puzzle ───
+  // The slot's path spans (0,0) which has a null letter → BlockCell, while the
+  // word still claims that position. The mapper must detect this and throw.
+  test(
+      'throws CrosswordGenerationException when a word path covers a BlockCell '
+      '(null-letter answer cell on a slot path)', () {
+    const response = CrosswordGenerationResponse(
+      success: true,
+      gridCells: [
+        [
+          GenerationGridCellDto(
+            kind: 'answer',
+            row: 0,
+            col: 0,
+            // null letter → will become BlockCell
+          ),
+          GenerationGridCellDto(
+            kind: 'answer',
+            row: 0,
+            col: 1,
+            letter: 'A',
+          ),
+        ],
+      ],
+      slots: [
+        GenerationSlotDto(
+          slotId: 1,
+          startRow: 0,
+          startCol: 0,
+          direction: 'right',
+          length: 2,
+          clueRow: 0,
+          clueCol: 0,
+        ),
+      ],
+    );
+    expect(
+      () => GeneratedPuzzleMapper.map(response, title: 'X'),
+      throwsA(
+        isA<CrosswordGenerationException>().having(
+          (e) => e.toString(),
+          'message',
+          contains('(0, 0)'),
+        ),
+      ),
+    );
+  });
+
   // ── FIX 5: clue tag references missing slot throws ────────────────────────
   test('throws CrosswordGenerationException for clue tag with missing slot',
       () {

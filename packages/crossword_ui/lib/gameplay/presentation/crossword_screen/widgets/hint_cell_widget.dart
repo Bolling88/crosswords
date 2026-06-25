@@ -1,5 +1,6 @@
-import 'package:crossword_core/crossword_core.dart';
 import 'package:flutter/material.dart';
+
+import 'package:crossword_core/crossword_core.dart';
 
 import '../../../../common/data/constants/app_colors.dart';
 import 'clue_arrow_painter.dart';

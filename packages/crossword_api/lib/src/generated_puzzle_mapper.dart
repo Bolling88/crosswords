@@ -105,6 +105,21 @@ class GeneratedPuzzleMapper {
       ));
     }
 
+    // Invariant: every grid cell that a word's path covers must be an AnswerCell.
+    // A null-letter generator cell becomes a BlockCell, which is fine for inert
+    // open positions, but if a slot's path covers such a position the puzzle is
+    // corrupt — a Word would span a BlockCell, which gameplay code cannot handle.
+    for (final word in words) {
+      for (final pos in word.cells) {
+        final cell = cells[pos];
+        if (cell != null && cell is! AnswerCell) {
+          throw CrosswordGenerationException(
+            'Word ${word.id} path includes non-AnswerCell at (${pos.$1}, ${pos.$2})',
+          );
+        }
+      }
+    }
+
     return CrosswordPuzzle(
       rows: rows,
       cols: cols,

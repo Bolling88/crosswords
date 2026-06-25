@@ -1,7 +1,7 @@
+import 'package:flutter_test/flutter_test.dart';
+
 import 'package:crossword_core/crossword_core.dart';
 import 'package:crossword_ui/gameplay/presentation/crossword_screen/widgets/clue_arrow_painter.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('clueArrowVectors', () {
@@ -48,6 +48,14 @@ void main() {
       final prev = spine[spine.length - 2];
       expect(tip.dx > prev.dx, isTrue);
       expect((tip.dy - prev.dy).abs() < 1e-9, isTrue);
+    });
+
+    test('final segment runs in the travel direction (down)', () {
+      final spine = clueArrowSpine(ArrowShape.diagonalNeThenDown);
+      final tip = spine.last;
+      final prev = spine[spine.length - 2];
+      expect(tip.dy > prev.dy, isTrue);
+      expect((tip.dx - prev.dx).abs() < 1e-9, isTrue);
     });
 
     test('all points stay within the unit square', () {
