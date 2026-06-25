@@ -218,4 +218,27 @@ void main() {
     expect(p.wordAt((2, 2), Direction.right)!.id, 'h2');
     expect(p.wordAt((2, 2), Direction.down)!.id, 'h1');
   });
+
+  test('two-clue cell orders arrows top-first by word start row', () {
+    final dto = _puzzle([
+      [
+        const ClueCellDto(
+          rightWordId: 'across',
+          rightStart: PositionDto(col: 1, row: 0),
+          downWordId: 'down',
+          downStart: PositionDto(col: 0, row: 1),
+        ),
+        _a('A'),
+      ],
+      [
+        _a('B'),
+        _block,
+      ],
+    ]);
+
+    final clue = PuzzleResolver.resolve(dto).cells[(0, 0)] as ClueCell;
+    expect(clue.arrows.length, 2);
+    expect(clue.arrows.first.wordId, 'across'); // start row 0 (top)
+    expect(clue.arrows.last.wordId, 'down'); // start row 1 (bottom)
+  });
 }

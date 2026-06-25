@@ -40,55 +40,73 @@ class PuzzleResolver {
             domainCells[(r, c)] =
                 AnswerCell(value: cell.value, isSeed: seeds.contains((r, c)));
           case ClueCellDto():
-            final arrows = <ClueArrow>[];
+            // (startRow, startCol, arrow) so we can order arrows top-first.
+            final entries = <(int, int, ClueArrow)>[];
 
-            if (cell.rightWordId != null && cell.rightStart != null) {
+            final rightWordId = cell.rightWordId;
+            final rightStart = cell.rightStart;
+            if (rightWordId != null && rightStart != null) {
               words.add(_resolveWord(
-                id: cell.rightWordId!,
+                id: rightWordId,
                 clueId: cell.rightClueId,
                 clueText: cell.right,
-                start: cell.rightStart!,
+                start: rightStart,
                 base: Direction.right,
                 answerAt: answerAt,
                 separatorEdges: separatorEdges,
               ));
-              arrows.add(ClueArrow(
-                direction: Direction.right,
-                shape: ArrowShapeResolver.resolve(
-                  clueRow: r,
-                  clueCol: c,
-                  startRow: cell.rightStart!.row,
-                  startCol: cell.rightStart!.col,
-                  base: Direction.right,
+              entries.add((
+                rightStart.row,
+                rightStart.col,
+                ClueArrow(
+                  direction: Direction.right,
+                  shape: ArrowShapeResolver.resolve(
+                    clueRow: r,
+                    clueCol: c,
+                    startRow: rightStart.row,
+                    startCol: rightStart.col,
+                    base: Direction.right,
+                  ),
+                  wordId: rightWordId,
                 ),
-                wordId: cell.rightWordId!,
               ));
             }
 
-            if (cell.downWordId != null && cell.downStart != null) {
+            final downWordId = cell.downWordId;
+            final downStart = cell.downStart;
+            if (downWordId != null && downStart != null) {
               words.add(_resolveWord(
-                id: cell.downWordId!,
+                id: downWordId,
                 clueId: cell.downClueId,
                 clueText: cell.down,
-                start: cell.downStart!,
+                start: downStart,
                 base: Direction.down,
                 answerAt: answerAt,
                 separatorEdges: separatorEdges,
               ));
-              arrows.add(ClueArrow(
-                direction: Direction.down,
-                shape: ArrowShapeResolver.resolve(
-                  clueRow: r,
-                  clueCol: c,
-                  startRow: cell.downStart!.row,
-                  startCol: cell.downStart!.col,
-                  base: Direction.down,
+              entries.add((
+                downStart.row,
+                downStart.col,
+                ClueArrow(
+                  direction: Direction.down,
+                  shape: ArrowShapeResolver.resolve(
+                    clueRow: r,
+                    clueCol: c,
+                    startRow: downStart.row,
+                    startCol: downStart.col,
+                    base: Direction.down,
+                  ),
+                  wordId: downWordId,
                 ),
-                wordId: cell.downWordId!,
               ));
             }
 
-            domainCells[(r, c)] = ClueCell(arrows: arrows);
+            entries.sort((a, b) {
+              final byRow = a.$1.compareTo(b.$1);
+              return byRow != 0 ? byRow : a.$2.compareTo(b.$2);
+            });
+            domainCells[(r, c)] =
+                ClueCell(arrows: [for (final entry in entries) entry.$3]);
         }
       }
     }
