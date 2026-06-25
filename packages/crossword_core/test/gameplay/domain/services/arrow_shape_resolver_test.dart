@@ -74,6 +74,58 @@ void main() {
       );
     });
 
+    // Remaining diagonal corners not present in the fixture, defined for
+    // completeness so any geometry the generator can emit has a glyph.
+    test('start diagonally NW of clue, running right → diagonalNwThenRight', () {
+      expect(
+        ArrowShapeResolver.resolve(
+          clueRow: 1, clueCol: 1, startRow: 0, startCol: 0,
+          base: Direction.right,
+        ),
+        ArrowShape.diagonalNwThenRight,
+      );
+    });
+
+    test('start diagonally SE of clue, running right → diagonalSeThenRight', () {
+      expect(
+        ArrowShapeResolver.resolve(
+          clueRow: 0, clueCol: 0, startRow: 1, startCol: 1,
+          base: Direction.right,
+        ),
+        ArrowShape.diagonalSeThenRight,
+      );
+    });
+
+    test('start diagonally NE of clue, running right → diagonalNeThenRight', () {
+      expect(
+        ArrowShapeResolver.resolve(
+          clueRow: 1, clueCol: 0, startRow: 0, startCol: 1,
+          base: Direction.right,
+        ),
+        ArrowShape.diagonalNeThenRight,
+      );
+    });
+
+    test('start diagonally SE of clue, running down → diagonalSeThenDown', () {
+      expect(
+        ArrowShapeResolver.resolve(
+          clueRow: 0, clueCol: 0, startRow: 1, startCol: 1,
+          base: Direction.down,
+        ),
+        ArrowShape.diagonalSeThenDown,
+      );
+    });
+
+    test('start diagonally NE of clue, running down → diagonalNeThenDown', () {
+      expect(
+        ArrowShapeResolver.resolve(
+          clueRow: 1, clueCol: 0, startRow: 0, startCol: 1,
+          base: Direction.down,
+        ),
+        ArrowShape.diagonalNeThenDown,
+      );
+    });
+
     test('non-adjacent, non-diagonal start throws ArgumentError', () {
       expect(
         () => ArrowShapeResolver.resolve(
