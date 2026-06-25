@@ -1,8 +1,8 @@
+import 'package:crossword_core/crossword_core.dart';
 import 'package:flutter/material.dart';
 
-import 'package:crossword_core/crossword_core.dart';
-
 import '../../../../common/data/constants/app_colors.dart';
+import 'clue_arrow_painter.dart';
 
 class HintCellWidget extends StatelessWidget {
   final ClueCell cell;
@@ -34,69 +34,34 @@ class HintCellWidget extends StatelessWidget {
           color: isActive ? AppColors.clueCellActive : AppColors.clueCell,
           border: Border.all(color: AppColors.gridLine, width: 0.5),
         ),
-        child: Stack(
-          children: [
-            // Clue prose is null in generator output, so clue cells render
-            // arrows only. Texts can be layered here once authored.
-            for (final arrow in cell.arrows) _buildArrow(arrow.shape),
-          ],
-        ),
+        child: _buildContent(),
       ),
     );
   }
 
-  Widget _buildArrow(ArrowShape shape) {
-    return switch (shape) {
-      ArrowShape.straightRight => Align(
-          alignment: Alignment.centerRight,
-          child: Icon(Icons.play_arrow,
-              color: AppColors.ink, size: size * 0.3),
-        ),
-      ArrowShape.straightDown => Align(
-          alignment: Alignment.bottomCenter,
-          child: Transform.rotate(
-            angle: 1.5707963267948966, // pi/2
-            child: Icon(Icons.play_arrow,
-                color: AppColors.ink, size: size * 0.3),
-          ),
-        ),
-      // Bent arrows: an elbow glyph hugging the corner the word turns through.
-      // The base glyph (subdirectory_arrow_right) comes DOWN then turns RIGHT;
-      // the other three orientations mirror/rotate it.
-      ArrowShape.bentDownThenRight => Align(
-          alignment: Alignment.bottomRight,
-          child: Icon(Icons.subdirectory_arrow_right,
-              color: AppColors.ink, size: size * 0.34),
-        ),
-      ArrowShape.bentUpThenRight => Align(
-          alignment: Alignment.topRight,
-          child: Transform(
-            alignment: Alignment.center,
-            transform: Matrix4.diagonal3Values(1, -1, 1), // flip vertically
-            child: Icon(Icons.subdirectory_arrow_right,
-                color: AppColors.ink, size: size * 0.34),
-          ),
-        ),
-      ArrowShape.bentRightThenDown => Align(
-          alignment: Alignment.bottomRight,
-          child: Transform.rotate(
-            angle: 1.5707963267948966, // pi/2: turns the elbow to right→down
-            child: Icon(Icons.subdirectory_arrow_right,
-                color: AppColors.ink, size: size * 0.34),
-          ),
-        ),
-      ArrowShape.bentLeftThenDown => Align(
-          alignment: Alignment.bottomLeft,
-          child: Transform(
-            alignment: Alignment.center,
-            transform: Matrix4.diagonal3Values(-1, 1, 1), // mirror horizontally
-            child: Transform.rotate(
-              angle: 1.5707963267948966, // pi/2
-              child: Icon(Icons.subdirectory_arrow_right,
-                  color: AppColors.ink, size: size * 0.34),
-            ),
-          ),
-        ),
-    };
+  Widget _buildContent() {
+    final arrows = cell.arrows;
+    if (arrows.isEmpty) {
+      return const SizedBox.expand();
+    }
+    if (arrows.length == 1) {
+      return _arrowPaint(arrows.first);
+    }
+    // Two clues share this box: split it into top and bottom compartments.
+    // arrows are ordered top-first by the mapper/resolver.
+    return Column(
+      children: [
+        Expanded(child: _arrowPaint(arrows[0])),
+        Container(height: 0.5, color: AppColors.gridLine),
+        Expanded(child: _arrowPaint(arrows[1])),
+      ],
+    );
+  }
+
+  Widget _arrowPaint(ClueArrow arrow) {
+    return CustomPaint(
+      painter: ClueArrowPainter(shape: arrow.shape, color: AppColors.ink),
+      child: const SizedBox.expand(),
+    );
   }
 }
