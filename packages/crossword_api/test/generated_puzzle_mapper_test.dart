@@ -84,10 +84,11 @@ void main() {
     );
   });
 
-  // ── FIX 2: answer cell with null letter throws ────────────────────────────
-  test('throws CrosswordGenerationException for answer cell with null letter',
-      () {
-    // A minimal 1x1 grid with a single answer cell whose letter is null.
+  // ── Answer cell with null letter is an unused/open grid position ──────────
+  // The generator routinely emits answer cells that belong to no word (empty
+  // word_ids, null letter). These are inert open positions, not malformed
+  // data, so they map to BlockCell rather than throwing.
+  test('answer cell with null letter maps to BlockCell (not an error)', () {
     const response = CrosswordGenerationResponse(
       success: true,
       gridCells: [
@@ -102,10 +103,37 @@ void main() {
       ],
       slots: [],
     );
-    expect(
-      () => GeneratedPuzzleMapper.map(response, title: 'X'),
-      throwsA(isA<CrosswordGenerationException>()),
+    final puzzle = GeneratedPuzzleMapper.map(response, title: 'X');
+    expect(puzzle.cells[(0, 0)], isA<BlockCell>());
+  });
+
+  // A null-letter answer cell alongside a real lettered answer cell must not
+  // abort the whole mapping — this is the shape every live response has.
+  test('null-letter answer cell coexists with lettered answer cells', () {
+    const response = CrosswordGenerationResponse(
+      success: true,
+      gridCells: [
+        [
+          GenerationGridCellDto(
+            kind: 'answer',
+            row: 0,
+            col: 0,
+            // unused open cell, no letter
+          ),
+          GenerationGridCellDto(
+            kind: 'answer',
+            row: 0,
+            col: 1,
+            letter: 'A',
+          ),
+        ],
+      ],
+      slots: [],
     );
+    final puzzle = GeneratedPuzzleMapper.map(response, title: 'X');
+    expect(puzzle.cells[(0, 0)], isA<BlockCell>());
+    expect(puzzle.cells[(0, 1)], isA<AnswerCell>());
+    expect((puzzle.cells[(0, 1)] as AnswerCell).value, 'A');
   });
 
   // ── FIX 4: unknown direction throws ──────────────────────────────────────
@@ -163,5 +191,29 @@ void main() {
       () => GeneratedPuzzleMapper.map(response, title: 'X'),
       throwsA(isA<CrosswordGenerationException>()),
     );
+  });
+
+  // Cell (5,0) carries two rightward clues: slot 6 starts at row 4 (above),
+  // slot 8 starts at row 5. Top-first ordering puts slot 6 first.
+  test('two-clue box (5,0) orders arrows top-first by word start', () {
+    final clue = puzzle.cells[(5, 0)] as ClueCell;
+    expect(clue.arrows.length, 2);
+    expect(clue.arrows[0].wordId, '6');
+    expect(clue.arrows[1].wordId, '8');
+  });
+
+  // Cell (5,7): slot 21 starts at row 4 (above), slot 23 at row 6.
+  test('two-clue box (5,7) orders arrows top-first by word start', () {
+    final clue = puzzle.cells[(5, 7)] as ClueCell;
+    expect(clue.arrows.length, 2);
+    expect(clue.arrows[0].wordId, '21');
+    expect(clue.arrows[1].wordId, '23');
+  });
+
+  // Clue (0,7) sits diagonally NE of its word start (1,6); the word runs right.
+  test('diagonal clue (0,7) resolves to diagonalSwThenRight', () {
+    final clue = puzzle.cells[(0, 7)] as ClueCell;
+    final arrow = clue.arrows.firstWhere((a) => a.wordId == '1');
+    expect(arrow.shape, ArrowShape.diagonalSwThenRight);
   });
 }

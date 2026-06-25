@@ -46,12 +46,15 @@ class GeneratedPuzzleMapper {
         final pos = (c.row, c.col);
         switch (c.kind) {
           case 'answer':
-            // FIX 2: a null letter in an answer cell is a malformed response.
+            // The generator emits answer cells that belong to no word (null
+            // letter, empty word_ids). These are inert open positions, not a
+            // malformed response, so render them as blocks rather than
+            // aborting the whole puzzle.
             final letter = c.letter;
             if (letter == null) {
-              throw CrosswordGenerationException(
-                'Answer cell at (${c.row}, ${c.col}) has no letter',
-              );
+              cells[pos] = const BlockCell();
+              solutionBuffer.write('#');
+              break;
             }
             cells[pos] = AnswerCell(
               value: letter,
@@ -115,12 +118,14 @@ class GeneratedPuzzleMapper {
     );
   }
 
-  /// FIX 5: builds [ClueArrow]s for a clue cell, throwing on a missing slot.
+  /// Builds [ClueArrow]s for a clue cell, throwing on a missing slot. Arrows
+  /// are ordered top-first (smaller word-start row, then col) so the renderer
+  /// can split a two-clue box into top/bottom compartments without slot data.
   static List<ClueArrow> _arrowsFor(
     GenerationGridCellDto cell,
     Map<int, GenerationSlotDto> slotById,
   ) {
-    final arrows = <ClueArrow>[];
+    final entries = <(GenerationSlotDto, ClueArrow)>[];
     for (final tag in cell.clueTags) {
       final slot = slotById[tag.id];
       if (slot == null) {
@@ -129,19 +134,26 @@ class GeneratedPuzzleMapper {
         );
       }
       final dir = _direction(slot.direction);
-      arrows.add(ClueArrow(
-        direction: dir,
-        shape: ArrowShapeResolver.resolve(
-          clueRow: slot.clueRow,
-          clueCol: slot.clueCol,
-          startRow: slot.startRow,
-          startCol: slot.startCol,
-          base: dir,
+      entries.add((
+        slot,
+        ClueArrow(
+          direction: dir,
+          shape: ArrowShapeResolver.resolve(
+            clueRow: slot.clueRow,
+            clueCol: slot.clueCol,
+            startRow: slot.startRow,
+            startCol: slot.startCol,
+            base: dir,
+          ),
+          wordId: slot.slotId.toString(),
         ),
-        wordId: slot.slotId.toString(),
       ));
     }
-    return arrows;
+    entries.sort((a, b) {
+      final byRow = a.$1.startRow.compareTo(b.$1.startRow);
+      return byRow != 0 ? byRow : a.$1.startCol.compareTo(b.$1.startCol);
+    });
+    return [for (final entry in entries) entry.$2];
   }
 
   /// FIX 4: unknown directions throw instead of assert-then-default.
