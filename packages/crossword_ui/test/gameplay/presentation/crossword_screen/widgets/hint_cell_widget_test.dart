@@ -8,6 +8,11 @@ Finder _arrowPaints() => find.byWidgetPredicate(
       (w) => w is CustomPaint && w.painter is ClueArrowPainter,
     );
 
+Finder _clueTexts() => find.descendant(
+      of: find.byType(HintCellWidget),
+      matching: find.byType(Text),
+    );
+
 Widget _host(ClueCell cell) => MaterialApp(
       home: Scaffold(
         body: Center(
@@ -22,12 +27,13 @@ Widget _host(ClueCell cell) => MaterialApp(
     );
 
 void main() {
-  testWidgets('empty clue cell paints no arrows', (tester) async {
+  testWidgets('empty clue cell renders no text and no arrow', (tester) async {
     await tester.pumpWidget(_host(const ClueCell()));
+    expect(_clueTexts(), findsNothing);
     expect(_arrowPaints(), findsNothing);
   });
 
-  testWidgets('non-default (bent) clue paints one arrow, no divider column',
+  testWidgets('clue cell is text-only — arrows live in the answer boxes',
       (tester) async {
     await tester.pumpWidget(_host(const ClueCell(arrows: [
       ClueArrow(
@@ -36,7 +42,8 @@ void main() {
         wordId: 'w1',
       ),
     ])));
-    expect(_arrowPaints(), findsOneWidget);
+    expect(_clueTexts(), findsOneWidget);
+    expect(_arrowPaints(), findsNothing);
     expect(
       find.descendant(
         of: find.byType(HintCellWidget),
@@ -46,69 +53,7 @@ void main() {
     );
   });
 
-  testWidgets('default straight clues draw no arrow (logical reading order)',
-      (tester) async {
-    await tester.pumpWidget(_host(const ClueCell(arrows: [
-      ClueArrow(
-        direction: Direction.right,
-        shape: ArrowShape.straightRight,
-        wordId: 'w1',
-      ),
-    ])));
-    expect(_arrowPaints(), findsNothing);
-    // The clue text is still rendered.
-    expect(
-      find.descendant(
-        of: find.byType(HintCellWidget),
-        matching: find.byType(Text),
-      ),
-      findsOneWidget,
-    );
-  });
-
-  testWidgets('two-clue cell splits into two compartments with a divider',
-      (tester) async {
-    await tester.pumpWidget(_host(const ClueCell(arrows: [
-      ClueArrow(
-        direction: Direction.right,
-        shape: ArrowShape.bentDownThenRight,
-        wordId: 'top',
-      ),
-      ClueArrow(
-        direction: Direction.down,
-        shape: ArrowShape.bentRightThenDown,
-        wordId: 'bottom',
-      ),
-    ])));
-    expect(_arrowPaints(), findsNWidgets(2));
-    expect(
-      find.descendant(
-        of: find.byType(HintCellWidget),
-        matching: find.byType(Column),
-      ),
-      findsOneWidget,
-    );
-  });
-
-  testWidgets('single clue renders its (mock) clue text', (tester) async {
-    await tester.pumpWidget(_host(const ClueCell(arrows: [
-      ClueArrow(
-        direction: Direction.right,
-        shape: ArrowShape.straightRight,
-        wordId: 'w1',
-      ),
-    ])));
-    final text = tester.widget<Text>(
-      find.descendant(
-        of: find.byType(HintCellWidget),
-        matching: find.byType(Text),
-      ),
-    );
-    expect(text.data, isNotNull);
-    expect(text.data, isNotEmpty);
-  });
-
-  testWidgets('two-clue cell renders one clue text per compartment',
+  testWidgets('two-clue cell splits with a divider and one text per half',
       (tester) async {
     await tester.pumpWidget(_host(const ClueCell(arrows: [
       ClueArrow(
@@ -122,12 +67,14 @@ void main() {
         wordId: 'bottom',
       ),
     ])));
+    expect(_clueTexts(), findsNWidgets(2));
+    expect(_arrowPaints(), findsNothing);
     expect(
       find.descendant(
         of: find.byType(HintCellWidget),
-        matching: find.byType(Text),
+        matching: find.byType(Column),
       ),
-      findsNWidgets(2),
+      findsOneWidget,
     );
   });
 }

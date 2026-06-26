@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:crossword_core/crossword_core.dart';
 
 import '../../../../common/data/constants/app_colors.dart';
-import 'clue_arrow_painter.dart';
 import 'mock_clue_text.dart';
 
 class HintCellWidget extends StatelessWidget {
@@ -47,31 +46,24 @@ class HintCellWidget extends StatelessWidget {
       return const SizedBox.expand();
     }
     if (arrows.length == 1) {
-      return _compartment(arrows.first, isSplit: false);
+      return _clueText(arrows.first, isSplit: false);
     }
     // Two clues share this box: split it into top and bottom compartments.
-    // arrows are ordered top-first by the mapper/resolver.
+    // Arrows are ordered top-first by the mapper/resolver. The direction glyphs
+    // live in the answer boxes (korsord style), so the clue cell is text only.
     return Column(
       children: [
-        Expanded(child: _compartment(arrows[0], isSplit: true)),
+        Expanded(child: _clueText(arrows[0], isSplit: true)),
         Container(height: 0.5, color: AppColors.gridLine),
-        Expanded(child: _compartment(arrows[1], isSplit: true)),
+        Expanded(child: _clueText(arrows[1], isSplit: true)),
       ],
     );
   }
 
-  /// One clue: mock prose filling the box. A small arrow is snapped onto the
-  /// cell border toward the word's start ONLY when the flow is non-obvious;
-  /// words that continue in the logical direction draw no arrow (korsord rule).
-  Widget _compartment(ClueArrow arrow, {required bool isSplit}) {
-    final implied = clueArrowIsImplied(arrow.shape);
-    final entry = clueArrowVectors(arrow.shape).entry;
+  Widget _clueText(ClueArrow arrow, {required bool isSplit}) {
     final fontSize = size * (isSplit ? 0.13 : 0.155);
-
-    final text = Padding(
-      padding: implied
-          ? EdgeInsets.all(size * 0.05)
-          : _textPadding(entry, isSplit: isSplit),
+    return Padding(
+      padding: EdgeInsets.all(size * 0.05),
       child: Center(
         child: Text(
           mockClueText(arrow.wordId),
@@ -87,39 +79,6 @@ class HintCellWidget extends StatelessWidget {
           ),
         ),
       ),
-    );
-
-    if (implied) {
-      return text;
-    }
-
-    final arrowExtent = size * (isSplit ? 0.22 : 0.28);
-    return Stack(
-      children: [
-        text,
-        Align(
-          alignment: clueArrowAlignment(arrow.shape),
-          child: SizedBox(
-            width: arrowExtent,
-            height: arrowExtent,
-            child: CustomPaint(
-              painter: ClueArrowPainter(shape: arrow.shape, color: AppColors.ink),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  /// Extra inset on the side the arrow sits, so prose doesn't crowd the glyph.
-  EdgeInsets _textPadding(Offset entry, {required bool isSplit}) {
-    final base = size * 0.05;
-    final extra = size * (isSplit ? 0.16 : 0.2);
-    return EdgeInsets.only(
-      left: base + (entry.dx < 0 ? extra : 0),
-      right: base + (entry.dx > 0 ? extra : 0),
-      top: base + (entry.dy < 0 ? extra : 0),
-      bottom: base + (entry.dy > 0 ? extra : 0),
     );
   }
 }

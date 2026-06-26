@@ -1,4 +1,3 @@
-import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:crossword_core/crossword_core.dart';
@@ -18,12 +17,6 @@ void main() {
       expect(v.travel, const Offset(1, 0));
     });
 
-    test('diagonalNwThenDown enters toward NW and reads down', () {
-      final v = clueArrowVectors(ArrowShape.diagonalNwThenDown);
-      expect(v.entry, const Offset(-1, -1));
-      expect(v.travel, const Offset(0, 1));
-    });
-
     test('every shape reads in a cardinal direction', () {
       for (final shape in ArrowShape.values) {
         final travel = clueArrowVectors(shape).travel;
@@ -36,23 +29,43 @@ void main() {
     });
   });
 
-  group('clueArrowSpine', () {
-    test('straight has 2 points, bent/diagonal have 3', () {
-      expect(clueArrowSpine(ArrowShape.straightRight).length, 2);
-      expect(clueArrowSpine(ArrowShape.bentDownThenRight).length, 3);
-      expect(clueArrowSpine(ArrowShape.diagonalNwThenDown).length, 3);
+  group('clueArrowIsImplied', () {
+    test('straight shapes are implied (no glyph drawn)', () {
+      expect(clueArrowIsImplied(ArrowShape.straightRight), isTrue);
+      expect(clueArrowIsImplied(ArrowShape.straightDown), isTrue);
     });
 
-    test('final segment runs in the travel direction (right)', () {
-      final spine = clueArrowSpine(ArrowShape.diagonalSwThenRight);
+    test('only the two straight shapes are implied', () {
+      final drawn =
+          ArrowShape.values.where((s) => !clueArrowIsImplied(s)).toSet();
+      expect(drawn, contains(ArrowShape.bentDownThenRight));
+      expect(drawn, contains(ArrowShape.diagonalNwThenDown));
+      expect(drawn.length, ArrowShape.values.length - 2);
+    });
+  });
+
+  group('startArrowSpine', () {
+    test('has three points: tail (clue side), elbow, tip (travel)', () {
+      expect(startArrowSpine(ArrowShape.bentDownThenRight).length, 3);
+      expect(startArrowSpine(ArrowShape.diagonalNwThenDown).length, 3);
+    });
+
+    test('the tail sits on the clue side (opposite the entry vector)', () {
+      // bentDownThenRight: entry is (0,1), so the clue is above → tail near top.
+      final spine = startArrowSpine(ArrowShape.bentDownThenRight);
+      expect(spine.first.dy < 0.5, isTrue);
+    });
+
+    test('the final segment runs in the travel direction (right)', () {
+      final spine = startArrowSpine(ArrowShape.bentDownThenRight);
       final tip = spine.last;
       final prev = spine[spine.length - 2];
       expect(tip.dx > prev.dx, isTrue);
       expect((tip.dy - prev.dy).abs() < 1e-9, isTrue);
     });
 
-    test('final segment runs in the travel direction (down)', () {
-      final spine = clueArrowSpine(ArrowShape.diagonalNeThenDown);
+    test('the final segment runs in the travel direction (down)', () {
+      final spine = startArrowSpine(ArrowShape.bentRightThenDown);
       final tip = spine.last;
       final prev = spine[spine.length - 2];
       expect(tip.dy > prev.dy, isTrue);
@@ -61,50 +74,11 @@ void main() {
 
     test('all points stay within the unit square', () {
       for (final shape in ArrowShape.values) {
-        for (final p in clueArrowSpine(shape)) {
+        for (final p in startArrowSpine(shape)) {
           expect(p.dx, inInclusiveRange(0.0, 1.0));
           expect(p.dy, inInclusiveRange(0.0, 1.0));
         }
       }
-    });
-  });
-
-  group('clueArrowAlignment', () {
-    test('straightRight snaps to the right edge', () {
-      expect(clueArrowAlignment(ArrowShape.straightRight), Alignment.centerRight);
-    });
-
-    test('straightDown snaps to the bottom edge', () {
-      expect(clueArrowAlignment(ArrowShape.straightDown), Alignment.bottomCenter);
-    });
-
-    test('diagonalNwThenDown snaps to the top-left corner', () {
-      expect(clueArrowAlignment(ArrowShape.diagonalNwThenDown), Alignment.topLeft);
-    });
-
-    test('every alignment sits on an edge or corner (no centre)', () {
-      for (final shape in ArrowShape.values) {
-        final a = clueArrowAlignment(shape);
-        expect(a.x.abs() == 1 || a.y.abs() == 1, isTrue, reason: '$shape');
-      }
-    });
-  });
-
-  group('clueArrowIsImplied', () {
-    test('straight shapes are implied (no glyph drawn)', () {
-      expect(clueArrowIsImplied(ArrowShape.straightRight), isTrue);
-      expect(clueArrowIsImplied(ArrowShape.straightDown), isTrue);
-    });
-
-    test('bent and diagonal shapes are not implied (glyph drawn)', () {
-      final drawn = ArrowShape.values
-          .where((s) => !clueArrowIsImplied(s))
-          .toSet();
-      expect(drawn, isNot(contains(ArrowShape.straightRight)));
-      expect(drawn, contains(ArrowShape.bentDownThenRight));
-      expect(drawn, contains(ArrowShape.diagonalNwThenDown));
-      // Only the two straight shapes are implied.
-      expect(drawn.length, ArrowShape.values.length - 2);
     });
   });
 }

@@ -46,38 +46,29 @@ import 'package:crossword_core/crossword_core.dart';
 bool clueArrowIsImplied(ArrowShape shape) =>
     shape == ArrowShape.straightRight || shape == ArrowShape.straightDown;
 
-/// Cell edge/corner the small arrow hugs, derived from where the word starts
-/// relative to the clue cell. Lets the widget snap the arrow onto the cell
-/// border ("on the line"), the way printed korsord arrows sit. The entry unit
-/// vector (-1/0/1 per axis) maps directly onto [Alignment]'s (-1..1) space.
-Alignment clueArrowAlignment(ArrowShape shape) {
-  final entry = clueArrowVectors(shape).entry;
-  return Alignment(entry.dx, entry.dy);
-}
-
-// 8% inner margin keeps the arrowhead tip off the cell edge.
+// 6% inner margin keeps the glyph off the cell edge.
 Offset _clampUnit(Offset o) =>
-    Offset(o.dx.clamp(0.08, 0.92), o.dy.clamp(0.08, 0.92));
+    Offset(o.dx.clamp(0.06, 0.94), o.dy.clamp(0.06, 0.94));
 
-/// Arrow spine in the unit square (0..1), ordered tail→tip. Straight arrows are
-/// a 2-point line; bent and diagonal arrows add an elbow toward the start cell.
-List<Offset> clueArrowSpine(ArrowShape shape) {
+/// Arrow drawn INSIDE a word's first input box, korsord style: it enters from
+/// the edge facing the clue and bends to point the way the answer is written.
+/// Points are unit coords (0..1) over the cell, ordered tail (clue side) →
+/// elbow → tip (travel side). Implied shapes are never drawn (see
+/// [clueArrowIsImplied]); their spine is still well-formed.
+List<Offset> startArrowSpine(ArrowShape shape) {
   final v = clueArrowVectors(shape);
+  // entry points clue → start, so the clue lies in the opposite direction.
+  final clueDir = Offset(-v.entry.dx, -v.entry.dy);
   const center = Offset(0.5, 0.5);
-  if (v.entry == v.travel) {
-    return [
-      _clampUnit(center - v.travel * 0.4),
-      _clampUnit(center + v.travel * 0.4),
-    ];
-  }
-  final elbow = _clampUnit(center + v.entry * 0.3);
-  final tip = _clampUnit(elbow + v.travel * 0.45);
-  return [_clampUnit(center - v.travel * 0.15), elbow, tip];
+  final tail = _clampUnit(center + clueDir * 0.4);
+  final elbow = _clampUnit(center + clueDir * 0.14);
+  final tip = _clampUnit(elbow + v.travel * 0.4);
+  return [tail, elbow, tip];
 }
 
-/// Draws a single clue arrow (line spine + filled arrowhead) filling its canvas.
-/// Scoped CustomPainter exception: only the arrow glyph is painted; the grid
-/// itself remains widget-based.
+/// Draws a small clue arrow inside a word's first input box. Scoped
+/// CustomPainter exception: only the arrow glyph is painted; the grid itself
+/// remains widget-based.
 class ClueArrowPainter extends CustomPainter {
   final ArrowShape shape;
   final Color color;
@@ -86,13 +77,13 @@ class ClueArrowPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final spine = clueArrowSpine(shape)
+    final spine = startArrowSpine(shape)
         .map((p) => Offset(p.dx * size.width, p.dy * size.height))
         .toList();
 
     final stroke = Paint()
       ..color = color
-      ..strokeWidth = math.max(1.0, size.shortestSide * 0.07)
+      ..strokeWidth = math.max(1.0, size.shortestSide * 0.06)
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round
       ..style = PaintingStyle.stroke;
@@ -106,7 +97,7 @@ class ClueArrowPainter extends CustomPainter {
     final tip = spine.last;
     final prev = spine[spine.length - 2];
     final angle = math.atan2(tip.dy - prev.dy, tip.dx - prev.dx);
-    final headLen = size.shortestSide * 0.24;
+    final headLen = size.shortestSide * 0.18;
     const spread = 0.5; // radians off the shaft axis
     final left = Offset(
       tip.dx - headLen * math.cos(angle - spread),

@@ -10,6 +10,7 @@ import '../cubit/crossword_cubit.dart';
 import '../cubit/crossword_state.dart';
 import 'answer_cell_widget.dart';
 import 'blocked_cell_widget.dart';
+import 'clue_arrow_painter.dart';
 import 'hint_cell_widget.dart';
 
 class CrosswordGrid extends StatelessWidget {
@@ -51,6 +52,7 @@ class CrosswordGrid extends StatelessWidget {
 
   Widget _buildTable(BuildContext context, double cellSize) {
     final cubit = context.read<CrosswordCubit>();
+    final startArrows = _startArrows(state.puzzle);
     return Table(
       defaultColumnWidth: FixedColumnWidth(cellSize),
       defaultVerticalAlignment: TableCellVerticalAlignment.top,
@@ -59,7 +61,13 @@ class CrosswordGrid extends StatelessWidget {
           children: List.generate(state.puzzle.cols, (col) {
             return SizedBox(
               height: cellSize,
-              child: _buildCell(row, col, cellSize, cubit),
+              child: _buildCell(
+                row,
+                col,
+                cellSize,
+                cubit,
+                startArrows[(row, col)] ?? const [],
+              ),
             );
           }),
         );
@@ -67,7 +75,13 @@ class CrosswordGrid extends StatelessWidget {
     );
   }
 
-  Widget _buildCell(int row, int col, double cellSize, CrosswordCubit cubit) {
+  Widget _buildCell(
+    int row,
+    int col,
+    double cellSize,
+    CrosswordCubit cubit,
+    List<ClueArrow> arrows,
+  ) {
     final cell = state.puzzle.cells[(row, col)];
     if (cell == null) {
       return SizedBox(width: cellSize, height: cellSize);
@@ -87,6 +101,7 @@ class CrosswordGrid extends StatelessWidget {
       AnswerCell() => AnswerCellWidget(
           letter: state.userInputs[(row, col)] ??
               (cell.isSeed ? cell.value : null),
+          arrows: arrows,
           isSelected: state.selectedCell == (row, col),
           isHighlighted: state.highlightedCells.contains((row, col)),
           isSeed: cell.isSeed,
@@ -102,6 +117,23 @@ class CrosswordGrid extends StatelessWidget {
       BlockCell() => BlockedCellWidget(size: cellSize),
       ImageCell() => SizedBox(width: cellSize, height: cellSize),
     };
+  }
+
+  /// Maps each word's start box to the arrows of words that begin there and
+  /// read in a non-default direction. Default flow (clue directly before the
+  /// word) draws no glyph, matching printed korsord; those shapes are skipped.
+  Map<(int, int), List<ClueArrow>> _startArrows(CrosswordPuzzle puzzle) {
+    final byStart = <(int, int), List<ClueArrow>>{};
+    for (final cell in puzzle.cells.values) {
+      if (cell is! ClueCell) continue;
+      for (final arrow in cell.arrows) {
+        if (clueArrowIsImplied(arrow.shape)) continue;
+        final word = puzzle.wordById(arrow.wordId);
+        if (word == null || word.cells.isEmpty) continue;
+        byStart.putIfAbsent(word.cells.first, () => <ClueArrow>[]).add(arrow);
+      }
+    }
+    return byStart;
   }
 
   /// The flash token for cells of the most recently confirmed word; null for

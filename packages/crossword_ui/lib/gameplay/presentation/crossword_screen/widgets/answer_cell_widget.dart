@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 
+import 'package:crossword_core/crossword_core.dart';
+
 import '../../../../common/data/constants/app_colors.dart';
 import '../../../../common/data/constants/app_text_styles.dart';
+import 'clue_arrow_painter.dart';
 
 class AnswerCellWidget extends StatelessWidget {
   /// The letter to display: the player's input, or a seed's given letter.
   final String? letter;
+
+  /// Direction arrows for words that *start* in this box and read in a
+  /// non-default direction. Drawn korsord-style inside the input square.
+  final List<ClueArrow> arrows;
   final bool isSelected;
   final bool isHighlighted;
   final bool isSeed;
@@ -30,6 +37,7 @@ class AnswerCellWidget extends StatelessWidget {
     required this.onTap,
     required this.fontFamily,
     this.letter,
+    this.arrows = const [],
     this.isSelected = false,
     this.isHighlighted = false,
     this.isSeed = false,
@@ -79,17 +87,19 @@ class AnswerCellWidget extends StatelessWidget {
       alignment: Alignment.center,
       // Keyed by the letter so a newly entered glyph pops in; clearing a cell
       // (letter -> null) swaps without animating.
-      child: TweenAnimationBuilder<double>(
-        key: ValueKey(letter ?? ''),
-        tween: Tween(begin: letter == null ? 1.0 : 0.6, end: 1.0),
-        duration: const Duration(milliseconds: 120),
-        curve: Curves.easeOutBack,
-        builder: (context, scale, child) =>
-            Transform.scale(scale: scale, child: child),
-        child: Text(
-          letter ?? '',
-          style: AppTextStyles.answerLetter(size * 0.66, family: fontFamily)
-              .copyWith(color: inkColor),
+      child: _withArrows(
+        TweenAnimationBuilder<double>(
+          key: ValueKey(letter ?? ''),
+          tween: Tween(begin: letter == null ? 1.0 : 0.6, end: 1.0),
+          duration: const Duration(milliseconds: 120),
+          curve: Curves.easeOutBack,
+          builder: (context, scale, child) =>
+              Transform.scale(scale: scale, child: child),
+          child: Text(
+            letter ?? '',
+            style: AppTextStyles.answerLetter(size * 0.66, family: fontFamily)
+                .copyWith(color: inkColor),
+          ),
         ),
       ),
     );
@@ -120,5 +130,23 @@ class AnswerCellWidget extends StatelessWidget {
     }
 
     return GestureDetector(onTap: onTap, child: cell);
+  }
+
+  /// Layers any start-arrows behind the centred [letter] so the glyph reads on
+  /// top. Returns [letter] unchanged when this box starts no deviating word.
+  Widget _withArrows(Widget letter) {
+    if (arrows.isEmpty) {
+      return letter;
+    }
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        for (final arrow in arrows)
+          CustomPaint(
+            painter: ClueArrowPainter(shape: arrow.shape, color: AppColors.ink),
+          ),
+        Center(child: letter),
+      ],
+    );
   }
 }
