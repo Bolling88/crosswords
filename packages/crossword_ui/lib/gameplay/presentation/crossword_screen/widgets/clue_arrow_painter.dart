@@ -82,24 +82,32 @@ class ClueArrowPainter extends CustomPainter {
         .map((p) => Offset(p.dx * size.width, p.dy * size.height))
         .toList();
 
-    final stroke = Paint()
-      ..color = color
-      ..strokeWidth = math.max(0.8, size.shortestSide * 0.032)
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round
-      ..style = PaintingStyle.stroke;
-
-    final path = Path()..moveTo(spine.first.dx, spine.first.dy);
-    for (final point in spine.skip(1)) {
-      path.lineTo(point.dx, point.dy);
-    }
-    canvas.drawPath(path, stroke);
-
     final tip = spine.last;
     final prev = spine[spine.length - 2];
     final angle = math.atan2(tip.dy - prev.dy, tip.dx - prev.dx);
-    final headLen = size.shortestSide * 0.14;
-    const spread = 0.34; // narrow half-angle → a sharp, pointy head
+    final headLen = size.shortestSide * 0.16;
+    const spread = 0.3; // narrow half-angle → a sharp, pointy head
+
+    final stroke = Paint()
+      ..color = color
+      ..strokeWidth = math.max(0.8, size.shortestSide * 0.032)
+      ..strokeCap = StrokeCap.butt
+      ..strokeJoin = StrokeJoin.round
+      ..style = PaintingStyle.stroke;
+
+    // Stop the shaft at the base of the head so its line cap never pokes past
+    // (and blunts) the tip; the filled triangle alone forms the sharp point.
+    final shaftEnd = Offset(
+      tip.dx - math.cos(angle) * headLen * 0.8,
+      tip.dy - math.sin(angle) * headLen * 0.8,
+    );
+    final path = Path()..moveTo(spine.first.dx, spine.first.dy);
+    for (final point in spine.sublist(1, spine.length - 1)) {
+      path.lineTo(point.dx, point.dy);
+    }
+    path.lineTo(shaftEnd.dx, shaftEnd.dy);
+    canvas.drawPath(path, stroke);
+
     final left = Offset(
       tip.dx - headLen * math.cos(angle - spread),
       tip.dy - headLen * math.sin(angle - spread),
@@ -110,7 +118,8 @@ class ClueArrowPainter extends CustomPainter {
     );
     final head = Paint()
       ..color = color
-      ..style = PaintingStyle.fill;
+      ..style = PaintingStyle.fill
+      ..isAntiAlias = true;
     canvas.drawPath(
       Path()
         ..moveTo(tip.dx, tip.dy)
