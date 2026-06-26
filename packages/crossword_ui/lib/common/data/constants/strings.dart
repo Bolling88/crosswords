@@ -68,6 +68,13 @@ class Strings {
   static const String generateMaxWordLenLabel = 'Längsta ord';
   static const String generateSeedWordsLabel = 'Egna ord';
   static const String generateSeedWordsHint = 'Skilj orden med komma';
+  static const String generateLanguageLabel = 'Språk';
+  static const String generateLanguageSwedish = 'Svenska';
+  static const String generateMaxSecondsLabel = 'Max tid (s)';
+  static const String generatePictureColsLabel = 'Bildrutor (bredd)';
+  static const String generatePictureRowsLabel = 'Bildrutor (höjd)';
+  static const String generateRandomSeedLabel = 'Slumpfrö';
+  static const String generateRandomSeedHint = 'Lämna tomt för slumpmässigt';
   static const String generateAction = 'Skapa';
   static const String generatingLabel = 'Skapar…';
   static const String generateTestPuzzleAction = 'Testkorsord';
