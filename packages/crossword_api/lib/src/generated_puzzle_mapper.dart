@@ -19,8 +19,24 @@ class GeneratedPuzzleMapper {
     final slots = response.slots ?? const [];
     final seedCells = response.seedCells ?? const [];
 
-    final rows = gridCells.length;
-    final cols = rows == 0 ? 0 : gridCells.first.length;
+    // A picture cell spans rowspan×colspan grid positions but the backend
+    // emits it as a single origin entry and omits the covered positions, so a
+    // row containing a picture has fewer entries than the grid is wide. Derive
+    // the dimensions from each cell's own coordinates and span (not the ragged
+    // list shape) — otherwise `cols`/`rows` undercount by span-1 and the table
+    // clips the rightmost/bottom cells while the arrow overlay still paints.
+    var maxRow = -1;
+    var maxCol = -1;
+    for (final row in gridCells) {
+      for (final c in row) {
+        final bottom = c.row + c.rowspan - 1;
+        final right = c.col + c.colspan - 1;
+        if (bottom > maxRow) maxRow = bottom;
+        if (right > maxCol) maxCol = right;
+      }
+    }
+    final rows = maxRow + 1;
+    final cols = maxCol + 1;
 
     // FIX 3: reject empty grid early so callers get a clear error.
     if (rows == 0 || cols == 0) {

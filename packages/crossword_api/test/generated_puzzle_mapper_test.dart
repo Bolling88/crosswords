@@ -136,6 +136,45 @@ void main() {
     expect((puzzle.cells[(0, 1)] as AnswerCell).value, 'A');
   });
 
+  // ── Picture cells: ragged grid_cells must not shrink the puzzle width ─────
+  // A picture cell spans rowspan×colspan grid positions but the backend emits
+  // it as a SINGLE origin entry and omits the covered positions. A row holding
+  // a picture therefore has fewer entries than the grid is wide, so deriving
+  // cols from `gridCells.first.length` undercounts the width by colspan-1 and
+  // the rightmost columns never render. Width must come from cell coordinates.
+  test('picture colspan does not shrink puzzle width (ragged first row)', () {
+    const response = CrosswordGenerationResponse(
+      success: true,
+      gridCells: [
+        // Row 0: 2x2 picture at (0,0) collapses cols 0-1 into one entry, then
+        // real cells at cols 2 and 3 → 3 entries for a 4-wide grid.
+        [
+          GenerationGridCellDto(
+            kind: 'picture',
+            row: 0,
+            col: 0,
+            rowspan: 2,
+            colspan: 2,
+          ),
+          GenerationGridCellDto(kind: 'answer', row: 0, col: 2, letter: 'A'),
+          GenerationGridCellDto(kind: 'answer', row: 0, col: 3, letter: 'B'),
+        ],
+        // Row 1: cols 0-1 covered by the picture's rowspan → only cols 2-3.
+        [
+          GenerationGridCellDto(kind: 'answer', row: 1, col: 2, letter: 'C'),
+          GenerationGridCellDto(kind: 'answer', row: 1, col: 3, letter: 'D'),
+        ],
+      ],
+      slots: [],
+    );
+    final puzzle = GeneratedPuzzleMapper.map(response, title: 'X');
+    expect(puzzle.cols, 4);
+    expect(puzzle.rows, 2);
+    // The cells that previously fell outside the clipped width are present.
+    expect(puzzle.cells[(0, 3)], isA<AnswerCell>());
+    expect(puzzle.cells[(1, 3)], isA<AnswerCell>());
+  });
+
   // ── FIX 4: unknown direction throws ──────────────────────────────────────
   test('throws CrosswordGenerationException for unknown slot direction', () {
     // A 1x1 clue cell whose slot uses direction 'left'.
