@@ -58,11 +58,15 @@ Offset _clampInner(Offset o) =>
 /// (see [clueArrowIsImplied]); their spine is still well-formed.
 List<Offset> startArrowSpine(ArrowShape shape) {
   final v = clueArrowVectors(shape);
-  // entry points clue → start, so the clue lies in the opposite direction.
-  final clueDir = Offset(-v.entry.dx, -v.entry.dy);
+  // The clue lies opposite the entry vector. Project that onto the axis
+  // perpendicular to travel, so a diagonal clue renders as a clean orthogonal
+  // bend anchored to one edge instead of a cramped, clipped corner arrow.
+  final perp = v.travel.dx != 0
+      ? Offset(0, (-v.entry.dy).sign)
+      : Offset((-v.entry.dx).sign, 0);
   const center = Offset(0.5, 0.5);
-  final tail = center + clueDir * 0.5; // on the edge facing the clue
-  final elbow = center + clueDir * 0.32; // short stub in from that edge
+  final tail = center + perp * 0.5; // on the edge facing the clue
+  final elbow = center + perp * 0.32; // short stub in from that edge
   final tip = _clampInner(elbow + v.travel * 0.22);
   return [tail, elbow, tip];
 }

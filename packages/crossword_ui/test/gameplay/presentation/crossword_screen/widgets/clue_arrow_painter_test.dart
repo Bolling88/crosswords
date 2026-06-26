@@ -80,5 +80,26 @@ void main() {
         }
       }
     });
+
+    test('diagonal clues anchor to a single edge, not a corner', () {
+      // The tail must sit on exactly one edge (one axis centred at 0.5), so a
+      // diagonal clue renders as a clean orthogonal bend rather than a cramped
+      // corner arrow.
+      const diagonals = [
+        ArrowShape.diagonalSwThenRight,
+        ArrowShape.diagonalNwThenRight,
+        ArrowShape.diagonalSeThenDown,
+        ArrowShape.diagonalNeThenDown,
+      ];
+      for (final shape in diagonals) {
+        final tail = startArrowSpine(shape).first;
+        final onVerticalEdge = (tail.dx == 0.0 || tail.dx == 1.0);
+        final onHorizontalEdge = (tail.dy == 0.0 || tail.dy == 1.0);
+        // Exactly one edge, and the free axis stays centred.
+        expect(onVerticalEdge ^ onHorizontalEdge, isTrue, reason: '$shape');
+        if (onVerticalEdge) expect(tail.dy, 0.5, reason: '$shape');
+        if (onHorizontalEdge) expect(tail.dx, 0.5, reason: '$shape');
+      }
+    });
   });
 }
