@@ -46,23 +46,24 @@ import 'package:crossword_core/crossword_core.dart';
 bool clueArrowIsImplied(ArrowShape shape) =>
     shape == ArrowShape.straightRight || shape == ArrowShape.straightDown;
 
-// 6% inner margin keeps the glyph off the cell edge.
-Offset _clampUnit(Offset o) =>
-    Offset(o.dx.clamp(0.06, 0.94), o.dy.clamp(0.06, 0.94));
+// Keeps the head end a hair inside the cell so a stroked line isn't clipped.
+Offset _clampInner(Offset o) =>
+    Offset(o.dx.clamp(0.05, 0.95), o.dy.clamp(0.05, 0.95));
 
 /// Arrow drawn INSIDE a word's first input box, korsord style: it enters from
 /// the edge facing the clue and bends to point the way the answer is written.
 /// Points are unit coords (0..1) over the cell, ordered tail (clue side) →
-/// elbow → tip (travel side). Implied shapes are never drawn (see
-/// [clueArrowIsImplied]); their spine is still well-formed.
+/// elbow → tip (travel side). The tail sits right on the clue-facing edge so
+/// the arrow touches the hint box with no gap. Implied shapes are never drawn
+/// (see [clueArrowIsImplied]); their spine is still well-formed.
 List<Offset> startArrowSpine(ArrowShape shape) {
   final v = clueArrowVectors(shape);
   // entry points clue → start, so the clue lies in the opposite direction.
   final clueDir = Offset(-v.entry.dx, -v.entry.dy);
   const center = Offset(0.5, 0.5);
-  final tail = _clampUnit(center + clueDir * 0.4);
-  final elbow = _clampUnit(center + clueDir * 0.14);
-  final tip = _clampUnit(elbow + v.travel * 0.4);
+  final tail = center + clueDir * 0.5; // on the edge facing the clue
+  final elbow = center + clueDir * 0.16;
+  final tip = _clampInner(elbow + v.travel * 0.34);
   return [tail, elbow, tip];
 }
 
@@ -97,7 +98,7 @@ class ClueArrowPainter extends CustomPainter {
     final tip = spine.last;
     final prev = spine[spine.length - 2];
     final angle = math.atan2(tip.dy - prev.dy, tip.dx - prev.dx);
-    final headLen = size.shortestSide * 0.12;
+    final headLen = size.shortestSide * 0.11;
     const spread = 0.5; // radians off the shaft axis
     final left = Offset(
       tip.dx - headLen * math.cos(angle - spread),
