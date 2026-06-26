@@ -38,6 +38,14 @@ import 'package:crossword_core/crossword_core.dart';
   }
 }
 
+/// Whether the arrow is implied by the natural reading flow and should NOT be
+/// drawn. Like printed korsord, a clue directly left of a word that reads right
+/// (`straightRight`) or directly above a word that reads down (`straightDown`)
+/// needs no glyph — the answer simply continues in the logical direction. Every
+/// other shape marks a deviation (a bend or an offset start) and is drawn.
+bool clueArrowIsImplied(ArrowShape shape) =>
+    shape == ArrowShape.straightRight || shape == ArrowShape.straightDown;
+
 /// Cell edge/corner the small arrow hugs, derived from where the word starts
 /// relative to the clue cell. Lets the widget snap the arrow onto the cell
 /// border ("on the line"), the way printed korsord arrows sit. The entry unit

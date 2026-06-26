@@ -60,33 +60,43 @@ class HintCellWidget extends StatelessWidget {
     );
   }
 
-  /// One clue: mock prose filling the box, with a small arrow snapped onto the
-  /// cell border toward the word's start. Text is padded away from the arrow.
+  /// One clue: mock prose filling the box. A small arrow is snapped onto the
+  /// cell border toward the word's start ONLY when the flow is non-obvious;
+  /// words that continue in the logical direction draw no arrow (korsord rule).
   Widget _compartment(ClueArrow arrow, {required bool isSplit}) {
+    final implied = clueArrowIsImplied(arrow.shape);
     final entry = clueArrowVectors(arrow.shape).entry;
-    final arrowExtent = size * (isSplit ? 0.22 : 0.28);
     final fontSize = size * (isSplit ? 0.13 : 0.155);
 
-    return Stack(
-      children: [
-        Padding(
-          padding: _textPadding(entry, isSplit: isSplit),
-          child: Center(
-            child: Text(
-              mockClueText(arrow.wordId),
-              textAlign: TextAlign.center,
-              maxLines: isSplit ? 2 : 3,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontFamily: fontFamily,
-                color: AppColors.ink,
-                fontSize: fontSize,
-                height: 1.05,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
+    final text = Padding(
+      padding: implied
+          ? EdgeInsets.all(size * 0.05)
+          : _textPadding(entry, isSplit: isSplit),
+      child: Center(
+        child: Text(
+          mockClueText(arrow.wordId),
+          textAlign: TextAlign.center,
+          maxLines: isSplit ? 2 : 3,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+            fontFamily: fontFamily,
+            color: AppColors.ink,
+            fontSize: fontSize,
+            height: 1.05,
+            fontWeight: FontWeight.w500,
           ),
         ),
+      ),
+    );
+
+    if (implied) {
+      return text;
+    }
+
+    final arrowExtent = size * (isSplit ? 0.22 : 0.28);
+    return Stack(
+      children: [
+        text,
         Align(
           alignment: clueArrowAlignment(arrow.shape),
           child: SizedBox(

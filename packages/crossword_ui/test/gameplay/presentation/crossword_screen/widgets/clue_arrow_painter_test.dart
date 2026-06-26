@@ -89,4 +89,22 @@ void main() {
       }
     });
   });
+
+  group('clueArrowIsImplied', () {
+    test('straight shapes are implied (no glyph drawn)', () {
+      expect(clueArrowIsImplied(ArrowShape.straightRight), isTrue);
+      expect(clueArrowIsImplied(ArrowShape.straightDown), isTrue);
+    });
+
+    test('bent and diagonal shapes are not implied (glyph drawn)', () {
+      final drawn = ArrowShape.values
+          .where((s) => !clueArrowIsImplied(s))
+          .toSet();
+      expect(drawn, isNot(contains(ArrowShape.straightRight)));
+      expect(drawn, contains(ArrowShape.bentDownThenRight));
+      expect(drawn, contains(ArrowShape.diagonalNwThenDown));
+      // Only the two straight shapes are implied.
+      expect(drawn.length, ArrowShape.values.length - 2);
+    });
+  });
 }
