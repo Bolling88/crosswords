@@ -60,8 +60,8 @@ void main() {
     );
 
     // ty' = (extent - m) - s*cy = 270 - 390 = -120; cell lands at y = 270.
-    expect(result, isNotNull);
-    expect(result!.storage[13], closeTo(-120, 0.5));
+    if (result == null) fail('expected a transform');
+    expect(result.storage[13], closeTo(-120, 0.5));
     expect(2 * 195 + result.storage[13], closeTo(270, 0.5));
   });
 
@@ -79,8 +79,8 @@ void main() {
     );
 
     // ty' = m - s*cy = 30 - 90 = -60; cell lands at y = 30; x unchanged.
-    expect(result, isNotNull);
-    expect(result!.storage[13], closeTo(-60, 0.5));
+    if (result == null) fail('expected a transform');
+    expect(result.storage[13], closeTo(-60, 0.5));
     expect(result.storage[12], closeTo(0, 0.5));
   });
 
@@ -95,8 +95,8 @@ void main() {
       margin: margin,
     );
 
-    expect(result, isNotNull);
-    expect(result!.storage[12], closeTo(-120, 0.5));
+    if (result == null) fail('expected a transform');
+    expect(result.storage[12], closeTo(-120, 0.5));
   });
 
   test('clamps so the scaled child still covers the viewport', () {
@@ -112,8 +112,8 @@ void main() {
       margin: margin,
     );
 
-    expect(result, isNotNull);
-    expect(result!.storage[13], closeTo(-300, 0.5));
+    if (result == null) fail('expected a transform');
+    expect(result.storage[13], closeTo(-300, 0.5));
     // Child bottom (scale*childHeight + ty) stays at the viewport bottom.
     expect(2 * 300 + result.storage[13], closeTo(300, 0.5));
   });
@@ -129,7 +129,8 @@ void main() {
       margin: margin,
     );
 
-    expect(result!.storage[0], closeTo(2, 0.0001)); // scale preserved
+    if (result == null) fail('expected a transform');
+    expect(result.storage[0], closeTo(2, 0.0001)); // scale preserved
     expect(result.storage[12], closeTo(0, 0.5)); // x translation unchanged
   });
 }

@@ -40,8 +40,8 @@ void main() {
     final word = puzzle.wordById('w1');
 
     expect(word, isNotNull);
-    expect(word!.direction, Direction.right);
-    expect(word.cells, [(0, 1), (0, 2), (0, 3)]);
+    expect(word?.direction, Direction.right);
+    expect(word?.cells, [(0, 1), (0, 2), (0, 3)]);
   });
 
   test('clue arrow shape is straightRight when start is adjacent right', () {
@@ -99,7 +99,7 @@ void main() {
     ]);
 
     final word = PuzzleResolver.resolve(dto).wordById('w1');
-    expect(word!.cells, [(0, 1), (0, 2), (1, 2), (2, 2)]);
+    expect(word?.cells, [(0, 1), (0, 2), (1, 2), (2, 2)]);
   });
 
   test('records separator index and a right separator edge', () {
@@ -112,7 +112,7 @@ void main() {
     ]);
 
     final puzzle = PuzzleResolver.resolve(dto);
-    expect(puzzle.wordById('w1')!.separators, {0});
+    expect(puzzle.wordById('w1')?.separators, {0});
     expect(puzzle.separatorEdges[(0, 1)], contains(Direction.right));
   });
 
@@ -136,8 +136,8 @@ void main() {
     final puzzle = PuzzleResolver.resolve(dto);
     final clue = puzzle.cells[(0, 0)] as ClueCell;
     expect(clue.arrows.length, 2);
-    expect(puzzle.wordById('across')!.direction, Direction.right);
-    expect(puzzle.wordById('down')!.direction, Direction.down);
+    expect(puzzle.wordById('across')?.direction, Direction.right);
+    expect(puzzle.wordById('down')?.direction, Direction.down);
   });
 
   test('marks seed answer cells and preserves åäö values', () {
@@ -210,13 +210,13 @@ void main() {
     ]);
 
     final p = PuzzleResolver.resolve(dto);
-    expect(p.wordById('h1')!.cells, [(0, 1), (0, 2), (1, 2), (2, 2)]);
-    expect(p.wordById('h2')!.cells, [(2, 2), (2, 3)]);
+    expect(p.wordById('h1')?.cells, [(0, 1), (0, 2), (1, 2), (2, 2)]);
+    expect(p.wordById('h2')?.cells, [(2, 2), (2, 3)]);
 
     // The shared cell resolves to the horizontally-running word for "right"
     // and the vertically-running (redirected) word for "down".
-    expect(p.wordAt((2, 2), Direction.right)!.id, 'h2');
-    expect(p.wordAt((2, 2), Direction.down)!.id, 'h1');
+    expect(p.wordAt((2, 2), Direction.right)?.id, 'h2');
+    expect(p.wordAt((2, 2), Direction.down)?.id, 'h1');
   });
 
   test('two-clue cell orders arrows top-first by word start row', () {
