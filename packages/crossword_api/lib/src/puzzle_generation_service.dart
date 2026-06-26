@@ -21,6 +21,11 @@ class PuzzleGenerationService {
     required int maxWordLen,
     required String title,
     List<String> seedWords = const [],
+    String languageCode = 'sv',
+    int? randomSeed,
+    int maxSeconds = 30,
+    int pictureCols = 0,
+    int pictureRows = 0,
   }) =>
       _repository.generate(
         width: width,
@@ -28,6 +33,11 @@ class PuzzleGenerationService {
         maxWordLen: maxWordLen,
         title: title,
         seedWords: seedWords,
+        languageCode: languageCode,
+        randomSeed: randomSeed,
+        maxSeconds: maxSeconds,
+        pictureCols: pictureCols,
+        pictureRows: pictureRows,
       );
 
   Future<CrosswordPuzzle> loadTestPuzzle() => _loadTestPuzzleFn();

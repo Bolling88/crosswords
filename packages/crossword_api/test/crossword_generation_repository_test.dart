@@ -5,7 +5,58 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 
+class _CapturingRemoteDataSource implements CrosswordGenerationRemoteDataSource {
+  CrosswordGenerationRequest? captured;
+
+  @override
+  Future<CrosswordGenerationResponse> generate(
+    CrosswordGenerationRequest request,
+  ) async {
+    captured = request;
+    return const CrosswordGenerationResponse(
+      success: false,
+      failureReason: 'test',
+    );
+  }
+}
+
 void main() {
+  test('repository forwards every field into the request DTO', () async {
+    final remote = _CapturingRemoteDataSource();
+    final repository = CrosswordGenerationRepository(remoteDataSource: remote);
+
+    try {
+      await repository.generate(
+        width: 17,
+        height: 13,
+        maxWordLen: 8,
+        title: 'T',
+        seedWords: ['KATT'],
+        languageCode: 'sv',
+        randomSeed: 42,
+        maxSeconds: 60,
+        pictureCols: 8,
+        pictureRows: 6,
+      );
+    } catch (_) {
+      // Mapper may throw on the minimal failure response; we only assert the
+      // captured request below.
+    }
+
+    final captured = remote.captured;
+    expect(captured, isNotNull);
+    expect(captured?.width, 17);
+    expect(captured?.height, 13);
+    expect(captured?.maxWordLen, 8);
+    expect(captured?.seedWords, ['KATT']);
+    expect(captured?.languageCode, 'sv');
+    expect(captured?.randomSeed, 42);
+    expect(captured?.maxSeconds, 60);
+    expect(captured?.pictureCols, 8);
+    expect(captured?.pictureRows, 6);
+  });
+
+
   CrosswordGenerationRepository repoWith(MockClient client) =>
       CrosswordGenerationRepository(
         remoteDataSource: CrosswordGenerationRemoteDataSource(client: client),

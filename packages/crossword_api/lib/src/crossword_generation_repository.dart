@@ -19,6 +19,11 @@ class CrosswordGenerationRepository {
     required int maxWordLen,
     required String title,
     List<String> seedWords = const [],
+    String languageCode = 'sv',
+    int? randomSeed,
+    int maxSeconds = 30,
+    int pictureCols = 0,
+    int pictureRows = 0,
   }) async {
     final response = await _remoteDataSource.generate(
       CrosswordGenerationRequest(
@@ -26,6 +31,11 @@ class CrosswordGenerationRepository {
         height: height,
         maxWordLen: maxWordLen,
         seedWords: seedWords,
+        languageCode: languageCode,
+        randomSeed: randomSeed,
+        maxSeconds: maxSeconds,
+        pictureCols: pictureCols,
+        pictureRows: pictureRows,
       ),
     );
     return GeneratedPuzzleMapper.map(response, title: title);
