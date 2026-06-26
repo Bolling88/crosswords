@@ -70,6 +70,13 @@ List<Offset> startArrowSpine(ArrowShape shape) {
   final tail = center + clueDir * 0.5; // on the edge/corner facing the clue
   final elbow = center + perp * 0.32; // stub in along the perpendicular lane
   final tip = _clampInner(elbow + v.travel * 0.22);
+
+  // Diagonal clues reach into a corner and read long; pull the whole glyph
+  // toward centre so it stays compact — same shape and direction, just shorter.
+  if (clueDir.dx != 0 && clueDir.dy != 0) {
+    Offset shrink(Offset p) => center + (p - center) * 0.68;
+    return [shrink(tail), shrink(elbow), shrink(tip)];
+  }
   return [tail, elbow, tip];
 }
 

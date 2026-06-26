@@ -93,8 +93,12 @@ void main() {
       ];
       for (final shape in diagonals) {
         final tail = startArrowSpine(shape).first;
-        expect(tail.dx == 0.0 || tail.dx == 1.0, isTrue, reason: '$shape');
-        expect(tail.dy == 0.0 || tail.dy == 1.0, isTrue, reason: '$shape');
+        // Pulled toward the clue corner on both axes (off-centre), but kept
+        // inside the cell so the compact glyph doesn't clip.
+        expect(tail.dx, isNot(0.5), reason: '$shape');
+        expect(tail.dy, isNot(0.5), reason: '$shape');
+        expect(tail.dx > 0.0 && tail.dx < 1.0, isTrue, reason: '$shape');
+        expect(tail.dy > 0.0 && tail.dy < 1.0, isTrue, reason: '$shape');
       }
     });
 
