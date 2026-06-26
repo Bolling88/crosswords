@@ -14,28 +14,40 @@ class HintCellWidget extends StatelessWidget {
   /// Whether this clue starts the currently active word.
   final bool isActive;
 
+  /// Screen-reader description of this cell's clue(s) and direction(s).
+  final String semanticLabel;
+
   const HintCellWidget({
     required this.cell,
     required this.size,
     required this.onTap,
     required this.fontFamily,
+    required this.semanticLabel,
     this.isActive = false,
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return Semantics(
+      label: semanticLabel,
+      button: true,
       onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 150),
-        width: size,
-        height: size,
-        decoration: BoxDecoration(
-          color: isActive ? AppColors.clueCellActive : AppColors.clueCell,
-          border: Border.all(color: AppColors.gridLine, width: 0.5),
+      // The label already carries the clue prose, so drop the visual Text's
+      // own semantics to avoid the screen reader announcing each clue twice.
+      excludeSemantics: true,
+      child: GestureDetector(
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          width: size,
+          height: size,
+          decoration: BoxDecoration(
+            color: isActive ? AppColors.clueCellActive : AppColors.clueCell,
+            border: Border.all(color: AppColors.gridLine, width: 0.5),
+          ),
+          child: _buildContent(),
         ),
-        child: _buildContent(),
       ),
     );
   }

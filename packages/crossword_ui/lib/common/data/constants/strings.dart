@@ -81,4 +81,33 @@ class Strings {
   static const String generatedPuzzleTitle = 'Korsord';
   static const String generationErrorMessage =
       'Kunde inte skapa korsordet. Försök igen.';
+
+  /// Korsord direction words used in clue-cell semantics: a right-pointing
+  /// arrow introduces an across word, a down-pointing arrow a down word.
+  static const String directionAcross = 'vågrätt';
+  static const String directionDown = 'lodrätt';
+
+  /// Screen-reader label for an answer cell. Row/column are 1-based so the
+  /// spoken position matches what a sighted player would count.
+  static String answerCellSemantics({
+    required int row,
+    required int col,
+    String? letter,
+  }) {
+    final position = 'rad ${row + 1}, kolumn ${col + 1}';
+    if (letter == null || letter.isEmpty) {
+      return 'Tom ruta, $position';
+    }
+    return 'Ruta, $position, bokstav $letter';
+  }
+
+  /// Screen-reader label for a clue cell, built from its already-formatted
+  /// "clue, direction" fragments (one per arrow). Empty for a blank cell.
+  static String clueCellSemantics(List<String> clues) {
+    if (clues.isEmpty) return 'Tom ledtrådsruta';
+    return 'Ledtråd: ${clues.join('. ')}';
+  }
+
+  /// Screen-reader label for an image clue.
+  static const String imageClueSemantics = 'Bildledtråd';
 }

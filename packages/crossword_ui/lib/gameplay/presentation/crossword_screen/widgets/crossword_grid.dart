@@ -12,6 +12,7 @@ import 'answer_cell_widget.dart';
 import 'blocked_cell_widget.dart';
 import 'clue_arrow_painter.dart';
 import 'hint_cell_widget.dart';
+import 'mock_clue_text.dart';
 
 class CrosswordGrid extends StatelessWidget {
   /// Width of the outer frame border. Callers computing the grid's cell size
@@ -91,26 +92,60 @@ class CrosswordGrid extends StatelessWidget {
         onTap: () => cubit.selectCell(row, col),
         fontFamily: fontFamily,
         isActive: state.activeClueCell == (row, col),
+        semanticLabel: _clueSemanticLabel(cell),
       ),
-      AnswerCell() => AnswerCellWidget(
-        letter:
-            state.userInputs[(row, col)] ?? (cell.isSeed ? cell.value : null),
-        isSelected: state.selectedCell == (row, col),
-        isHighlighted: state.highlightedCells.contains((row, col)),
-        isSeed: cell.isSeed,
-        isIncorrect: state.incorrectCells.contains((row, col)),
-        isRevealed: state.revealedCells.contains((row, col)),
-        confirmPulseToken: _pulseTokenFor(row, col),
-        hasRightSeparator: edges.contains(Direction.right),
-        hasBottomSeparator: edges.contains(Direction.down),
-        size: cellSize,
-        onTap: () => cubit.selectCell(row, col),
-        fontFamily: fontFamily,
-      ),
+      AnswerCell() => _buildAnswerCell(row, col, cell, cellSize, edges, fontFamily, cubit),
       BlockCell() => BlockedCellWidget(size: cellSize),
       ImageCell() => SizedBox(width: cellSize, height: cellSize),
     };
   }
+
+  Widget _buildAnswerCell(
+    int row,
+    int col,
+    AnswerCell cell,
+    double cellSize,
+    Set<Direction> edges,
+    String fontFamily,
+    CrosswordCubit cubit,
+  ) {
+    final letter =
+        state.userInputs[(row, col)] ?? (cell.isSeed ? cell.value : null);
+    return AnswerCellWidget(
+      letter: letter,
+      isSelected: state.selectedCell == (row, col),
+      isHighlighted: state.highlightedCells.contains((row, col)),
+      isSeed: cell.isSeed,
+      isIncorrect: state.incorrectCells.contains((row, col)),
+      isRevealed: state.revealedCells.contains((row, col)),
+      confirmPulseToken: _pulseTokenFor(row, col),
+      hasRightSeparator: edges.contains(Direction.right),
+      hasBottomSeparator: edges.contains(Direction.down),
+      size: cellSize,
+      onTap: () => cubit.selectCell(row, col),
+      fontFamily: fontFamily,
+      semanticLabel: Strings.answerCellSemantics(
+        row: row,
+        col: col,
+        letter: letter,
+      ),
+    );
+  }
+
+  /// Builds the screen-reader label for a clue cell by pairing each arrow's
+  /// (mock) clue text with the Swedish word for its direction.
+  String _clueSemanticLabel(ClueCell cell) {
+    final clues = cell.arrows
+        .map(
+          (arrow) =>
+              '${mockClueText(arrow.wordId)}, ${_directionWord(arrow.direction)}',
+        )
+        .toList();
+    return Strings.clueCellSemantics(clues);
+  }
+
+  String _directionWord(Direction direction) =>
+      direction == Direction.right ? Strings.directionAcross : Strings.directionDown;
 
   /// The flash token for cells of the most recently confirmed word; null for
   /// all other cells (and before any confirmation has happened).
@@ -152,25 +187,32 @@ class CrosswordGrid extends StatelessWidget {
             top: row * cellSize,
             width: cell.spanCols * cellSize,
             height: cell.spanRows * cellSize,
-            child: Container(
-              decoration: BoxDecoration(
-                color: AppColors.imageCell,
-                border: Border.all(color: AppColors.gridLine, width: 0.5),
-              ),
-              alignment: Alignment.center,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.image_outlined,
-                    size: cellSize * 1.1,
-                    color: AppColors.inkMuted,
-                  ),
-                  Text(
-                    Strings.imageClueLabel,
-                    style: AppTextStyles.imageLabel(cellSize * 0.28),
-                  ),
-                ],
+            child: Semantics(
+              label: Strings.imageClueSemantics,
+              image: true,
+              // Drop the visual 'BILD' Text's semantics so the screen reader
+              // announces only the richer image-clue label.
+              excludeSemantics: true,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: AppColors.imageCell,
+                  border: Border.all(color: AppColors.gridLine, width: 0.5),
+                ),
+                alignment: Alignment.center,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.image_outlined,
+                      size: cellSize * 1.1,
+                      color: AppColors.inkMuted,
+                    ),
+                    Text(
+                      Strings.imageClueLabel,
+                      style: AppTextStyles.imageLabel(cellSize * 0.28),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
