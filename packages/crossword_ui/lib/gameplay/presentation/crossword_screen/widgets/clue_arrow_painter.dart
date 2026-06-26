@@ -83,7 +83,7 @@ class ClueArrowPainter extends CustomPainter {
 
     final stroke = Paint()
       ..color = color
-      ..strokeWidth = math.max(1.0, size.shortestSide * 0.06)
+      ..strokeWidth = math.max(0.8, size.shortestSide * 0.032)
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round
       ..style = PaintingStyle.stroke;
@@ -97,7 +97,7 @@ class ClueArrowPainter extends CustomPainter {
     final tip = spine.last;
     final prev = spine[spine.length - 2];
     final angle = math.atan2(tip.dy - prev.dy, tip.dx - prev.dx);
-    final headLen = size.shortestSide * 0.18;
+    final headLen = size.shortestSide * 0.12;
     const spread = 0.5; // radians off the shaft axis
     final left = Offset(
       tip.dx - headLen * math.cos(angle - spread),
