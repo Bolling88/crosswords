@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:crossword_core/crossword_core.dart';
 import 'package:crossword_ui/crossword_ui.dart';
+import 'package:crossword_ui/gameplay/presentation/crossword_screen/widgets/answer_cell_widget.dart';
 import 'package:crossword_ui/gameplay/presentation/crossword_screen/widgets/clue_arrow_painter.dart';
 import 'package:crossword_ui/gameplay/presentation/crossword_screen/widgets/hint_cell_widget.dart';
 
@@ -140,5 +141,30 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(hintColor(), AppColors.clueCellActive);
+  });
+
+  testWidgets('animated cells are isolated behind a RepaintBoundary', (
+    tester,
+  ) async {
+    await tester.pumpWidget(harness());
+
+    // Each clue and answer cell sits behind its own RepaintBoundary so a
+    // per-cell animation does not re-rasterise the whole grid.
+    expect(
+      find.ancestor(
+        of: find.byType(HintCellWidget),
+        matching: find.byType(RepaintBoundary),
+      ),
+      findsWidgets,
+    );
+    for (final cell in find.byType(AnswerCellWidget).evaluate()) {
+      expect(
+        find.ancestor(
+          of: find.byWidget(cell.widget),
+          matching: find.byType(RepaintBoundary),
+        ),
+        findsWidgets,
+      );
+    }
   });
 }

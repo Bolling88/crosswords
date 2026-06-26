@@ -96,16 +96,34 @@ class CrosswordGrid extends StatelessWidget {
     final fontFamily = state.font.googleFamily;
     final edges = state.puzzle.separatorEdges[(row, col)] ?? const {};
 
+    // Clue and answer cells animate independently — the letter pop-in, the
+    // word-confirm flash, and the selection/highlight colour transitions. A
+    // RepaintBoundary per animated cell keeps each animation frame from
+    // re-rasterising the whole grid. The static block/empty/image cells never
+    // animate, so they are left unwrapped to avoid extra compositing layers.
     return switch (cell) {
-      ClueCell() => HintCellWidget(
-        cell: cell,
-        size: cellSize,
-        onTap: () => cubit.selectCell(row, col),
-        fontFamily: fontFamily,
-        isActive: state.activeClueCell == (row, col),
-        semanticLabel: _clueSemanticLabel(cell, l10n),
+      ClueCell() => RepaintBoundary(
+        child: HintCellWidget(
+          cell: cell,
+          size: cellSize,
+          onTap: () => cubit.selectCell(row, col),
+          fontFamily: fontFamily,
+          isActive: state.activeClueCell == (row, col),
+          semanticLabel: _clueSemanticLabel(cell, l10n),
+        ),
       ),
-      AnswerCell() => _buildAnswerCell(row, col, cell, cellSize, edges, fontFamily, cubit, l10n),
+      AnswerCell() => RepaintBoundary(
+        child: _buildAnswerCell(
+          row,
+          col,
+          cell,
+          cellSize,
+          edges,
+          fontFamily,
+          cubit,
+          l10n,
+        ),
+      ),
       BlockCell() => BlockedCellWidget(size: cellSize),
       ImageCell() => SizedBox(width: cellSize, height: cellSize),
     };
