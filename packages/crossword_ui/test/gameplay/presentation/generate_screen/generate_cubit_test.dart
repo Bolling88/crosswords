@@ -15,6 +15,11 @@ class _FakeService implements PuzzleGenerationService {
     required int maxWordLen,
     required String title,
     List<String> seedWords = const [],
+    String languageCode = 'sv',
+    int? randomSeed,
+    int maxSeconds = 30,
+    int pictureCols = 0,
+    int pictureRows = 0,
   }) async {
     final err = error;
     if (err != null) throw err;
