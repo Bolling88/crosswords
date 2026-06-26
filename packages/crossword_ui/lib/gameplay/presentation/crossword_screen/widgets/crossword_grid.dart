@@ -127,8 +127,14 @@ class CrosswordGrid extends StatelessWidget {
       final cell = entry.value;
       if (cell is! ClueCell) continue;
       final (row, col) = entry.key;
-      for (final arrow in cell.arrows) {
-        arrows.add((row: row, col: col, arrow: arrow));
+      for (var i = 0; i < cell.arrows.length; i++) {
+        arrows.add((
+          row: row,
+          col: col,
+          slot: i,
+          slotCount: cell.arrows.length,
+          arrow: cell.arrows[i],
+        ));
       }
     }
     return arrows;

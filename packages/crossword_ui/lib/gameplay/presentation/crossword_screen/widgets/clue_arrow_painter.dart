@@ -3,7 +3,13 @@ import 'package:flutter/material.dart';
 
 import 'package:crossword_core/crossword_core.dart';
 
-typedef GridClueArrow = ({int row, int col, ClueArrow arrow});
+typedef GridClueArrow = ({
+  int row,
+  int col,
+  int slot,
+  int slotCount,
+  ClueArrow arrow,
+});
 
 /// Direction from the clue cell toward the word's start (entry) and the
 /// direction the word then reads (travel), in screen coords (+x right, +y down).
@@ -46,12 +52,15 @@ typedef GridClueArrow = ({int row, int col, ClueArrow arrow});
 /// clue cell.
 List<Offset> clueBoundaryArrowSpine({
   required ArrowShape shape,
-  required Offset clueCellOrigin,
+  required Rect clueBounds,
   required double cellSize,
 }) {
   final v = clueArrowVectors(shape);
-  final center = clueCellOrigin + Offset(cellSize * 0.5, cellSize * 0.5);
-  final exit = center + v.entry * (cellSize * 0.5);
+  final center = clueBounds.center;
+  final exit = Offset(
+    center.dx + v.entry.dx * clueBounds.width * 0.5,
+    center.dy + v.entry.dy * clueBounds.height * 0.5,
+  );
   final insideStart = exit + v.entry * (cellSize * 0.18);
 
   if (v.entry == v.travel) {
@@ -76,16 +85,25 @@ class ClueArrowLayerPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     for (final clueArrow in arrows) {
-      final origin = Offset(clueArrow.col * cellSize, clueArrow.row * cellSize);
       _paintSpine(
         canvas,
         clueBoundaryArrowSpine(
           shape: clueArrow.arrow.shape,
-          clueCellOrigin: origin,
+          clueBounds: _clueBounds(clueArrow),
           cellSize: cellSize,
         ),
       );
     }
+  }
+
+  Rect _clueBounds(GridClueArrow clueArrow) {
+    final slotHeight = cellSize / clueArrow.slotCount;
+    return Rect.fromLTWH(
+      clueArrow.col * cellSize,
+      clueArrow.row * cellSize + clueArrow.slot * slotHeight,
+      cellSize,
+      slotHeight,
+    );
   }
 
   void _paintSpine(Canvas canvas, List<Offset> spine) {

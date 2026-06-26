@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:crossword_core/crossword_core.dart';
@@ -30,14 +31,21 @@ void main() {
   });
 
   group('clueBoundaryArrowSpine', () {
-    const origin = Offset.zero;
     const cellSize = 10.0;
+    const cellBounds = Rect.fromLTWH(0, 0, cellSize, cellSize);
 
     List<Offset> spine(ArrowShape shape) => clueBoundaryArrowSpine(
       shape: shape,
-      clueCellOrigin: origin,
+      clueBounds: cellBounds,
       cellSize: cellSize,
     );
+
+    List<Offset> splitSpine(ArrowShape shape, int slot) =>
+        clueBoundaryArrowSpine(
+          shape: shape,
+          clueBounds: Rect.fromLTWH(0, slot * cellSize / 2, cellSize, 5),
+          cellSize: cellSize,
+        );
 
     test('straight arrows have two points and bent arrows have three', () {
       expect(spine(ArrowShape.straightRight).length, 2);
@@ -90,6 +98,17 @@ void main() {
     test('diagonal clues exit from the matching corner', () {
       expect(spine(ArrowShape.diagonalSwThenRight).first, const Offset(0, 10));
       expect(spine(ArrowShape.diagonalNeThenDown).first, const Offset(10, 0));
+    });
+
+    test('split clue arrows exit from their own compartment', () {
+      expect(
+        splitSpine(ArrowShape.straightRight, 0).first,
+        const Offset(10, 2.5),
+      );
+      expect(
+        splitSpine(ArrowShape.straightRight, 1).first,
+        const Offset(10, 7.5),
+      );
     });
 
     test('orthogonal bent clues include an elbow before the tip', () {
