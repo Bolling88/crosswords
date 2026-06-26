@@ -43,7 +43,7 @@ class _StopAfterCapture implements Exception {}
 void main() {
   group('GeneratePuzzleCubit', () {
     test('max seconds stepper clamps within bounds', () {
-      final cubit = GeneratePuzzleCubit(service: _FakeService());
+      final cubit = GeneratePuzzleCubit(service: _FakeService(), generatedPuzzleTitle: 'Korsord');
       // default 30 -> repeatedly decrement past the floor.
       for (var i = 0; i < 20; i++) {
         cubit.decrementMaxSeconds();
@@ -57,7 +57,7 @@ void main() {
     });
 
     test('picture cols clamp to grid width and never below zero', () {
-      final cubit = GeneratePuzzleCubit(service: _FakeService());
+      final cubit = GeneratePuzzleCubit(service: _FakeService(), generatedPuzzleTitle: 'Korsord');
       cubit.selectSize(11);
       for (var i = 0; i < 20; i++) {
         cubit.incrementPictureCols();
@@ -73,7 +73,7 @@ void main() {
     });
 
     test('selectSize clamps existing picture dims down to new size', () {
-      final cubit = GeneratePuzzleCubit(service: _FakeService());
+      final cubit = GeneratePuzzleCubit(service: _FakeService(), generatedPuzzleTitle: 'Korsord');
       cubit.selectSize(17);
       for (var i = 0; i < 17; i++) {
         cubit.incrementPictureCols();
@@ -88,7 +88,8 @@ void main() {
 
     test('generate forwards all fields including parsed random seed', () async {
       final service = _FakeService();
-      final cubit = GeneratePuzzleCubit(service: service);
+      final cubit =
+          GeneratePuzzleCubit(service: service, generatedPuzzleTitle: 'Korsord');
       cubit.selectSize(17);
       cubit.selectMaxWordLen(8);
       cubit.incrementMaxSeconds(); // 30 -> 35
@@ -108,7 +109,8 @@ void main() {
 
     test('blank random seed is forwarded as null', () async {
       final service = _FakeService();
-      final cubit = GeneratePuzzleCubit(service: service);
+      final cubit =
+          GeneratePuzzleCubit(service: service, generatedPuzzleTitle: 'Korsord');
       cubit.randomSeedController.text = '   ';
 
       await cubit.generate();

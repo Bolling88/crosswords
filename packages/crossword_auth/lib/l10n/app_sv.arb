@@ -1,0 +1,115 @@
+{
+  "@@locale": "sv",
+  "signInTitle": "Logga in",
+  "@signInTitle": {
+    "description": "Sign-in screen title."
+  },
+  "registerTitle": "Skapa konto",
+  "@registerTitle": {
+    "description": "Register screen title."
+  },
+  "toggleToRegister": "Skapa ett konto",
+  "@toggleToRegister": {
+    "description": "Toggle from sign-in to register."
+  },
+  "toggleToSignIn": "Har du redan ett konto? Logga in",
+  "@toggleToSignIn": {
+    "description": "Toggle from register to sign-in."
+  },
+  "emailLabel": "E-post",
+  "@emailLabel": {
+    "description": "Email field label."
+  },
+  "passwordLabel": "Lösenord",
+  "@passwordLabel": {
+    "description": "Password field label."
+  },
+  "signInAction": "Logga in",
+  "@signInAction": {
+    "description": "Primary sign-in action."
+  },
+  "registerAction": "Skapa konto",
+  "@registerAction": {
+    "description": "Primary register action."
+  },
+  "forgotPassword": "Glömt lösenord?",
+  "@forgotPassword": {
+    "description": "Forgot-password link."
+  },
+  "continueWithGoogle": "Fortsätt med Google",
+  "@continueWithGoogle": {
+    "description": "Continue with Google button."
+  },
+  "continueWithApple": "Fortsätt med Apple",
+  "@continueWithApple": {
+    "description": "Continue with Apple button."
+  },
+  "socialDivider": "eller",
+  "@socialDivider": {
+    "description": "Divider between email and social sign-in."
+  },
+  "resetSent": "Vi har skickat en återställningslänk till din e-post.",
+  "@resetSent": {
+    "description": "Password-reset email sent confirmation."
+  },
+  "emailRequired": "Ange din e-postadress.",
+  "@emailRequired": {
+    "description": "Validation: email required."
+  },
+  "passwordRequired": "Ange ditt lösenord.",
+  "@passwordRequired": {
+    "description": "Validation: password required."
+  },
+  "passwordTooShort": "Lösenordet måste vara minst 6 tecken.",
+  "@passwordTooShort": {
+    "description": "Validation: password too short."
+  },
+  "errorInvalidCredentials": "Fel e-post eller lösenord.",
+  "@errorInvalidCredentials": {
+    "description": "Error: invalid credentials."
+  },
+  "errorEmailInUse": "E-postadressen används redan.",
+  "@errorEmailInUse": {
+    "description": "Error: email already in use."
+  },
+  "errorInvalidEmail": "Ogiltig e-postadress.",
+  "@errorInvalidEmail": {
+    "description": "Error: invalid email."
+  },
+  "errorWeakPassword": "Lösenordet är för svagt.",
+  "@errorWeakPassword": {
+    "description": "Error: weak password."
+  },
+  "errorNetwork": "Nätverksfel. Försök igen.",
+  "@errorNetwork": {
+    "description": "Error: network failure."
+  },
+  "errorGeneric": "Något gick fel. Försök igen.",
+  "@errorGeneric": {
+    "description": "Error: generic failure."
+  },
+  "accountTitle": "Konto",
+  "@accountTitle": {
+    "description": "Account screen title."
+  },
+  "accountTooltip": "Konto",
+  "@accountTooltip": {
+    "description": "Account button tooltip."
+  },
+  "signedInAs": "Inloggad som",
+  "@signedInAs": {
+    "description": "Account screen: signed-in-as label."
+  },
+  "signOutAction": "Logga ut",
+  "@signOutAction": {
+    "description": "Sign-out action."
+  },
+  "signOutConfirmTitle": "Logga ut?",
+  "@signOutConfirmTitle": {
+    "description": "Sign-out confirmation dialog title."
+  },
+  "signOutConfirmBody": "Du loggas ut från ditt konto.",
+  "@signOutConfirmBody": {
+    "description": "Sign-out confirmation dialog body."
+  }
+}

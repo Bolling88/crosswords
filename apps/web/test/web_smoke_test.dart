@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:crossword_auth/crossword_auth.dart';
 import 'package:crossword_core/crossword_core.dart';
 import 'package:crossword_ui/crossword_ui.dart';
 import 'package:crosswords_web/crossword/web_crossword_screen.dart';
@@ -25,7 +27,18 @@ void main() {
             value: ProgressService(prefs: prefs),
           ),
         ],
-        child: MaterialApp(home: WebCrosswordScreen(puzzle: puzzle)),
+        child: MaterialApp(
+          locale: const Locale('sv'),
+          localizationsDelegates: const [
+            CrosswordUiL10n.delegate,
+            CrosswordAuthL10n.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('sv'), Locale('en')],
+          home: WebCrosswordScreen(puzzle: puzzle),
+        ),
       ),
     );
     await tester.pumpAndSettle();

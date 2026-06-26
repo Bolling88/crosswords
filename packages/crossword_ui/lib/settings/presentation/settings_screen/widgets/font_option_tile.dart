@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../domain/entities/app_font.dart';
 import '../../../../common/data/constants/app_colors.dart';
-import '../../../../common/data/constants/strings.dart';
+import '../../../../l10n/gen/crossword_ui_l10n.dart';
 
 /// A single selectable font row that previews itself in its own font.
 class FontOptionTile extends StatelessWidget {
@@ -42,7 +42,7 @@ class FontOptionTile extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      Strings.fontPreviewSample,
+                      CrosswordUiL10n.of(context).fontPreviewSample,
                       style: GoogleFonts.getFont(
                         font.googleFamily,
                         fontSize: 18,

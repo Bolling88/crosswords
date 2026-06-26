@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../common/data/constants/strings.dart';
+import '../../../../l10n/gen/crossword_ui_l10n.dart';
 import '../cubit/crossword_cubit.dart';
 
 enum _MenuAction {
@@ -22,8 +22,9 @@ class CrosswordMenuButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cubit = context.read<CrosswordCubit>();
+    final l10n = CrosswordUiL10n.of(context);
     return PopupMenuButton<_MenuAction>(
-      tooltip: Strings.gameMenuTooltip,
+      tooltip: l10n.gameMenuTooltip,
       icon: const Icon(Icons.more_vert),
       onSelected: (action) {
         switch (action) {
@@ -43,36 +44,36 @@ class CrosswordMenuButton extends StatelessWidget {
             _confirmRestart(context, cubit);
         }
       },
-      itemBuilder: (context) => const <PopupMenuEntry<_MenuAction>>[
+      itemBuilder: (context) => <PopupMenuEntry<_MenuAction>>[
         PopupMenuItem(
           value: _MenuAction.checkWord,
-          child: Text(Strings.checkWordAction),
+          child: Text(l10n.checkWordAction),
         ),
         PopupMenuItem(
           value: _MenuAction.checkPuzzle,
-          child: Text(Strings.checkPuzzleAction),
+          child: Text(l10n.checkPuzzleAction),
         ),
-        PopupMenuDivider(),
+        const PopupMenuDivider(),
         PopupMenuItem(
           value: _MenuAction.revealLetter,
-          child: Text(Strings.revealLetterAction),
+          child: Text(l10n.revealLetterAction),
         ),
         PopupMenuItem(
           value: _MenuAction.revealWord,
-          child: Text(Strings.revealWordAction),
+          child: Text(l10n.revealWordAction),
         ),
         PopupMenuItem(
           value: _MenuAction.revealSolution,
-          child: Text(Strings.revealSolutionAction),
+          child: Text(l10n.revealSolutionAction),
         ),
-        PopupMenuDivider(),
+        const PopupMenuDivider(),
         PopupMenuItem(
           value: _MenuAction.clearWord,
-          child: Text(Strings.clearWordAction),
+          child: Text(l10n.clearWordAction),
         ),
         PopupMenuItem(
           value: _MenuAction.restart,
-          child: Text(Strings.restartAction),
+          child: Text(l10n.restartAction),
         ),
       ],
     );
@@ -83,19 +84,20 @@ class CrosswordMenuButton extends StatelessWidget {
     BuildContext context,
     CrosswordCubit cubit,
   ) async {
+    final l10n = CrosswordUiL10n.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text(Strings.revealSolutionConfirmTitle),
-        content: const Text(Strings.revealSolutionConfirmBody),
+        title: Text(l10n.revealSolutionConfirmTitle),
+        content: Text(l10n.revealSolutionConfirmBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, false),
-            child: const Text(Strings.cancelAction),
+            child: Text(l10n.cancelAction),
           ),
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, true),
-            child: const Text(Strings.revealSolutionAction),
+            child: Text(l10n.revealSolutionAction),
           ),
         ],
       ),
@@ -109,19 +111,20 @@ class CrosswordMenuButton extends StatelessWidget {
     BuildContext context,
     CrosswordCubit cubit,
   ) async {
+    final l10n = CrosswordUiL10n.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text(Strings.restartConfirmTitle),
-        content: const Text(Strings.restartConfirmBody),
+        title: Text(l10n.restartConfirmTitle),
+        content: Text(l10n.restartConfirmBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, false),
-            child: const Text(Strings.cancelAction),
+            child: Text(l10n.cancelAction),
           ),
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, true),
-            child: const Text(Strings.restartAction),
+            child: Text(l10n.restartAction),
           ),
         ],
       ),

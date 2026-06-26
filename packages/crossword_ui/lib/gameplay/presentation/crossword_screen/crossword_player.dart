@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../common/data/constants/app_colors.dart';
-import '../../../common/data/constants/strings.dart';
+import '../../../l10n/gen/crossword_ui_l10n.dart';
 import 'cubit/crossword_cubit.dart';
 import 'cubit/crossword_state.dart';
 import 'widgets/crossword_grid.dart';
@@ -25,8 +25,10 @@ class CrosswordPlayer extends StatelessWidget {
           _showSolvedDialog(context);
         } else if (state is PuzzleFilledButIncorrect) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(Strings.puzzleFilledButIncorrect),
+            SnackBar(
+              content: Text(
+                CrosswordUiL10n.of(context).puzzleFilledButIncorrect,
+              ),
             ),
           );
         }
@@ -39,23 +41,24 @@ class CrosswordPlayer extends StatelessWidget {
   /// keep admiring the grid or start over.
   void _showSolvedDialog(BuildContext context) {
     final cubit = context.read<CrosswordCubit>();
+    final l10n = CrosswordUiL10n.of(context);
     showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
         backgroundColor: AppColors.paper,
-        title: const Text(Strings.solvedTitle),
-        content: const Text(Strings.solvedBody),
+        title: Text(l10n.solvedTitle),
+        content: Text(l10n.solvedBody),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.pop(dialogContext);
               cubit.restartPuzzle();
             },
-            child: const Text(Strings.restartAction),
+            child: Text(l10n.restartAction),
           ),
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text(Strings.closeAction),
+            child: Text(l10n.closeAction),
           ),
         ],
       ),

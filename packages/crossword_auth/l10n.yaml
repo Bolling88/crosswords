@@ -1,0 +1,6 @@
+arb-dir: lib/l10n
+template-arb-file: app_sv.arb
+output-localization-file: crossword_auth_l10n.dart
+output-class: CrosswordAuthL10n
+output-dir: lib/l10n/gen
+nullable-getter: false

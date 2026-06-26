@@ -2,6 +2,7 @@ import 'package:crossword_core/crossword_core.dart';
 import 'package:crossword_ui/crossword_ui.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -12,6 +13,14 @@ Future<Widget> _app() async {
   final fontService = FontService(prefs: prefs);
   final puzzle = await LocalPuzzleDataSource().loadGeneratedPuzzle();
   return MaterialApp(
+    locale: const Locale('sv'),
+    localizationsDelegates: const [
+      CrosswordUiL10n.delegate,
+      GlobalMaterialLocalizations.delegate,
+      GlobalWidgetsLocalizations.delegate,
+      GlobalCupertinoLocalizations.delegate,
+    ],
+    supportedLocales: const [Locale('sv'), Locale('en')],
     home: RepositoryProvider<FontService>.value(
       value: fontService,
       child: BlocProvider(

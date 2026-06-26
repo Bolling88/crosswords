@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -54,6 +55,14 @@ void main() {
   tearDown(() => cubit.close());
 
   Widget harness() => MaterialApp(
+    locale: const Locale('sv'),
+    localizationsDelegates: const [
+      CrosswordUiL10n.delegate,
+      GlobalMaterialLocalizations.delegate,
+      GlobalWidgetsLocalizations.delegate,
+      GlobalCupertinoLocalizations.delegate,
+    ],
+    supportedLocales: const [Locale('sv'), Locale('en')],
     home: BlocProvider.value(
       value: cubit,
       child: Scaffold(

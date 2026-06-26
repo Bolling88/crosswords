@@ -1,6 +1,6 @@
 export 'common/data/constants/app_colors.dart';
 export 'common/data/constants/app_text_styles.dart';
-export 'common/data/constants/strings.dart';
+export 'l10n/gen/crossword_ui_l10n.dart';
 export 'common/presentation/widgets/brand_app_bar.dart';
 export 'settings/domain/entities/app_font.dart';
 export 'settings/domain/services/font_service.dart';
