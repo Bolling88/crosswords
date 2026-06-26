@@ -175,6 +175,159 @@ void main() {
     expect(puzzle.cells[(1, 3)], isA<AnswerCell>());
   });
 
+  // ── Picture cells map to ImageCell across their whole span ───────────────
+  // The origin entry is the only one the backend emits; the mapper must
+  // materialize the span-covered positions too so they render under the image
+  // overlay instead of as blank holes, and so a word path that illegally
+  // crosses the image is caught by validation.
+  test('picture origin maps to an origin ImageCell carrying its span', () {
+    const response = CrosswordGenerationResponse(
+      success: true,
+      gridCells: [
+        [
+          GenerationGridCellDto(
+            kind: 'picture',
+            row: 0,
+            col: 0,
+            rowspan: 2,
+            colspan: 2,
+          ),
+          GenerationGridCellDto(kind: 'answer', row: 0, col: 2, letter: 'A'),
+        ],
+      ],
+      slots: [],
+    );
+    final puzzle = GeneratedPuzzleMapper.map(response, title: 'X');
+    final origin = puzzle.cells[(0, 0)];
+    expect(origin, isA<ImageCell>());
+    expect((origin as ImageCell).isOrigin, isTrue);
+    expect(origin.spanRows, 2);
+    expect(origin.spanCols, 2);
+  });
+
+  test('picture-covered positions map to non-origin ImageCells', () {
+    const response = CrosswordGenerationResponse(
+      success: true,
+      gridCells: [
+        [
+          GenerationGridCellDto(
+            kind: 'picture',
+            row: 0,
+            col: 0,
+            rowspan: 2,
+            colspan: 2,
+          ),
+          GenerationGridCellDto(kind: 'answer', row: 0, col: 2, letter: 'A'),
+        ],
+      ],
+      slots: [],
+    );
+    final puzzle = GeneratedPuzzleMapper.map(response, title: 'X');
+    for (final pos in const [(0, 1), (1, 0), (1, 1)]) {
+      final cell = puzzle.cells[pos];
+      expect(cell, isA<ImageCell>(), reason: 'covered $pos should be ImageCell');
+      expect((cell as ImageCell).isOrigin, isFalse);
+    }
+  });
+
+  test('word path crossing a picture span throws', () {
+    const response = CrosswordGenerationResponse(
+      success: true,
+      gridCells: [
+        [
+          GenerationGridCellDto(
+            kind: 'picture',
+            row: 0,
+            col: 0,
+            rowspan: 1,
+            colspan: 2,
+          ),
+        ],
+      ],
+      slots: [
+        // A rightward word starting inside the image span.
+        GenerationSlotDto(
+          slotId: 1,
+          startRow: 0,
+          startCol: 0,
+          direction: 'right',
+          length: 2,
+          clueRow: 0,
+          clueCol: 0,
+        ),
+      ],
+    );
+    expect(
+      () => GeneratedPuzzleMapper.map(response, title: 'X'),
+      throwsA(isA<CrosswordGenerationException>()),
+    );
+  });
+
+  // Real backend response (11×11, 3×3 picture at (0,0)) captured from
+  // POST /crossword-puzzles/generate with picture_cols/rows = 3. Guards the end
+  // -to-end fix: ragged grid_cells must not clip the width, and the picture
+  // span must materialize as ImageCells.
+  test('real picture response maps to full 11x11 grid with an ImageCell span',
+      () {
+    final raw = File('test/fixtures/generation_response_picture_11x11.json')
+        .readAsStringSync();
+    final res = CrosswordGenerationResponse.fromJson(
+        jsonDecode(raw) as Map<String, dynamic>);
+    final picturePuzzle = GeneratedPuzzleMapper.map(res, title: 'Pic');
+
+    // Width must not be clipped to the ragged first row's entry count (9).
+    expect(picturePuzzle.cols, 11);
+    expect(picturePuzzle.rows, 11);
+
+    // The previously-clipped rightmost column now holds real cells.
+    expect(picturePuzzle.cells.containsKey((0, 10)), isTrue);
+
+    // The 3×3 picture at (0,0): origin plus eight covered ImageCells.
+    final origin = picturePuzzle.cells[(0, 0)];
+    expect(origin, isA<ImageCell>());
+    expect((origin as ImageCell).isOrigin, isTrue);
+    expect(origin.spanRows, 3);
+    expect(origin.spanCols, 3);
+    for (var r = 0; r < 3; r++) {
+      for (var c = 0; c < 3; c++) {
+        final cell = picturePuzzle.cells[(r, c)];
+        expect(cell, isA<ImageCell>(), reason: 'picture cell ($r,$c)');
+        expect((cell as ImageCell).isOrigin, (r == 0 && c == 0));
+      }
+    }
+
+    // The standalone arrow at (3,0) spans 2 rows; (4,0) is omitted from the
+    // response, so the mapper must materialize it rather than leave a hole the
+    // grid would paint as a transparent gap.
+    expect(picturePuzzle.cells[(3, 0)], isA<BlockCell>());
+    expect(picturePuzzle.cells.containsKey((4, 0)), isTrue,
+        reason: 'arrow-covered (4,0) must not be a hole');
+    expect(picturePuzzle.cells[(4, 0)], isA<BlockCell>());
+  });
+
+  test('arrow cell materializes its whole span as BlockCells', () {
+    const response = CrosswordGenerationResponse(
+      success: true,
+      gridCells: [
+        [
+          GenerationGridCellDto(
+            kind: 'arrow',
+            row: 0,
+            col: 0,
+            rowspan: 2,
+            colspan: 1,
+          ),
+          GenerationGridCellDto(kind: 'answer', row: 0, col: 1, letter: 'A'),
+        ],
+      ],
+      slots: [],
+    );
+    final puzzle = GeneratedPuzzleMapper.map(response, title: 'X');
+    expect(puzzle.cells[(0, 0)], isA<BlockCell>());
+    expect(puzzle.cells[(1, 0)], isA<BlockCell>(),
+        reason: 'arrow-covered (1,0) must be materialized, not a hole');
+  });
+
   // ── FIX 4: unknown direction throws ──────────────────────────────────────
   test('throws CrosswordGenerationException for unknown slot direction', () {
     // A 1x1 clue cell whose slot uses direction 'left'.

@@ -92,9 +92,42 @@ class GeneratedPuzzleMapper {
             // response — throw rather than silently dropping the arrow.
             cells[pos] = ClueCell(arrows: _arrowsFor(c, slotById));
             solutionBuffer.write('#');
+          case 'picture':
+            // A picture spans rowspan×colspan positions but is emitted as a
+            // single origin entry with the covered positions omitted. Anchor
+            // the image at the origin and materialize the covered positions as
+            // non-origin ImageCells so the renderer shows them under the image
+            // overlay (not as blank holes) and so a word path that illegally
+            // crosses the image trips the AnswerCell guard below. Only the
+            // emitted origin contributes to the solution signature, matching
+            // every other kind (one char per emitted cell).
+            for (var dr = 0; dr < c.rowspan; dr++) {
+              for (var dc = 0; dc < c.colspan; dc++) {
+                cells[(c.row + dr, c.col + dc)] = ImageCell(
+                  spanRows: c.rowspan,
+                  spanCols: c.colspan,
+                  isOrigin: dr == 0 && dc == 0,
+                );
+              }
+            }
+            solutionBuffer.write('#');
+          case 'arrow':
+            // A standalone arrow marker can span rowspan×colspan positions and,
+            // like a picture, is emitted as a single origin entry with the
+            // covered positions omitted. We don't render the directional glyph
+            // yet, so treat it as an inert block — but materialize the whole
+            // span so the covered positions are real BlockCells, not transparent
+            // holes the grid would otherwise leave (see crossword_grid: a null
+            // cell paints an empty SizedBox). One '#' per emitted entry keeps
+            // the solution signature consistent with every other kind.
+            for (var dr = 0; dr < c.rowspan; dr++) {
+              for (var dc = 0; dc < c.colspan; dc++) {
+                cells[(c.row + dr, c.col + dc)] = const BlockCell();
+              }
+            }
+            solutionBuffer.write('#');
           default:
-            // 'picture' / 'arrow' kinds are not produced with pictures off;
-            // treat anything else as an inert block.
+            // Any other kind is an inert 1×1 block.
             cells[pos] = const BlockCell();
             solutionBuffer.write('#');
         }

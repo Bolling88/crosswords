@@ -24,7 +24,10 @@ class BlockCell extends Cell {
   const BlockCell();
 }
 
-/// Retained for future image clues; not produced by the current generator.
+/// An image clue spanning [spanRows]×[spanCols] grid positions. The generator
+/// emits one origin entry per picture; the mapper materializes the covered
+/// positions as non-origin [ImageCell]s ([isOrigin] false) so they render under
+/// the image overlay instead of as blank holes.
 class ImageCell extends Cell {
   final int spanRows;
   final int spanCols;
