@@ -85,6 +85,21 @@ class _GenerateScreenContent extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              const Text(Strings.generateLanguageLabel),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                children: [
+                  ChoiceChip(
+                    label: const Text(Strings.generateLanguageSwedish),
+                    selected: state.languageCode == 'sv',
+                    onSelected: state.isGenerating
+                        ? null
+                        : (_) => cubit.selectLanguage('sv'),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
               const Text(Strings.generateSizeLabel),
               const SizedBox(height: 8),
               Wrap(
@@ -117,6 +132,30 @@ class _GenerateScreenContent extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 24),
+              _LabeledStepper(
+                label: Strings.generateMaxSecondsLabel,
+                value: state.maxSeconds,
+                enabled: !state.isGenerating,
+                onDecrement: cubit.decrementMaxSeconds,
+                onIncrement: cubit.incrementMaxSeconds,
+              ),
+              const SizedBox(height: 16),
+              _LabeledStepper(
+                label: Strings.generatePictureColsLabel,
+                value: state.pictureCols,
+                enabled: !state.isGenerating,
+                onDecrement: cubit.decrementPictureCols,
+                onIncrement: cubit.incrementPictureCols,
+              ),
+              const SizedBox(height: 16),
+              _LabeledStepper(
+                label: Strings.generatePictureRowsLabel,
+                value: state.pictureRows,
+                enabled: !state.isGenerating,
+                onDecrement: cubit.decrementPictureRows,
+                onIncrement: cubit.incrementPictureRows,
+              ),
+              const SizedBox(height: 24),
               const Text(Strings.generateSeedWordsLabel),
               const SizedBox(height: 8),
               TextField(
@@ -124,6 +163,18 @@ class _GenerateScreenContent extends StatelessWidget {
                 enabled: !state.isGenerating,
                 decoration: const InputDecoration(
                   hintText: Strings.generateSeedWordsHint,
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 24),
+              const Text(Strings.generateRandomSeedLabel),
+              const SizedBox(height: 8),
+              TextField(
+                controller: cubit.randomSeedController,
+                enabled: !state.isGenerating,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  hintText: Strings.generateRandomSeedHint,
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -150,6 +201,53 @@ class _GenerateScreenContent extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// A label with `−`/`+` buttons around a current numeric [value]. Buttons are
+/// disabled when [enabled] is false or when the corresponding callback is null.
+class _LabeledStepper extends StatelessWidget {
+  final String label;
+  final int value;
+  final VoidCallback? onDecrement;
+  final VoidCallback? onIncrement;
+  final bool enabled;
+
+  const _LabeledStepper({
+    required this.label,
+    required this.value,
+    required this.onDecrement,
+    required this.onIncrement,
+    required this.enabled,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(label),
+        Row(
+          children: [
+            IconButton(
+              onPressed: enabled ? onDecrement : null,
+              icon: const Icon(Icons.remove),
+            ),
+            SizedBox(
+              width: 40,
+              child: Text(
+                '$value',
+                textAlign: TextAlign.center,
+              ),
+            ),
+            IconButton(
+              onPressed: enabled ? onIncrement : null,
+              icon: const Icon(Icons.add),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }
