@@ -26,10 +26,14 @@ class AnswerCellWidget extends StatelessWidget {
   final VoidCallback onTap;
   final String fontFamily;
 
+  /// Screen-reader description of this cell's position and current letter.
+  final String semanticLabel;
+
   const AnswerCellWidget({
     required this.size,
     required this.onTap,
     required this.fontFamily,
+    required this.semanticLabel,
     this.letter,
     this.isSelected = false,
     this.isHighlighted = false,
@@ -122,6 +126,15 @@ class AnswerCellWidget extends StatelessWidget {
       );
     }
 
-    return GestureDetector(onTap: onTap, child: cell);
+    return Semantics(
+      label: semanticLabel,
+      selected: isSelected,
+      button: true,
+      onTap: onTap,
+      // The label already spells out the letter, so drop the visual Text's
+      // own semantics to avoid the screen reader announcing it twice.
+      excludeSemantics: true,
+      child: GestureDetector(onTap: onTap, child: cell),
+    );
   }
 }

@@ -88,13 +88,13 @@ class GenerationSucceeded extends GenerateState {
   List<Object?> get props => [...super.props, puzzle, key];
 }
 
+/// Event state: generation failed. Carries no copy — the screen renders the
+/// localized [CrosswordUiL10n.generationErrorMessage] itself.
 class ShowGenerationError extends GenerateState {
-  final String message;
   final Key key = UniqueKey();
 
-  ShowGenerationError({required GenerateState state, required this.message})
-      : super.copy(state);
+  ShowGenerationError({required GenerateState state}) : super.copy(state);
 
   @override
-  List<Object?> get props => [...super.props, message, key];
+  List<Object?> get props => [...super.props, key];
 }

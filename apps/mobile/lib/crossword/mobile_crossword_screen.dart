@@ -30,15 +30,16 @@ class _MobileCrosswordView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cubit = context.read<CrosswordCubit>();
+    final l10n = CrosswordUiL10n.of(context);
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: BrandAppBar(
-        title: Strings.appTitle,
+        title: l10n.appTitle,
         actions: [
           const CrosswordMenuButton(),
           IconButton(
             icon: const Icon(Icons.settings),
-            tooltip: Strings.settingsTooltip,
+            tooltip: l10n.settingsTooltip,
             onPressed: () => Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const SettingsScreen()),
@@ -46,7 +47,7 @@ class _MobileCrosswordView extends StatelessWidget {
           ),
           IconButton(
             icon: const Icon(Icons.account_circle),
-            tooltip: AuthStrings.accountTooltip,
+            tooltip: CrosswordAuthL10n.of(context).accountTooltip,
             onPressed: () => Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const AccountScreen()),
@@ -54,7 +55,7 @@ class _MobileCrosswordView extends StatelessWidget {
           ),
           IconButton(
             icon: const Icon(Icons.fit_screen),
-            tooltip: Strings.resetViewTooltip,
+            tooltip: l10n.resetViewTooltip,
             onPressed: cubit.resetView,
           ),
         ],

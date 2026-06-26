@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:crossword_core/crossword_core.dart';
 import 'package:crossword_ui/crossword_ui.dart';
+
+final CrosswordUiL10n _l10n = lookupCrosswordUiL10n(const Locale('sv'));
 
 CrosswordPuzzle _puzzle() {
   const w = Word(
@@ -49,6 +52,14 @@ void main() {
   tearDown(() => cubit.close());
 
   Widget harness() => MaterialApp(
+        locale: const Locale('sv'),
+        localizationsDelegates: const [
+          CrosswordUiL10n.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [Locale('sv'), Locale('en')],
         home: BlocProvider.value(
           value: cubit,
           child: const Scaffold(body: CrosswordPlayer()),
@@ -63,8 +74,8 @@ void main() {
     cubit.onLetterInput('B');
     await tester.pumpAndSettle();
 
-    expect(find.text(Strings.solvedTitle), findsOneWidget);
-    expect(find.text(Strings.solvedBody), findsOneWidget);
+    expect(find.text(_l10n.solvedTitle), findsOneWidget);
+    expect(find.text(_l10n.solvedBody), findsOneWidget);
   });
 
   testWidgets('a full but wrong grid shows the nudge snackbar',
@@ -75,7 +86,7 @@ void main() {
     cubit.onLetterInput('X');
     await tester.pump();
 
-    expect(find.text(Strings.puzzleFilledButIncorrect), findsOneWidget);
-    expect(find.text(Strings.solvedTitle), findsNothing);
+    expect(find.text(_l10n.puzzleFilledButIncorrect), findsOneWidget);
+    expect(find.text(_l10n.solvedTitle), findsNothing);
   });
 }

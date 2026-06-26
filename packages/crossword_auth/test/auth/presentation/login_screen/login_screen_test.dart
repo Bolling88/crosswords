@@ -1,14 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:crossword_auth/auth/common/strings/auth_strings.dart';
-import 'package:crossword_auth/auth/presentation/login_screen/cubit/login_cubit.dart';
-import 'package:crossword_auth/auth/presentation/login_screen/login_screen.dart';
+import 'package:crossword_auth/crossword_auth.dart';
 
 import '../../support/fake_auth_service.dart';
 
+final CrosswordAuthL10n _l10n = lookupCrosswordAuthL10n(const Locale('sv'));
+
 Widget _harness(FakeAuthService service) {
   return MaterialApp(
+    locale: const Locale('sv'),
+    localizationsDelegates: const [
+      CrosswordAuthL10n.delegate,
+      GlobalMaterialLocalizations.delegate,
+      GlobalWidgetsLocalizations.delegate,
+      GlobalCupertinoLocalizations.delegate,
+    ],
+    supportedLocales: const [Locale('sv'), Locale('en')],
     home: BlocProvider(
       create: (_) => LoginCubit(authService: service),
       child: const LoginScreenBuilder(),
@@ -21,12 +30,12 @@ void main() {
     final service = FakeAuthService();
     await tester.pumpWidget(_harness(service));
 
-    expect(find.text(AuthStrings.signInTitle), findsWidgets);
+    expect(find.text(_l10n.signInTitle), findsWidgets);
 
-    await tester.tap(find.text(AuthStrings.toggleToRegister));
+    await tester.tap(find.text(_l10n.toggleToRegister));
     await tester.pump();
 
-    expect(find.text(AuthStrings.registerTitle), findsWidgets);
+    expect(find.text(_l10n.registerTitle), findsWidgets);
     addTearDown(service.dispose);
   });
 
@@ -50,7 +59,7 @@ void main() {
     await tester.tap(find.byKey(const Key('login_submit'))); // empty -> validation error
     await tester.pump();
 
-    expect(find.text(AuthStrings.emailRequired), findsOneWidget);
+    expect(find.text(_l10n.emailRequired), findsOneWidget);
     addTearDown(service.dispose);
   });
 }

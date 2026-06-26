@@ -5,8 +5,8 @@ import 'package:crossword_api/crossword_api.dart';
 import 'package:crossword_core/crossword_core.dart';
 
 import '../../../common/data/constants/app_colors.dart';
-import '../../../common/data/constants/strings.dart';
 import '../../../common/presentation/widgets/brand_app_bar.dart';
+import '../../../l10n/gen/crossword_ui_l10n.dart';
 import 'cubit/generate_cubit.dart';
 import 'cubit/generate_state.dart';
 
@@ -31,9 +31,15 @@ class GenerateScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Resolve the localized default title here (a normal build context that
+    // may listen), not in the `create` callback below — `Localizations.of`
+    // depends on an InheritedWidget and must not run in that one-shot lifecycle.
+    final generatedPuzzleTitle = CrosswordUiL10n.of(context).generatedPuzzleTitle;
     return BlocProvider(
-      create: (context) =>
-          GeneratePuzzleCubit(service: context.read<PuzzleGenerationService>()),
+      create: (_) => GeneratePuzzleCubit(
+        service: context.read<PuzzleGenerationService>(),
+        generatedPuzzleTitle: generatedPuzzleTitle,
+      ),
       child: _GenerateScreenBuilder(gameplayBuilder: gameplayBuilder),
     );
   }
@@ -59,7 +65,13 @@ class _GenerateScreenBuilder extends StatelessWidget {
         } else if (state is ShowGenerationError) {
           ScaffoldMessenger.of(context)
             ..hideCurrentSnackBar()
-            ..showSnackBar(SnackBar(content: Text(state.message)));
+            ..showSnackBar(
+              SnackBar(
+                content: Text(
+                  CrosswordUiL10n.of(context).generationErrorMessage,
+                ),
+              ),
+            );
         }
       },
       builder: (context, state) => _GenerateScreenContent(state: state),
@@ -76,22 +88,23 @@ class _GenerateScreenContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cubit = context.read<GeneratePuzzleCubit>();
+    final l10n = CrosswordUiL10n.of(context);
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: const BrandAppBar(title: Strings.generateTitle),
+      appBar: BrandAppBar(title: l10n.generateTitle),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(Strings.generateLanguageLabel),
+              Text(l10n.generateLanguageLabel),
               const SizedBox(height: 8),
               Wrap(
                 spacing: 8,
                 children: [
                   ChoiceChip(
-                    label: const Text(Strings.generateLanguageSwedish),
+                    label: Text(l10n.generateLanguageSwedish),
                     selected: state.languageCode == 'sv',
                     onSelected: state.isGenerating
                         ? null
@@ -100,7 +113,7 @@ class _GenerateScreenContent extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 24),
-              const Text(Strings.generateSizeLabel),
+              Text(l10n.generateSizeLabel),
               const SizedBox(height: 8),
               Wrap(
                 spacing: 8,
@@ -116,7 +129,7 @@ class _GenerateScreenContent extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 24),
-              const Text(Strings.generateMaxWordLenLabel),
+              Text(l10n.generateMaxWordLenLabel),
               const SizedBox(height: 8),
               Wrap(
                 spacing: 8,
@@ -133,7 +146,7 @@ class _GenerateScreenContent extends StatelessWidget {
               ),
               const SizedBox(height: 24),
               _LabeledStepper(
-                label: Strings.generateMaxSecondsLabel,
+                label: l10n.generateMaxSecondsLabel,
                 value: state.maxSeconds,
                 enabled: !state.isGenerating,
                 onDecrement: cubit.decrementMaxSeconds,
@@ -141,7 +154,7 @@ class _GenerateScreenContent extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               _LabeledStepper(
-                label: Strings.generatePictureColsLabel,
+                label: l10n.generatePictureColsLabel,
                 value: state.pictureCols,
                 enabled: !state.isGenerating,
                 onDecrement: cubit.decrementPictureCols,
@@ -149,33 +162,33 @@ class _GenerateScreenContent extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               _LabeledStepper(
-                label: Strings.generatePictureRowsLabel,
+                label: l10n.generatePictureRowsLabel,
                 value: state.pictureRows,
                 enabled: !state.isGenerating,
                 onDecrement: cubit.decrementPictureRows,
                 onIncrement: cubit.incrementPictureRows,
               ),
               const SizedBox(height: 24),
-              const Text(Strings.generateSeedWordsLabel),
+              Text(l10n.generateSeedWordsLabel),
               const SizedBox(height: 8),
               TextField(
                 controller: cubit.seedWordsController,
                 enabled: !state.isGenerating,
-                decoration: const InputDecoration(
-                  hintText: Strings.generateSeedWordsHint,
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  hintText: l10n.generateSeedWordsHint,
+                  border: const OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 24),
-              const Text(Strings.generateRandomSeedLabel),
+              Text(l10n.generateRandomSeedLabel),
               const SizedBox(height: 8),
               TextField(
                 controller: cubit.randomSeedController,
                 enabled: !state.isGenerating,
                 keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  hintText: Strings.generateRandomSeedHint,
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  hintText: l10n.generateRandomSeedHint,
+                  border: const OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 32),
@@ -183,9 +196,11 @@ class _GenerateScreenContent extends StatelessWidget {
                 width: double.infinity,
                 child: FilledButton(
                   onPressed: state.isGenerating ? null : cubit.generate,
-                  child: state.isGenerating
-                      ? const Text(Strings.generatingLabel)
-                      : const Text(Strings.generateAction),
+                  child: Text(
+                    state.isGenerating
+                        ? l10n.generatingLabel
+                        : l10n.generateAction,
+                  ),
                 ),
               ),
               const SizedBox(height: 12),
@@ -194,7 +209,7 @@ class _GenerateScreenContent extends StatelessWidget {
                 child: TextButton(
                   onPressed:
                       state.isGenerating ? null : cubit.openTestPuzzle,
-                  child: const Text(Strings.generateTestPuzzleAction),
+                  child: Text(l10n.generateTestPuzzleAction),
                 ),
               ),
             ],

@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:crossword_core/crossword_core.dart';
 import 'package:crossword_ui/crossword_ui.dart';
+
+final CrosswordUiL10n _l10n = lookupCrosswordUiL10n(const Locale('sv'));
 
 CrosswordPuzzle _puzzle() {
   const w = Word(
@@ -49,6 +52,14 @@ void main() {
   tearDown(() => cubit.close());
 
   Widget harness() => MaterialApp(
+        locale: const Locale('sv'),
+        localizationsDelegates: const [
+          CrosswordUiL10n.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [Locale('sv'), Locale('en')],
         home: BlocProvider.value(
           value: cubit,
           child: Scaffold(
@@ -68,7 +79,7 @@ void main() {
     cubit.selectCell(0, 1);
     await tester.pumpWidget(harness());
 
-    await openMenuAndTap(tester, Strings.revealLetterAction);
+    await openMenuAndTap(tester, _l10n.revealLetterAction);
 
     expect(cubit.state.userInputs[(0, 1)], 'A');
     expect(cubit.state.revealedCells, {(0, 1)});
@@ -79,7 +90,7 @@ void main() {
     cubit.onLetterInput('X');
     await tester.pumpWidget(harness());
 
-    await openMenuAndTap(tester, Strings.checkWordAction);
+    await openMenuAndTap(tester, _l10n.checkWordAction);
 
     expect(cubit.state.incorrectCells, {(0, 1)});
   });
@@ -88,15 +99,15 @@ void main() {
       (tester) async {
     await tester.pumpWidget(harness());
 
-    await openMenuAndTap(tester, Strings.revealSolutionAction);
+    await openMenuAndTap(tester, _l10n.revealSolutionAction);
     // Confirmation dialog is showing; cancel leaves the grid empty.
-    await tester.tap(find.text(Strings.cancelAction));
+    await tester.tap(find.text(_l10n.cancelAction));
     await tester.pumpAndSettle();
     expect(cubit.state.userInputs, isEmpty);
 
-    await openMenuAndTap(tester, Strings.revealSolutionAction);
-    expect(find.text(Strings.revealSolutionConfirmBody), findsOneWidget);
-    await tester.tap(find.text(Strings.revealSolutionAction).last);
+    await openMenuAndTap(tester, _l10n.revealSolutionAction);
+    expect(find.text(_l10n.revealSolutionConfirmBody), findsOneWidget);
+    await tester.tap(find.text(_l10n.revealSolutionAction).last);
     await tester.pumpAndSettle();
 
     expect(cubit.state.userInputs, {(0, 1): 'A', (0, 2): 'B'});
@@ -109,15 +120,15 @@ void main() {
     cubit.onLetterInput('A');
     await tester.pumpWidget(harness());
 
-    await openMenuAndTap(tester, Strings.restartAction);
+    await openMenuAndTap(tester, _l10n.restartAction);
     // Confirmation dialog is showing; cancel keeps the progress.
-    await tester.tap(find.text(Strings.cancelAction));
+    await tester.tap(find.text(_l10n.cancelAction));
     await tester.pumpAndSettle();
     expect(cubit.state.userInputs, isNotEmpty);
 
-    await openMenuAndTap(tester, Strings.restartAction);
-    expect(find.text(Strings.restartConfirmBody), findsOneWidget);
-    await tester.tap(find.text(Strings.restartAction).last);
+    await openMenuAndTap(tester, _l10n.restartAction);
+    expect(find.text(_l10n.restartConfirmBody), findsOneWidget);
+    await tester.tap(find.text(_l10n.restartAction).last);
     await tester.pumpAndSettle();
     expect(cubit.state.userInputs, isEmpty);
   });

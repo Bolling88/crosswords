@@ -64,7 +64,7 @@ Future<List<GenerateState>> _collect(
 
 void main() {
   test('selectSize updates width and height', () async {
-    final cubit = GeneratePuzzleCubit(service: _FakeService());
+    final cubit = GeneratePuzzleCubit(service: _FakeService(), generatedPuzzleTitle: 'Korsord');
     cubit.selectSize(17);
     expect(cubit.state.width, 17);
     expect(cubit.state.height, 17);
@@ -72,14 +72,15 @@ void main() {
   });
 
   test('selectMaxWordLen updates maxWordLen', () async {
-    final cubit = GeneratePuzzleCubit(service: _FakeService());
+    final cubit = GeneratePuzzleCubit(service: _FakeService(), generatedPuzzleTitle: 'Korsord');
     cubit.selectMaxWordLen(8);
     expect(cubit.state.maxWordLen, 8);
     await cubit.close();
   });
 
   test('generate emits generating then GenerationSucceeded', () async {
-    final cubit = GeneratePuzzleCubit(service: _FakeService(puzzle: _puzzle()));
+    final cubit = GeneratePuzzleCubit(
+        service: _FakeService(puzzle: _puzzle()), generatedPuzzleTitle: 'Korsord');
     final states = await _collect(cubit, cubit.generate);
     expect(states.first.isGenerating, isTrue);
     expect(states.last, isA<GenerationSucceeded>());
@@ -90,6 +91,7 @@ void main() {
   test('generate emits ShowGenerationError on failure', () async {
     final cubit = GeneratePuzzleCubit(
       service: _FakeService(error: const CrosswordGenerationException('x')),
+      generatedPuzzleTitle: 'Korsord',
     );
     final states = await _collect(cubit, cubit.generate);
     expect(states.first.isGenerating, isTrue);
@@ -99,7 +101,8 @@ void main() {
   });
 
   test('openTestPuzzle emits isGenerating then GenerationSucceeded', () async {
-    final cubit = GeneratePuzzleCubit(service: _FakeService(puzzle: _puzzle()));
+    final cubit = GeneratePuzzleCubit(
+        service: _FakeService(puzzle: _puzzle()), generatedPuzzleTitle: 'Korsord');
     final states = await _collect(cubit, cubit.openTestPuzzle);
     expect(states.first.isGenerating, isTrue);
     expect(states.last, isA<GenerationSucceeded>());

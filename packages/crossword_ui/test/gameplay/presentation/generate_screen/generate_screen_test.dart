@@ -2,8 +2,20 @@ import 'package:crossword_api/crossword_api.dart';
 import 'package:crossword_core/crossword_core.dart';
 import 'package:crossword_ui/crossword_ui.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+final CrosswordUiL10n _l10n = lookupCrosswordUiL10n(const Locale('sv'));
+
+const List<LocalizationsDelegate<dynamic>> _delegates = [
+  CrosswordUiL10n.delegate,
+  GlobalMaterialLocalizations.delegate,
+  GlobalWidgetsLocalizations.delegate,
+  GlobalCupertinoLocalizations.delegate,
+];
+
+const List<Locale> _locales = [Locale('sv'), Locale('en')];
 
 class _FakeService implements PuzzleGenerationService {
   @override
@@ -61,6 +73,9 @@ void main() {
   testWidgets('shows controls and navigates on generate', (tester) async {
     await tester.pumpWidget(
       MaterialApp(
+        locale: const Locale('sv'),
+        localizationsDelegates: _delegates,
+        supportedLocales: _locales,
         home: RepositoryProvider<PuzzleGenerationService>.value(
           value: _FakeServiceWithGenerate(),
           child: GenerateScreen(
@@ -71,15 +86,15 @@ void main() {
       ),
     );
 
-    expect(find.text(Strings.generateTitle), findsOneWidget);
+    expect(find.text(_l10n.generateTitle), findsOneWidget);
 
-    await tester.ensureVisible(find.text(Strings.generateAction));
+    await tester.ensureVisible(find.text(_l10n.generateAction));
     await tester.pumpAndSettle();
-    await tester.tap(find.text(Strings.generateAction));
+    await tester.tap(find.text(_l10n.generateAction));
     await tester.pumpAndSettle();
 
     expect(
-      find.text('PLAYING ${Strings.generatedPuzzleTitle}'),
+      find.text('PLAYING ${_l10n.generatedPuzzleTitle}'),
       findsOneWidget,
     );
   });
@@ -87,6 +102,9 @@ void main() {
   testWidgets('renders new field labels', (tester) async {
     await tester.pumpWidget(
       MaterialApp(
+        locale: const Locale('sv'),
+        localizationsDelegates: _delegates,
+        supportedLocales: _locales,
         home: RepositoryProvider<PuzzleGenerationService>.value(
           value: _FakeService(),
           child: GenerateScreen(gameplayBuilder: (_, _) => const SizedBox()),
@@ -94,10 +112,10 @@ void main() {
       ),
     );
 
-    expect(find.text(Strings.generateLanguageLabel), findsOneWidget);
-    expect(find.text(Strings.generateMaxSecondsLabel), findsOneWidget);
-    expect(find.text(Strings.generatePictureColsLabel), findsOneWidget);
-    expect(find.text(Strings.generatePictureRowsLabel), findsOneWidget);
-    expect(find.text(Strings.generateRandomSeedLabel), findsOneWidget);
+    expect(find.text(_l10n.generateLanguageLabel), findsOneWidget);
+    expect(find.text(_l10n.generateMaxSecondsLabel), findsOneWidget);
+    expect(find.text(_l10n.generatePictureColsLabel), findsOneWidget);
+    expect(find.text(_l10n.generatePictureRowsLabel), findsOneWidget);
+    expect(find.text(_l10n.generateRandomSeedLabel), findsOneWidget);
   });
 }

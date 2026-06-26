@@ -21,6 +21,7 @@ Widget _host(ClueCell cell) => MaterialApp(
         size: 48,
         onTap: () {},
         fontFamily: 'Roboto',
+        semanticLabel: 'ledtråd',
       ),
     ),
   ),

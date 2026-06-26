@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:crossword_core/crossword_core.dart';
 import 'package:crossword_ui/crossword_ui.dart';
+import 'package:crossword_ui/gameplay/presentation/crossword_screen/widgets/answer_cell_widget.dart';
 import 'package:crossword_ui/gameplay/presentation/crossword_screen/widgets/clue_arrow_painter.dart';
 import 'package:crossword_ui/gameplay/presentation/crossword_screen/widgets/hint_cell_widget.dart';
 
@@ -54,6 +56,14 @@ void main() {
   tearDown(() => cubit.close());
 
   Widget harness() => MaterialApp(
+    locale: const Locale('sv'),
+    localizationsDelegates: const [
+      CrosswordUiL10n.delegate,
+      GlobalMaterialLocalizations.delegate,
+      GlobalWidgetsLocalizations.delegate,
+      GlobalCupertinoLocalizations.delegate,
+    ],
+    supportedLocales: const [Locale('sv'), Locale('en')],
     home: BlocProvider.value(
       value: cubit,
       child: Scaffold(
@@ -131,5 +141,30 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(hintColor(), AppColors.clueCellActive);
+  });
+
+  testWidgets('animated cells are isolated behind a RepaintBoundary', (
+    tester,
+  ) async {
+    await tester.pumpWidget(harness());
+
+    // Each clue and answer cell sits behind its own RepaintBoundary so a
+    // per-cell animation does not re-rasterise the whole grid.
+    expect(
+      find.ancestor(
+        of: find.byType(HintCellWidget),
+        matching: find.byType(RepaintBoundary),
+      ),
+      findsWidgets,
+    );
+    for (final cell in find.byType(AnswerCellWidget).evaluate()) {
+      expect(
+        find.ancestor(
+          of: find.byWidget(cell.widget),
+          matching: find.byType(RepaintBoundary),
+        ),
+        findsWidgets,
+      );
+    }
   });
 }

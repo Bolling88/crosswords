@@ -3,6 +3,21 @@ import 'package:flutter/foundation.dart';
 
 enum LoginMode { signIn, register }
 
+/// Why a sign-in / registration attempt failed. The cubit emits one of these;
+/// the screen maps it to localized copy via [CrosswordAuthL10n]. Keeps human
+/// strings out of the cubit (mirrors [AuthFailureReason]).
+enum LoginErrorReason {
+  emailRequired,
+  passwordRequired,
+  passwordTooShort,
+  invalidCredentials,
+  emailInUse,
+  invalidEmail,
+  weakPassword,
+  network,
+  generic,
+}
+
 class LoginState extends Equatable {
   final LoginMode mode;
   final bool isSubmitting;
@@ -25,16 +40,16 @@ class LoginState extends Equatable {
 }
 
 /// Event state: a transient error to show as a SnackBar. Carries a UniqueKey
-/// so identical consecutive messages still trigger the listener.
+/// so identical consecutive reasons still trigger the listener.
 class LoginError extends LoginState {
-  final String message;
+  final LoginErrorReason reason;
   final Key key = UniqueKey();
 
-  LoginError({required LoginState state, required this.message})
+  LoginError({required LoginState state, required this.reason})
       : super.copy(state);
 
   @override
-  List<Object?> get props => [...super.props, message, key];
+  List<Object?> get props => [...super.props, reason, key];
 }
 
 /// Event state: confirmation that a password-reset email was sent.

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -65,7 +66,15 @@ class CrosswordsWebApp extends StatelessWidget {
         ),
       ],
       child: MaterialApp(
-        title: Strings.appTitle,
+        onGenerateTitle: (context) => CrosswordUiL10n.of(context).appTitle,
+        localizationsDelegates: const [
+          CrosswordUiL10n.delegate,
+          CrosswordAuthL10n.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [Locale('sv'), Locale('en')],
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(
             seedColor: AppColors.brand,

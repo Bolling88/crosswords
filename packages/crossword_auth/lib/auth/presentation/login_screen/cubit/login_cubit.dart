@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../common/strings/auth_strings.dart';
 import '../../../domain/entities/auth_failure.dart';
 import '../../../domain/services/auth_service.dart';
 import 'login_state.dart';
@@ -30,7 +29,7 @@ class LoginCubit extends Cubit<LoginState> {
 
     final validation = _validate(email, password);
     if (validation != null) {
-      emit(LoginError(state: state, message: validation));
+      emit(LoginError(state: state, reason: validation));
       return;
     }
 
@@ -47,7 +46,7 @@ class LoginCubit extends Cubit<LoginState> {
     } on AuthFailure catch (failure) {
       emit(LoginError(
         state: state.copyWith(isSubmitting: false),
-        message: _messageFor(failure),
+        reason: _reasonFor(failure),
       ));
     }
   }
@@ -55,14 +54,14 @@ class LoginCubit extends Cubit<LoginState> {
   Future<void> sendPasswordReset() async {
     final email = emailController.text.trim();
     if (email.isEmpty) {
-      emit(LoginError(state: state, message: AuthStrings.emailRequired));
+      emit(LoginError(state: state, reason: LoginErrorReason.emailRequired));
       return;
     }
     try {
       await _authService.sendPasswordReset(email);
       emit(LoginPasswordResetSent(state: state));
     } on AuthFailure catch (failure) {
-      emit(LoginError(state: state, message: _messageFor(failure)));
+      emit(LoginError(state: state, reason: _reasonFor(failure)));
     }
   }
 
@@ -82,34 +81,34 @@ class LoginCubit extends Cubit<LoginState> {
       } else {
         emit(LoginError(
           state: state.copyWith(isSubmitting: false),
-          message: _messageFor(failure),
+          reason: _reasonFor(failure),
         ));
       }
     }
   }
 
-  String? _validate(String email, String password) {
-    if (email.isEmpty) return AuthStrings.emailRequired;
-    if (password.isEmpty) return AuthStrings.passwordRequired;
-    if (password.length < 6) return AuthStrings.passwordTooShort;
+  LoginErrorReason? _validate(String email, String password) {
+    if (email.isEmpty) return LoginErrorReason.emailRequired;
+    if (password.isEmpty) return LoginErrorReason.passwordRequired;
+    if (password.length < 6) return LoginErrorReason.passwordTooShort;
     return null;
   }
 
-  String _messageFor(AuthFailure failure) {
+  LoginErrorReason _reasonFor(AuthFailure failure) {
     switch (failure.reason) {
       case AuthFailureReason.invalidCredentials:
-        return AuthStrings.errorInvalidCredentials;
+        return LoginErrorReason.invalidCredentials;
       case AuthFailureReason.emailAlreadyInUse:
-        return AuthStrings.errorEmailInUse;
+        return LoginErrorReason.emailInUse;
       case AuthFailureReason.invalidEmail:
-        return AuthStrings.errorInvalidEmail;
+        return LoginErrorReason.invalidEmail;
       case AuthFailureReason.weakPassword:
-        return AuthStrings.errorWeakPassword;
+        return LoginErrorReason.weakPassword;
       case AuthFailureReason.network:
-        return AuthStrings.errorNetwork;
+        return LoginErrorReason.network;
       case AuthFailureReason.cancelled:
       case AuthFailureReason.unknown:
-        return AuthStrings.errorGeneric;
+        return LoginErrorReason.generic;
     }
   }
 

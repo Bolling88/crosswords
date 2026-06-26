@@ -1,0 +1,231 @@
+{
+  "@@locale": "sv",
+  "appTitle": "KORSORD",
+  "@appTitle": {
+    "description": "Application title."
+  },
+  "imageClueLabel": "BILD",
+  "@imageClueLabel": {
+    "description": "Label shown on image clue cells."
+  },
+  "imageClueSemantics": "Bildledtråd",
+  "@imageClueSemantics": {
+    "description": "Screen-reader label for an image clue."
+  },
+  "resetViewTooltip": "Återställ vy",
+  "@resetViewTooltip": {
+    "description": "Tooltip/semantics for the app-bar button that resets zoom & pan."
+  },
+  "settingsTooltip": "Inställningar",
+  "@settingsTooltip": {
+    "description": "Tooltip/semantics for the app-bar button that opens settings."
+  },
+  "settingsTitle": "Inställningar",
+  "@settingsTitle": {
+    "description": "Title of the settings screen."
+  },
+  "fontSettingLabel": "Typsnitt",
+  "@fontSettingLabel": {
+    "description": "Section header for the font picker."
+  },
+  "fontPreviewSample": "ABCÅÄÖ",
+  "@fontPreviewSample": {
+    "description": "Sample glyphs previewing each font option."
+  },
+  "gameMenuTooltip": "Spelmeny",
+  "@gameMenuTooltip": {
+    "description": "Tooltip for the in-game actions menu."
+  },
+  "checkWordAction": "Kontrollera ord",
+  "@checkWordAction": {
+    "description": "Game menu: check the current word."
+  },
+  "checkPuzzleAction": "Kontrollera allt",
+  "@checkPuzzleAction": {
+    "description": "Game menu: check the whole puzzle."
+  },
+  "revealLetterAction": "Visa bokstav",
+  "@revealLetterAction": {
+    "description": "Game menu: reveal a letter."
+  },
+  "revealWordAction": "Visa ord",
+  "@revealWordAction": {
+    "description": "Game menu: reveal a word."
+  },
+  "revealSolutionAction": "Visa lösning",
+  "@revealSolutionAction": {
+    "description": "Game menu: reveal the whole solution."
+  },
+  "clearWordAction": "Rensa ord",
+  "@clearWordAction": {
+    "description": "Game menu: clear the current word."
+  },
+  "restartAction": "Börja om",
+  "@restartAction": {
+    "description": "Game menu: restart the puzzle."
+  },
+  "revealSolutionConfirmTitle": "Visa lösningen?",
+  "@revealSolutionConfirmTitle": {
+    "description": "Reveal-solution confirmation dialog title."
+  },
+  "revealSolutionConfirmBody": "Hela korsordet fylls i med facit. Detta avslutar spelet.",
+  "@revealSolutionConfirmBody": {
+    "description": "Reveal-solution confirmation dialog body."
+  },
+  "restartConfirmTitle": "Börja om?",
+  "@restartConfirmTitle": {
+    "description": "Restart confirmation dialog title."
+  },
+  "restartConfirmBody": "All ifylld text rensas. Detta går inte att ångra.",
+  "@restartConfirmBody": {
+    "description": "Restart confirmation dialog body."
+  },
+  "cancelAction": "Avbryt",
+  "@cancelAction": {
+    "description": "Generic cancel action."
+  },
+  "solvedTitle": "Grattis!",
+  "@solvedTitle": {
+    "description": "Celebration dialog title after solving."
+  },
+  "solvedBody": "Du löste korsordet.",
+  "@solvedBody": {
+    "description": "Celebration dialog body after solving."
+  },
+  "closeAction": "Stäng",
+  "@closeAction": {
+    "description": "Generic close action."
+  },
+  "puzzleFilledButIncorrect": "Korsordet är fullt – något stämmer inte än.",
+  "@puzzleFilledButIncorrect": {
+    "description": "SnackBar nudge when the grid is full but wrong."
+  },
+  "gameplaySettingLabel": "Spel",
+  "@gameplaySettingLabel": {
+    "description": "Section header for gameplay settings."
+  },
+  "autocheckLabel": "Automatisk kontroll",
+  "@autocheckLabel": {
+    "description": "Autocheck switch label."
+  },
+  "autocheckDescription": "Markera felaktiga bokstäver direkt",
+  "@autocheckDescription": {
+    "description": "Autocheck switch description."
+  },
+  "generateTitle": "Skapa korsord",
+  "@generateTitle": {
+    "description": "Generate screen title."
+  },
+  "generateSizeLabel": "Storlek",
+  "@generateSizeLabel": {
+    "description": "Generate screen: size field label."
+  },
+  "generateMaxWordLenLabel": "Längsta ord",
+  "@generateMaxWordLenLabel": {
+    "description": "Generate screen: longest-word field label."
+  },
+  "generateSeedWordsLabel": "Egna ord",
+  "@generateSeedWordsLabel": {
+    "description": "Generate screen: own words field label."
+  },
+  "generateSeedWordsHint": "Skilj orden med komma",
+  "@generateSeedWordsHint": {
+    "description": "Generate screen: own words field hint."
+  },
+  "generateLanguageLabel": "Språk",
+  "@generateLanguageLabel": {
+    "description": "Generate screen: language field label."
+  },
+  "generateLanguageSwedish": "Svenska",
+  "@generateLanguageSwedish": {
+    "description": "Generate screen: Swedish language option."
+  },
+  "generateMaxSecondsLabel": "Max tid (s)",
+  "@generateMaxSecondsLabel": {
+    "description": "Generate screen: max time field label."
+  },
+  "generatePictureColsLabel": "Bildrutor (bredd)",
+  "@generatePictureColsLabel": {
+    "description": "Generate screen: image cells width field label."
+  },
+  "generatePictureRowsLabel": "Bildrutor (höjd)",
+  "@generatePictureRowsLabel": {
+    "description": "Generate screen: image cells height field label."
+  },
+  "generateRandomSeedLabel": "Slumpfrö",
+  "@generateRandomSeedLabel": {
+    "description": "Generate screen: random seed field label."
+  },
+  "generateRandomSeedHint": "Lämna tomt för slumpmässigt",
+  "@generateRandomSeedHint": {
+    "description": "Generate screen: random seed field hint."
+  },
+  "generateAction": "Skapa",
+  "@generateAction": {
+    "description": "Generate screen: create action."
+  },
+  "generatingLabel": "Skapar…",
+  "@generatingLabel": {
+    "description": "Generate screen: in-progress label."
+  },
+  "generateTestPuzzleAction": "Testkorsord",
+  "@generateTestPuzzleAction": {
+    "description": "Generate screen: open the bundled test puzzle."
+  },
+  "generatedPuzzleTitle": "Korsord",
+  "@generatedPuzzleTitle": {
+    "description": "Default title for a generated puzzle."
+  },
+  "generationErrorMessage": "Kunde inte skapa korsordet. Försök igen.",
+  "@generationErrorMessage": {
+    "description": "Generate screen: generic generation failure message."
+  },
+  "directionAcross": "vågrätt",
+  "@directionAcross": {
+    "description": "Direction word for an across clue (right-pointing arrow)."
+  },
+  "directionDown": "lodrätt",
+  "@directionDown": {
+    "description": "Direction word for a down clue (down-pointing arrow)."
+  },
+  "answerCellEmpty": "Tom ruta, rad {row}, kolumn {col}",
+  "@answerCellEmpty": {
+    "description": "Screen-reader label for an empty answer cell (1-based position).",
+    "placeholders": {
+      "row": {
+        "type": "int"
+      },
+      "col": {
+        "type": "int"
+      }
+    }
+  },
+  "answerCellFilled": "Ruta, rad {row}, kolumn {col}, bokstav {letter}",
+  "@answerCellFilled": {
+    "description": "Screen-reader label for a filled answer cell (1-based position).",
+    "placeholders": {
+      "row": {
+        "type": "int"
+      },
+      "col": {
+        "type": "int"
+      },
+      "letter": {
+        "type": "String"
+      }
+    }
+  },
+  "clueCellEmpty": "Tom ledtrådsruta",
+  "@clueCellEmpty": {
+    "description": "Screen-reader label for a blank clue cell."
+  },
+  "clueCellLabel": "Ledtråd: {clues}",
+  "@clueCellLabel": {
+    "description": "Screen-reader label for a clue cell, built from joined fragments.",
+    "placeholders": {
+      "clues": {
+        "type": "String"
+      }
+    }
+  }
+}

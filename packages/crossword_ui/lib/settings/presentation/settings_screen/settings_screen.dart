@@ -5,8 +5,8 @@ import '../../domain/services/font_service.dart';
 import '../../domain/services/gameplay_settings_service.dart';
 import '../../../common/data/constants/app_colors.dart';
 import '../../../common/data/constants/app_text_styles.dart';
-import '../../../common/data/constants/strings.dart';
 import '../../../common/presentation/widgets/brand_app_bar.dart';
+import '../../../l10n/gen/crossword_ui_l10n.dart';
 
 import 'cubit/settings_cubit.dart';
 import 'cubit/settings_state.dart';
@@ -46,9 +46,10 @@ class SettingsScreenContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cubit = context.read<SettingsCubit>();
+    final l10n = CrosswordUiL10n.of(context);
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: const BrandAppBar(title: Strings.settingsTitle),
+      appBar: BrandAppBar(title: l10n.settingsTitle),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
@@ -57,7 +58,7 @@ class SettingsScreenContent extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
                 child: Text(
-                  Strings.fontSettingLabel,
+                  l10n.fontSettingLabel,
                   style: AppTextStyles.clue(16),
                 ),
               ),
@@ -70,13 +71,13 @@ class SettingsScreenContent extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
                 child: Text(
-                  Strings.gameplaySettingLabel,
+                  l10n.gameplaySettingLabel,
                   style: AppTextStyles.clue(16),
                 ),
               ),
               SwitchListTile(
-                title: const Text(Strings.autocheckLabel),
-                subtitle: const Text(Strings.autocheckDescription),
+                title: Text(l10n.autocheckLabel),
+                subtitle: Text(l10n.autocheckDescription),
                 value: state.autocheck,
                 onChanged: cubit.setAutocheck,
               ),

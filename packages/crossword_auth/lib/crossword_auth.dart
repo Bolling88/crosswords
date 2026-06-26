@@ -1,4 +1,4 @@
-export 'auth/common/strings/auth_strings.dart';
+export 'l10n/gen/crossword_auth_l10n.dart';
 export 'auth/domain/entities/auth_failure.dart';
 export 'auth/domain/entities/auth_user.dart';
 export 'auth/domain/services/auth_service.dart';

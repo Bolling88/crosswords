@@ -3,10 +3,35 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:crossword_ui/crossword_ui.dart';
 
-import '../../common/strings/auth_strings.dart';
+import '../../../l10n/gen/crossword_auth_l10n.dart';
 import '../../domain/services/auth_service.dart';
 import 'cubit/login_cubit.dart';
 import 'cubit/login_state.dart';
+
+/// Maps a cubit-emitted [LoginErrorReason] to localized copy. Lives in the
+/// view layer so the cubit stays free of human-readable strings.
+String _messageForReason(LoginErrorReason reason, CrosswordAuthL10n l10n) {
+  switch (reason) {
+    case LoginErrorReason.emailRequired:
+      return l10n.emailRequired;
+    case LoginErrorReason.passwordRequired:
+      return l10n.passwordRequired;
+    case LoginErrorReason.passwordTooShort:
+      return l10n.passwordTooShort;
+    case LoginErrorReason.invalidCredentials:
+      return l10n.errorInvalidCredentials;
+    case LoginErrorReason.emailInUse:
+      return l10n.errorEmailInUse;
+    case LoginErrorReason.invalidEmail:
+      return l10n.errorInvalidEmail;
+    case LoginErrorReason.weakPassword:
+      return l10n.errorWeakPassword;
+    case LoginErrorReason.network:
+      return l10n.errorNetwork;
+    case LoginErrorReason.generic:
+      return l10n.errorGeneric;
+  }
+}
 
 /// Provides the [LoginCubit]. Built standalone by [AuthGate] when signed out.
 class LoginScreen extends StatelessWidget {
@@ -33,14 +58,17 @@ class LoginScreenBuilder extends StatelessWidget {
           state is LoginError || state is LoginPasswordResetSent,
       listener: (context, state) {
         final messenger = ScaffoldMessenger.of(context);
+        final l10n = CrosswordAuthL10n.of(context);
         if (state is LoginError) {
           messenger
             ..hideCurrentSnackBar()
-            ..showSnackBar(SnackBar(content: Text(state.message)));
+            ..showSnackBar(
+              SnackBar(content: Text(_messageForReason(state.reason, l10n))),
+            );
         } else if (state is LoginPasswordResetSent) {
           messenger
             ..hideCurrentSnackBar()
-            ..showSnackBar(const SnackBar(content: Text(AuthStrings.resetSent)));
+            ..showSnackBar(SnackBar(content: Text(l10n.resetSent)));
         }
       },
       builder: (context, state) => LoginScreenContent(state: state),
@@ -56,11 +84,10 @@ class LoginScreenContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cubit = context.read<LoginCubit>();
+    final l10n = CrosswordAuthL10n.of(context);
     final isRegister = state.mode == LoginMode.register;
-    final title =
-        isRegister ? AuthStrings.registerTitle : AuthStrings.signInTitle;
-    final primaryLabel =
-        isRegister ? AuthStrings.registerAction : AuthStrings.signInAction;
+    final title = isRegister ? l10n.registerTitle : l10n.signInTitle;
+    final primaryLabel = isRegister ? l10n.registerAction : l10n.signInAction;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -90,9 +117,9 @@ class LoginScreenContent extends StatelessWidget {
                     keyboardType: TextInputType.emailAddress,
                     autocorrect: false,
                     enabled: !state.isSubmitting,
-                    decoration: const InputDecoration(
-                      labelText: AuthStrings.emailLabel,
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: l10n.emailLabel,
+                      border: const OutlineInputBorder(),
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -102,9 +129,9 @@ class LoginScreenContent extends StatelessWidget {
                     focusNode: cubit.passwordFocus,
                     obscureText: true,
                     enabled: !state.isSubmitting,
-                    decoration: const InputDecoration(
-                      labelText: AuthStrings.passwordLabel,
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: l10n.passwordLabel,
+                      border: const OutlineInputBorder(),
                     ),
                   ),
                   if (!isRegister) ...[
@@ -113,7 +140,7 @@ class LoginScreenContent extends StatelessWidget {
                       child: TextButton(
                         onPressed:
                             state.isSubmitting ? null : cubit.sendPasswordReset,
-                        child: const Text(AuthStrings.forgotPassword),
+                        child: Text(l10n.forgotPassword),
                       ),
                     ),
                   ] else
@@ -135,21 +162,21 @@ class LoginScreenContent extends StatelessWidget {
                     onPressed: state.isSubmitting ? null : cubit.toggleMode,
                     child: Text(
                       isRegister
-                          ? AuthStrings.toggleToSignIn
-                          : AuthStrings.toggleToRegister,
+                          ? l10n.toggleToSignIn
+                          : l10n.toggleToRegister,
                     ),
                   ),
                   const SizedBox(height: 16),
                   const _OrDivider(),
                   const SizedBox(height: 16),
                   _SocialButton(
-                    label: AuthStrings.continueWithGoogle,
+                    label: l10n.continueWithGoogle,
                     onPressed:
                         state.isSubmitting ? null : cubit.signInWithGoogle,
                   ),
                   const SizedBox(height: 12),
                   _SocialButton(
-                    label: AuthStrings.continueWithApple,
+                    label: l10n.continueWithApple,
                     onPressed: state.isSubmitting ? null : cubit.signInWithApple,
                   ),
                 ],
@@ -167,17 +194,17 @@ class _OrDivider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Row(
+    return Row(
       children: [
-        Expanded(child: Divider(color: AppColors.gridLine)),
+        const Expanded(child: Divider(color: AppColors.gridLine)),
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Text(
-            AuthStrings.socialDivider,
-            style: TextStyle(color: AppColors.inkMuted),
+            CrosswordAuthL10n.of(context).socialDivider,
+            style: const TextStyle(color: AppColors.inkMuted),
           ),
         ),
-        Expanded(child: Divider(color: AppColors.gridLine)),
+        const Expanded(child: Divider(color: AppColors.gridLine)),
       ],
     );
   }

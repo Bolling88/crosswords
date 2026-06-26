@@ -25,14 +25,13 @@ class AccountSignedOut extends AccountState {
   List<Object?> get props => [...super.props, key];
 }
 
-/// Event state: sign-out failed; show a transient error.
+/// Event state: sign-out failed; show a transient error. Carries no copy — the
+/// screen renders the localized [CrosswordAuthL10n.errorGeneric] itself.
 class AccountSignOutError extends AccountState {
-  final String message;
   final Key key = UniqueKey();
 
-  AccountSignOutError({required AccountState state, required this.message})
-      : super.copy(state);
+  AccountSignOutError({required AccountState state}) : super.copy(state);
 
   @override
-  List<Object?> get props => [...super.props, message, key];
+  List<Object?> get props => [...super.props, key];
 }

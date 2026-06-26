@@ -11,6 +11,8 @@ resolution: workspace
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
   flutter_bloc: ^9.1.1
   shared_preferences: ^2.5.3
   firebase_core: ^3.8.0

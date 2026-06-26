@@ -1,15 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:crossword_auth/auth/common/strings/auth_strings.dart';
-import 'package:crossword_auth/auth/domain/entities/auth_user.dart';
-import 'package:crossword_auth/auth/domain/services/auth_service.dart';
-import 'package:crossword_auth/auth/presentation/account_screen/account_screen.dart';
+import 'package:crossword_auth/crossword_auth.dart';
+import 'package:crossword_ui/crossword_ui.dart';
 
 import '../../support/fake_auth_service.dart';
 
+final CrosswordAuthL10n _l10n = lookupCrosswordAuthL10n(const Locale('sv'));
+
 Widget _harness(FakeAuthService service) {
   return MaterialApp(
+    locale: const Locale('sv'),
+    localizationsDelegates: const [
+      CrosswordAuthL10n.delegate,
+      CrosswordUiL10n.delegate,
+      GlobalMaterialLocalizations.delegate,
+      GlobalWidgetsLocalizations.delegate,
+      GlobalCupertinoLocalizations.delegate,
+    ],
+    supportedLocales: const [Locale('sv'), Locale('en')],
     home: RepositoryProvider<AuthService>.value(
       value: service,
       child: const AccountScreen(),
@@ -35,14 +45,14 @@ void main() {
     await tester.pumpWidget(_harness(service));
 
     // Tap the body button.
-    await tester.tap(find.text(AuthStrings.signOutAction).first);
+    await tester.tap(find.text(_l10n.signOutAction).first);
     await tester.pumpAndSettle();
 
     // Dialog visible.
-    expect(find.text(AuthStrings.signOutConfirmTitle), findsOneWidget);
+    expect(find.text(_l10n.signOutConfirmTitle), findsOneWidget);
 
     // Confirm (the dialog's Logga ut action — last match).
-    await tester.tap(find.text(AuthStrings.signOutAction).last);
+    await tester.tap(find.text(_l10n.signOutAction).last);
     await tester.pumpAndSettle();
 
     expect(service.calls, contains('signOut'));

@@ -3,16 +3,24 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:crossword_api/crossword_api.dart';
 
-import '../../../../common/data/constants/strings.dart';
 import 'generate_state.dart';
 
 class GeneratePuzzleCubit extends Cubit<GenerateState> {
   final PuzzleGenerationService _service;
+
+  /// The localized default title stamped onto a generated puzzle. Resolved by
+  /// the screen from [CrosswordUiL10n] and injected here so the cubit never
+  /// touches localization itself.
+  final String _generatedPuzzleTitle;
+
   final TextEditingController seedWordsController = TextEditingController();
   final TextEditingController randomSeedController = TextEditingController();
 
-  GeneratePuzzleCubit({required PuzzleGenerationService service})
-      : _service = service,
+  GeneratePuzzleCubit({
+    required PuzzleGenerationService service,
+    required String generatedPuzzleTitle,
+  })  : _service = service,
+        _generatedPuzzleTitle = generatedPuzzleTitle,
         super(const GenerateState());
 
   void selectSize(int size) => emit(
@@ -99,7 +107,7 @@ class GeneratePuzzleCubit extends Cubit<GenerateState> {
         width: state.width,
         height: state.height,
         maxWordLen: state.maxWordLen,
-        title: Strings.generatedPuzzleTitle,
+        title: _generatedPuzzleTitle,
         seedWords: _parseSeedWords(seedWordsController.text),
         languageCode: state.languageCode,
         randomSeed: _parseRandomSeed(randomSeedController.text),
@@ -114,10 +122,7 @@ class GeneratePuzzleCubit extends Cubit<GenerateState> {
     } catch (e, stack) {
       debugPrint('Puzzle generation failed: $e');
       debugPrint('$stack');
-      emit(ShowGenerationError(
-        state: state.copyWith(isGenerating: false),
-        message: Strings.generationErrorMessage,
-      ));
+      emit(ShowGenerationError(state: state.copyWith(isGenerating: false)));
     }
   }
 
@@ -132,10 +137,7 @@ class GeneratePuzzleCubit extends Cubit<GenerateState> {
     } catch (e, stack) {
       debugPrint('Test puzzle load failed: $e');
       debugPrint('$stack');
-      emit(ShowGenerationError(
-        state: state.copyWith(isGenerating: false),
-        message: Strings.generationErrorMessage,
-      ));
+      emit(ShowGenerationError(state: state.copyWith(isGenerating: false)));
     }
   }
 

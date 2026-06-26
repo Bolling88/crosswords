@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:crossword_auth/auth/common/strings/auth_strings.dart';
 import 'package:crossword_auth/auth/domain/entities/auth_failure.dart';
 import 'package:crossword_auth/auth/presentation/login_screen/cubit/login_cubit.dart';
 import 'package:crossword_auth/auth/presentation/login_screen/cubit/login_state.dart';
@@ -62,13 +61,13 @@ void main() {
     await Future<void>.delayed(Duration.zero);
 
     expect(service.calls, isEmpty);
-    expect(states.whereType<LoginError>().single.message,
-        AuthStrings.passwordTooShort);
+    expect(states.whereType<LoginError>().single.reason,
+        LoginErrorReason.passwordTooShort);
 
     await sub.cancel();
   });
 
-  test('a thrown AuthFailure becomes a LoginError with mapped Swedish copy', () async {
+  test('a thrown AuthFailure becomes a LoginError with the mapped reason', () async {
     service.throwOnNextCall = const AuthFailure(AuthFailureReason.invalidCredentials);
     cubit.emailController.text = 'a@b.se';
     cubit.passwordController.text = 'secret1';
@@ -79,8 +78,8 @@ void main() {
     await cubit.submit();
     await Future<void>.delayed(Duration.zero);
 
-    expect(states.whereType<LoginError>().single.message,
-        AuthStrings.errorInvalidCredentials);
+    expect(states.whereType<LoginError>().single.reason,
+        LoginErrorReason.invalidCredentials);
     expect(cubit.state.isSubmitting, isFalse);
 
     await sub.cancel();
@@ -94,7 +93,8 @@ void main() {
     await Future<void>.delayed(Duration.zero);
 
     expect(service.calls, isEmpty);
-    expect(states.whereType<LoginError>().single.message, AuthStrings.emailRequired);
+    expect(states.whereType<LoginError>().single.reason,
+        LoginErrorReason.emailRequired);
 
     await sub.cancel();
   });

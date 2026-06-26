@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:crossword_ui/crossword_ui.dart';
 
-import '../../common/strings/auth_strings.dart';
+import '../../../l10n/gen/crossword_auth_l10n.dart';
 import '../../domain/services/auth_service.dart';
 import 'cubit/account_cubit.dart';
 import 'cubit/account_state.dart';
@@ -35,7 +35,11 @@ class AccountScreenBuilder extends StatelessWidget {
         } else if (state is AccountSignOutError) {
           ScaffoldMessenger.of(context)
             ..hideCurrentSnackBar()
-            ..showSnackBar(SnackBar(content: Text(state.message)));
+            ..showSnackBar(
+              SnackBar(
+                content: Text(CrosswordAuthL10n.of(context).errorGeneric),
+              ),
+            );
         }
       },
       builder: (context, state) => AccountScreenContent(state: state),
@@ -51,23 +55,24 @@ class AccountScreenContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cubit = context.read<AccountCubit>();
+    final l10n = CrosswordAuthL10n.of(context);
     final email = state.user?.email ?? '';
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: const BrandAppBar(title: AuthStrings.accountTitle),
+      appBar: BrandAppBar(title: l10n.accountTitle),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(AuthStrings.signedInAs, style: AppTextStyles.clue(14)),
+              Text(l10n.signedInAs, style: AppTextStyles.clue(14)),
               const SizedBox(height: 4),
               Text(email, style: AppTextStyles.clue(18)),
               const Spacer(),
               FilledButton(
                 onPressed: () => _confirmSignOut(context, cubit),
-                child: const Text(AuthStrings.signOutAction),
+                child: Text(l10n.signOutAction),
               ),
             ],
           ),
@@ -77,19 +82,21 @@ class AccountScreenContent extends StatelessWidget {
   }
 
   Future<void> _confirmSignOut(BuildContext context, AccountCubit cubit) async {
+    final l10n = CrosswordAuthL10n.of(context);
+    final uiL10n = CrosswordUiL10n.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text(AuthStrings.signOutConfirmTitle),
-        content: const Text(AuthStrings.signOutConfirmBody),
+        title: Text(l10n.signOutConfirmTitle),
+        content: Text(l10n.signOutConfirmBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, false),
-            child: const Text(Strings.cancelAction),
+            child: Text(uiL10n.cancelAction),
           ),
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, true),
-            child: const Text(AuthStrings.signOutAction),
+            child: Text(l10n.signOutAction),
           ),
         ],
       ),
