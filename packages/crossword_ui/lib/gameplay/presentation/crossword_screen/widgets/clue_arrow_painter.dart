@@ -98,8 +98,8 @@ class ClueArrowPainter extends CustomPainter {
     final tip = spine.last;
     final prev = spine[spine.length - 2];
     final angle = math.atan2(tip.dy - prev.dy, tip.dx - prev.dx);
-    final headLen = size.shortestSide * 0.11;
-    const spread = 0.5; // radians off the shaft axis
+    final headLen = size.shortestSide * 0.14;
+    const spread = 0.34; // narrow half-angle → a sharp, pointy head
     final left = Offset(
       tip.dx - headLen * math.cos(angle - spread),
       tip.dy - headLen * math.sin(angle - spread),
