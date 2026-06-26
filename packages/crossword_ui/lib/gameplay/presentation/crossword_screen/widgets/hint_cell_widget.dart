@@ -49,8 +49,7 @@ class HintCellWidget extends StatelessWidget {
       return _clueText(arrows.first, isSplit: false);
     }
     // Two clues share this box: split it into top and bottom compartments.
-    // Arrows are ordered top-first by the mapper/resolver. The direction glyphs
-    // live in the answer boxes (korsord style), so the clue cell is text only.
+    // Arrows are ordered top-first by the mapper/resolver.
     return Column(
       children: [
         Expanded(child: _clueText(arrows[0], isSplit: true)),
@@ -63,19 +62,26 @@ class HintCellWidget extends StatelessWidget {
   Widget _clueText(ClueArrow arrow, {required bool isSplit}) {
     final fontSize = size * (isSplit ? 0.13 : 0.155);
     return Padding(
-      padding: EdgeInsets.all(size * 0.05),
-      child: Center(
-        child: Text(
-          mockClueText(arrow.wordId),
-          textAlign: TextAlign.center,
-          maxLines: isSplit ? 2 : 3,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-            fontFamily: fontFamily,
-            color: AppColors.ink,
-            fontSize: fontSize,
-            height: 1.05,
-            fontWeight: FontWeight.w500,
+      padding: EdgeInsets.all(size * 0.055),
+      child: Align(
+        alignment: Alignment.center,
+        child: Padding(
+          padding: EdgeInsets.only(
+            bottom: arrow.direction == Direction.right ? size * 0.06 : 0,
+            right: arrow.direction == Direction.down ? size * 0.06 : 0,
+          ),
+          child: Text(
+            mockClueText(arrow.wordId),
+            textAlign: TextAlign.center,
+            maxLines: isSplit ? 2 : 3,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontFamily: fontFamily,
+              color: AppColors.ink,
+              fontSize: fontSize,
+              height: 1.05,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ),
       ),

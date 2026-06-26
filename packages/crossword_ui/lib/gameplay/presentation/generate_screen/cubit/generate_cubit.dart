@@ -34,7 +34,9 @@ class GeneratePuzzleCubit extends Cubit<GenerateState> {
         state: state.copyWith(isGenerating: false),
         puzzle: puzzle,
       ));
-    } catch (_) {
+    } catch (e, stack) {
+      debugPrint('Puzzle generation failed: $e');
+      debugPrint('$stack');
       emit(ShowGenerationError(
         state: state.copyWith(isGenerating: false),
         message: Strings.generationErrorMessage,
@@ -50,7 +52,9 @@ class GeneratePuzzleCubit extends Cubit<GenerateState> {
         state: state.copyWith(isGenerating: false),
         puzzle: puzzle,
       ));
-    } catch (_) {
+    } catch (e, stack) {
+      debugPrint('Test puzzle load failed: $e');
+      debugPrint('$stack');
       emit(ShowGenerationError(
         state: state.copyWith(isGenerating: false),
         message: Strings.generationErrorMessage,
