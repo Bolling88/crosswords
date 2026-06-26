@@ -6,6 +6,7 @@ import '../../../../common/data/constants/app_text_styles.dart';
 class AnswerCellWidget extends StatelessWidget {
   /// The letter to display: the player's input, or a seed's given letter.
   final String? letter;
+
   final bool isSelected;
   final bool isHighlighted;
   final bool isSeed;
@@ -46,15 +47,15 @@ class AnswerCellWidget extends StatelessWidget {
     final fillColor = isSelected
         ? AppColors.selection
         : isHighlighted
-            ? AppColors.highlight
-            : isSeed
-                ? AppColors.seedCell
-                : AppColors.paper;
+        ? AppColors.highlight
+        : isSeed
+        ? AppColors.seedCell
+        : AppColors.paper;
     final inkColor = isIncorrect
         ? AppColors.errorInk
         : isRevealed
-            ? AppColors.inkMuted
-            : AppColors.ink;
+        ? AppColors.inkMuted
+        : AppColors.ink;
 
     Widget cell = AnimatedContainer(
       duration: const Duration(milliseconds: 150),
@@ -70,8 +71,9 @@ class AnswerCellWidget extends StatelessWidget {
             width: hasRightSeparator ? 2.0 : 0.5,
           ),
           bottom: BorderSide(
-            color:
-                hasBottomSeparator ? AppColors.separator : AppColors.gridLine,
+            color: hasBottomSeparator
+                ? AppColors.separator
+                : AppColors.gridLine,
             width: hasBottomSeparator ? 2.0 : 0.5,
           ),
         ),
@@ -88,8 +90,10 @@ class AnswerCellWidget extends StatelessWidget {
             Transform.scale(scale: scale, child: child),
         child: Text(
           letter ?? '',
-          style: AppTextStyles.answerLetter(size * 0.66, family: fontFamily)
-              .copyWith(color: inkColor),
+          style: AppTextStyles.answerLetter(
+            size * 0.66,
+            family: fontFamily,
+          ).copyWith(color: inkColor),
         ),
       ),
     );
@@ -108,8 +112,7 @@ class AnswerCellWidget extends StatelessWidget {
             Positioned.fill(
               child: IgnorePointer(
                 child: ColoredBox(
-                  color:
-                      AppColors.seedCell.withAlpha((strength * 140).round()),
+                  color: AppColors.seedCell.withAlpha((strength * 140).round()),
                 ),
               ),
             ),

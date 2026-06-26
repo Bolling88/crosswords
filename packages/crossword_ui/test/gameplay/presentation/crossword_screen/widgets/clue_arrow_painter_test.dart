@@ -1,4 +1,4 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:crossword_core/crossword_core.dart';
@@ -18,12 +18,6 @@ void main() {
       expect(v.travel, const Offset(1, 0));
     });
 
-    test('diagonalNwThenDown enters toward NW and reads down', () {
-      final v = clueArrowVectors(ArrowShape.diagonalNwThenDown);
-      expect(v.entry, const Offset(-1, -1));
-      expect(v.travel, const Offset(0, 1));
-    });
-
     test('every shape reads in a cardinal direction', () {
       for (final shape in ArrowShape.values) {
         final travel = clueArrowVectors(shape).travel;
@@ -36,75 +30,91 @@ void main() {
     });
   });
 
-  group('clueArrowSpine', () {
-    test('straight has 2 points, bent/diagonal have 3', () {
-      expect(clueArrowSpine(ArrowShape.straightRight).length, 2);
-      expect(clueArrowSpine(ArrowShape.bentDownThenRight).length, 3);
-      expect(clueArrowSpine(ArrowShape.diagonalNwThenDown).length, 3);
+  group('clueBoundaryArrowSpine', () {
+    const cellSize = 10.0;
+    const cellBounds = Rect.fromLTWH(0, 0, cellSize, cellSize);
+
+    List<Offset> spine(ArrowShape shape) => clueBoundaryArrowSpine(
+      shape: shape,
+      clueBounds: cellBounds,
+      cellSize: cellSize,
+    );
+
+    List<Offset> splitSpine(ArrowShape shape, int slot) =>
+        clueBoundaryArrowSpine(
+          shape: shape,
+          clueBounds: Rect.fromLTWH(0, slot * cellSize / 2, cellSize, 5),
+          cellSize: cellSize,
+        );
+
+    test('straight arrows have two points and bent arrows have three', () {
+      expect(spine(ArrowShape.straightRight).length, 2);
+      expect(spine(ArrowShape.straightDown).length, 2);
+      expect(spine(ArrowShape.bentDownThenRight).length, 3);
+      expect(spine(ArrowShape.diagonalNwThenDown).length, 3);
     });
 
-    test('final segment runs in the travel direction (right)', () {
-      final spine = clueArrowSpine(ArrowShape.diagonalSwThenRight);
-      final tip = spine.last;
-      final prev = spine[spine.length - 2];
+    test('straight right exits from the right edge', () {
+      final points = spine(ArrowShape.straightRight);
+      expect(points.first, const Offset(10, 5));
+      expect(points.last.dx > cellSize, isTrue);
+      expect((points.last.dy - points.first.dy).abs() < 1e-9, isTrue);
+    });
+
+    test('straight down exits from the bottom edge', () {
+      final points = spine(ArrowShape.straightDown);
+      expect(points.first, const Offset(5, 10));
+      expect(points.last.dy > cellSize, isTrue);
+      expect((points.last.dx - points.first.dx).abs() < 1e-9, isTrue);
+    });
+
+    test('bent arrow exits at the answer edge then turns right', () {
+      final points = spine(ArrowShape.bentDownThenRight);
+      expect(points.first, const Offset(5, 10));
+      final tip = points.last;
+      final prev = points[points.length - 2];
       expect(tip.dx > prev.dx, isTrue);
       expect((tip.dy - prev.dy).abs() < 1e-9, isTrue);
     });
 
-    test('final segment runs in the travel direction (down)', () {
-      final spine = clueArrowSpine(ArrowShape.diagonalNeThenDown);
-      final tip = spine.last;
-      final prev = spine[spine.length - 2];
+    test('bent arrow exits at the answer edge then turns down', () {
+      final points = spine(ArrowShape.bentRightThenDown);
+      expect(points.first, const Offset(10, 5));
+      final tip = points.last;
+      final prev = points[points.length - 2];
       expect(tip.dy > prev.dy, isTrue);
       expect((tip.dx - prev.dx).abs() < 1e-9, isTrue);
     });
 
-    test('all points stay within the unit square', () {
+    test('all arrows exit from an edge or corner of the clue cell', () {
       for (final shape in ArrowShape.values) {
-        for (final p in clueArrowSpine(shape)) {
-          expect(p.dx, inInclusiveRange(0.0, 1.0));
-          expect(p.dy, inInclusiveRange(0.0, 1.0));
-        }
+        final exit = spine(shape).first;
+        final onVerticalEdge = exit.dx == 0 || exit.dx == cellSize;
+        final onHorizontalEdge = exit.dy == 0 || exit.dy == cellSize;
+        expect(onVerticalEdge || onHorizontalEdge, isTrue, reason: '$shape');
       }
     });
-  });
 
-  group('clueArrowAlignment', () {
-    test('straightRight snaps to the right edge', () {
-      expect(clueArrowAlignment(ArrowShape.straightRight), Alignment.centerRight);
+    test('diagonal clues exit from the matching corner', () {
+      expect(spine(ArrowShape.diagonalSwThenRight).first, const Offset(0, 10));
+      expect(spine(ArrowShape.diagonalNeThenDown).first, const Offset(10, 0));
     });
 
-    test('straightDown snaps to the bottom edge', () {
-      expect(clueArrowAlignment(ArrowShape.straightDown), Alignment.bottomCenter);
+    test('split clue arrows exit from their own compartment', () {
+      expect(
+        splitSpine(ArrowShape.straightRight, 0).first,
+        const Offset(10, 2.5),
+      );
+      expect(
+        splitSpine(ArrowShape.straightRight, 1).first,
+        const Offset(10, 7.5),
+      );
     });
 
-    test('diagonalNwThenDown snaps to the top-left corner', () {
-      expect(clueArrowAlignment(ArrowShape.diagonalNwThenDown), Alignment.topLeft);
-    });
-
-    test('every alignment sits on an edge or corner (no centre)', () {
-      for (final shape in ArrowShape.values) {
-        final a = clueArrowAlignment(shape);
-        expect(a.x.abs() == 1 || a.y.abs() == 1, isTrue, reason: '$shape');
-      }
-    });
-  });
-
-  group('clueArrowIsImplied', () {
-    test('straight shapes are implied (no glyph drawn)', () {
-      expect(clueArrowIsImplied(ArrowShape.straightRight), isTrue);
-      expect(clueArrowIsImplied(ArrowShape.straightDown), isTrue);
-    });
-
-    test('bent and diagonal shapes are not implied (glyph drawn)', () {
-      final drawn = ArrowShape.values
-          .where((s) => !clueArrowIsImplied(s))
-          .toSet();
-      expect(drawn, isNot(contains(ArrowShape.straightRight)));
-      expect(drawn, contains(ArrowShape.bentDownThenRight));
-      expect(drawn, contains(ArrowShape.diagonalNwThenDown));
-      // Only the two straight shapes are implied.
-      expect(drawn.length, ArrowShape.values.length - 2);
+    test('orthogonal bent clues include an elbow before the tip', () {
+      final points = spine(ArrowShape.bentDownThenRight);
+      expect(points[1], isNot(points.first));
+      expect(points[1], isNot(points.last));
     });
   });
 }

@@ -3,6 +3,14 @@ import 'package:flutter/material.dart';
 
 import 'package:crossword_core/crossword_core.dart';
 
+typedef GridClueArrow = ({
+  int row,
+  int col,
+  int slot,
+  int slotCount,
+  ClueArrow arrow,
+});
+
 /// Direction from the clue cell toward the word's start (entry) and the
 /// direction the word then reads (travel), in screen coords (+x right, +y down).
 ({Offset entry, Offset travel}) clueArrowVectors(ArrowShape shape) {
@@ -38,76 +46,92 @@ import 'package:crossword_core/crossword_core.dart';
   }
 }
 
-/// Whether the arrow is implied by the natural reading flow and should NOT be
-/// drawn. Like printed korsord, a clue directly left of a word that reads right
-/// (`straightRight`) or directly above a word that reads down (`straightDown`)
-/// needs no glyph — the answer simply continues in the logical direction. Every
-/// other shape marks a deviation (a bend or an offset start) and is drawn.
-bool clueArrowIsImplied(ArrowShape shape) =>
-    shape == ArrowShape.straightRight || shape == ArrowShape.straightDown;
-
-/// Cell edge/corner the small arrow hugs, derived from where the word starts
-/// relative to the clue cell. Lets the widget snap the arrow onto the cell
-/// border ("on the line"), the way printed korsord arrows sit. The entry unit
-/// vector (-1/0/1 per axis) maps directly onto [Alignment]'s (-1..1) space.
-Alignment clueArrowAlignment(ArrowShape shape) {
-  final entry = clueArrowVectors(shape).entry;
-  return Alignment(entry.dx, entry.dy);
-}
-
-// 8% inner margin keeps the arrowhead tip off the cell edge.
-Offset _clampUnit(Offset o) =>
-    Offset(o.dx.clamp(0.08, 0.92), o.dy.clamp(0.08, 0.92));
-
-/// Arrow spine in the unit square (0..1), ordered tail→tip. Straight arrows are
-/// a 2-point line; bent and diagonal arrows add an elbow toward the start cell.
-List<Offset> clueArrowSpine(ArrowShape shape) {
+/// Arrow drawn from a clue cell boundary into the answer area, Swedish magazine
+/// korsord style. Points are in canvas pixels, ordered exit edge/corner →
+/// optional bend → tip. The first point is always where the arrow exits the
+/// clue cell.
+List<Offset> clueBoundaryArrowSpine({
+  required ArrowShape shape,
+  required Rect clueBounds,
+  required double cellSize,
+}) {
   final v = clueArrowVectors(shape);
-  const center = Offset(0.5, 0.5);
+  final center = clueBounds.center;
+  final exit = Offset(
+    center.dx + v.entry.dx * clueBounds.width * 0.5,
+    center.dy + v.entry.dy * clueBounds.height * 0.5,
+  );
+  final insideStart = exit + v.entry * (cellSize * 0.18);
+
   if (v.entry == v.travel) {
-    return [
-      _clampUnit(center - v.travel * 0.4),
-      _clampUnit(center + v.travel * 0.4),
-    ];
+    return [exit, exit + v.travel * (cellSize * 0.28)];
   }
-  final elbow = _clampUnit(center + v.entry * 0.3);
-  final tip = _clampUnit(elbow + v.travel * 0.45);
-  return [_clampUnit(center - v.travel * 0.15), elbow, tip];
+
+  return [exit, insideStart, insideStart + v.travel * (cellSize * 0.24)];
 }
 
-/// Draws a single clue arrow (line spine + filled arrowhead) filling its canvas.
-/// Scoped CustomPainter exception: only the arrow glyph is painted; the grid
-/// itself remains widget-based.
-class ClueArrowPainter extends CustomPainter {
-  final ArrowShape shape;
+/// Draws clue arrows above the grid from hint boxes into their input boxes.
+class ClueArrowLayerPainter extends CustomPainter {
+  final List<GridClueArrow> arrows;
+  final double cellSize;
   final Color color;
 
-  const ClueArrowPainter({required this.shape, required this.color});
+  const ClueArrowLayerPainter({
+    required this.arrows,
+    required this.cellSize,
+    required this.color,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
-    final spine = clueArrowSpine(shape)
-        .map((p) => Offset(p.dx * size.width, p.dy * size.height))
-        .toList();
-
-    final stroke = Paint()
-      ..color = color
-      ..strokeWidth = math.max(1.0, size.shortestSide * 0.07)
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round
-      ..style = PaintingStyle.stroke;
-
-    final path = Path()..moveTo(spine.first.dx, spine.first.dy);
-    for (final point in spine.skip(1)) {
-      path.lineTo(point.dx, point.dy);
+    for (final clueArrow in arrows) {
+      _paintSpine(
+        canvas,
+        clueBoundaryArrowSpine(
+          shape: clueArrow.arrow.shape,
+          clueBounds: _clueBounds(clueArrow),
+          cellSize: cellSize,
+        ),
+      );
     }
-    canvas.drawPath(path, stroke);
+  }
 
+  Rect _clueBounds(GridClueArrow clueArrow) {
+    final slotHeight = cellSize / clueArrow.slotCount;
+    return Rect.fromLTWH(
+      clueArrow.col * cellSize,
+      clueArrow.row * cellSize + clueArrow.slot * slotHeight,
+      cellSize,
+      slotHeight,
+    );
+  }
+
+  void _paintSpine(Canvas canvas, List<Offset> spine) {
     final tip = spine.last;
     final prev = spine[spine.length - 2];
     final angle = math.atan2(tip.dy - prev.dy, tip.dx - prev.dx);
-    final headLen = size.shortestSide * 0.24;
-    const spread = 0.5; // radians off the shaft axis
+    final headLen = cellSize * 0.13;
+    const spread = 0.36;
+
+    final stroke = Paint()
+      ..color = color
+      ..strokeWidth = math.max(0.85, cellSize * 0.038)
+      ..strokeCap = StrokeCap.butt
+      ..strokeJoin = StrokeJoin.round
+      ..style = PaintingStyle.stroke
+      ..isAntiAlias = true;
+
+    final shaftEnd = Offset(
+      tip.dx - math.cos(angle) * headLen * 0.8,
+      tip.dy - math.sin(angle) * headLen * 0.8,
+    );
+    final path = Path()..moveTo(spine.first.dx, spine.first.dy);
+    for (final point in spine.sublist(1, spine.length - 1)) {
+      path.lineTo(point.dx, point.dy);
+    }
+    path.lineTo(shaftEnd.dx, shaftEnd.dy);
+    canvas.drawPath(path, stroke);
+
     final left = Offset(
       tip.dx - headLen * math.cos(angle - spread),
       tip.dy - headLen * math.sin(angle - spread),
@@ -118,7 +142,8 @@ class ClueArrowPainter extends CustomPainter {
     );
     final head = Paint()
       ..color = color
-      ..style = PaintingStyle.fill;
+      ..style = PaintingStyle.fill
+      ..isAntiAlias = true;
     canvas.drawPath(
       Path()
         ..moveTo(tip.dx, tip.dy)
@@ -130,6 +155,8 @@ class ClueArrowPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(ClueArrowPainter oldDelegate) =>
-      oldDelegate.shape != shape || oldDelegate.color != color;
+  bool shouldRepaint(ClueArrowLayerPainter oldDelegate) =>
+      oldDelegate.arrows != arrows ||
+      oldDelegate.cellSize != cellSize ||
+      oldDelegate.color != color;
 }

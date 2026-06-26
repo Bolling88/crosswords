@@ -10,6 +10,7 @@ import '../cubit/crossword_cubit.dart';
 import '../cubit/crossword_state.dart';
 import 'answer_cell_widget.dart';
 import 'blocked_cell_widget.dart';
+import 'clue_arrow_painter.dart';
 import 'hint_cell_widget.dart';
 
 class CrosswordGrid extends StatelessWidget {
@@ -21,11 +22,7 @@ class CrosswordGrid extends StatelessWidget {
   final CrosswordState state;
   final double cellSize;
 
-  const CrosswordGrid({
-    required this.state,
-    required this.cellSize,
-    super.key,
-  });
+  const CrosswordGrid({required this.state, required this.cellSize, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -44,6 +41,17 @@ class CrosswordGrid extends StatelessWidget {
         children: [
           _buildTable(context, cellSize),
           ..._buildImageOverlays(cellSize),
+          Positioned.fill(
+            child: IgnorePointer(
+              child: CustomPaint(
+                painter: ClueArrowLayerPainter(
+                  arrows: _clueArrows(),
+                  cellSize: cellSize,
+                  color: AppColors.ink,
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -78,27 +86,27 @@ class CrosswordGrid extends StatelessWidget {
 
     return switch (cell) {
       ClueCell() => HintCellWidget(
-          cell: cell,
-          size: cellSize,
-          onTap: () => cubit.selectCell(row, col),
-          fontFamily: fontFamily,
-          isActive: state.activeClueCell == (row, col),
-        ),
+        cell: cell,
+        size: cellSize,
+        onTap: () => cubit.selectCell(row, col),
+        fontFamily: fontFamily,
+        isActive: state.activeClueCell == (row, col),
+      ),
       AnswerCell() => AnswerCellWidget(
-          letter: state.userInputs[(row, col)] ??
-              (cell.isSeed ? cell.value : null),
-          isSelected: state.selectedCell == (row, col),
-          isHighlighted: state.highlightedCells.contains((row, col)),
-          isSeed: cell.isSeed,
-          isIncorrect: state.incorrectCells.contains((row, col)),
-          isRevealed: state.revealedCells.contains((row, col)),
-          confirmPulseToken: _pulseTokenFor(row, col),
-          hasRightSeparator: edges.contains(Direction.right),
-          hasBottomSeparator: edges.contains(Direction.down),
-          size: cellSize,
-          onTap: () => cubit.selectCell(row, col),
-          fontFamily: fontFamily,
-        ),
+        letter:
+            state.userInputs[(row, col)] ?? (cell.isSeed ? cell.value : null),
+        isSelected: state.selectedCell == (row, col),
+        isHighlighted: state.highlightedCells.contains((row, col)),
+        isSeed: cell.isSeed,
+        isIncorrect: state.incorrectCells.contains((row, col)),
+        isRevealed: state.revealedCells.contains((row, col)),
+        confirmPulseToken: _pulseTokenFor(row, col),
+        hasRightSeparator: edges.contains(Direction.right),
+        hasBottomSeparator: edges.contains(Direction.down),
+        size: cellSize,
+        onTap: () => cubit.selectCell(row, col),
+        fontFamily: fontFamily,
+      ),
       BlockCell() => BlockedCellWidget(size: cellSize),
       ImageCell() => SizedBox(width: cellSize, height: cellSize),
     };
@@ -111,6 +119,25 @@ class CrosswordGrid extends StatelessWidget {
     final word = state.puzzle.wordById(state.confirmedWordId ?? '');
     if (word == null || !word.cells.contains((row, col))) return null;
     return state.confirmedWordToken;
+  }
+
+  List<GridClueArrow> _clueArrows() {
+    final arrows = <GridClueArrow>[];
+    for (final entry in state.puzzle.cells.entries) {
+      final cell = entry.value;
+      if (cell is! ClueCell) continue;
+      final (row, col) = entry.key;
+      for (var i = 0; i < cell.arrows.length; i++) {
+        arrows.add((
+          row: row,
+          col: col,
+          slot: i,
+          slotCount: cell.arrows.length,
+          arrow: cell.arrows[i],
+        ));
+      }
+    }
+    return arrows;
   }
 
   List<Widget> _buildImageOverlays(double cellSize) {
