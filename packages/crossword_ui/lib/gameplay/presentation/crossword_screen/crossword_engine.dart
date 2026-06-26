@@ -1,6 +1,7 @@
 import 'package:crossword_core/crossword_core.dart';
 
 import 'cubit/crossword_state.dart';
+import 'word_navigator.dart';
 
 /// Pure crossword-solving logic, extracted from `CrosswordCubit`. Stateless and
 /// Flutter-free: every method takes the current [CrosswordState] plus an action
@@ -8,8 +9,14 @@ import 'cubit/crossword_state.dart';
 /// word, direction, inputs, and the active word's highlighted cells). It never
 /// touches the keyboard, fonts, controllers, or `emit`; the Cubit owns those.
 /// `font` is carried through untouched via [CrosswordState.copyWith].
+///
+/// Grid-traversal and predicate queries (stepping, gap-finding, fill/solve/lock
+/// checks) live in [WordNavigator]; this class wires those pure queries to the
+/// active [CrosswordState] and turns the results into the next state.
 class CrosswordEngine {
   const CrosswordEngine();
+
+  static const WordNavigator _nav = WordNavigator();
 
   /// Select the cell at [row],[col]: activate a clue's word, (re)select an
   /// answer cell, or toggle direction when re-selecting the current cell.
@@ -65,7 +72,7 @@ class CrosswordEngine {
 
     if (autocheck) {
       final word = state.puzzle.wordById(state.activeWordId ?? '');
-      if (word != null && _isWordCorrect(state, word, inputs)) {
+      if (word != null && _nav.isWordCorrect(state.puzzle, word, inputs)) {
         next = next.withConfirmedWord(word.id);
       }
     }
@@ -147,7 +154,7 @@ class CrosswordEngine {
 
     var next = state.copyWith(incorrectCells: incorrect);
     final word = state.puzzle.wordById(state.activeWordId ?? '');
-    if (word != null && _isWordCorrect(state, word, state.userInputs)) {
+    if (word != null && _nav.isWordCorrect(state.puzzle, word, state.userInputs)) {
       next = next.withConfirmedWord(word.id);
     }
     return next;
@@ -257,29 +264,6 @@ class CrosswordEngine {
     return CrosswordState(puzzle: state.puzzle, font: state.font);
   }
 
-  /// Whether [word] is fully filled with correct letters under [inputs].
-  /// (A missing letter never equals the solution, so this implies filled.)
-  bool _isWordCorrect(
-    CrosswordState state,
-    Word word,
-    Map<(int, int), String> inputs,
-  ) {
-    for (final pos in word.cells) {
-      final cell = state.puzzle.cells[pos];
-      if (cell is AnswerCell && !cell.isSeed && inputs[pos] != cell.value) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  /// Whether [cell] can no longer be edited: seeds are given by the puzzle,
-  /// revealed cells are given by the player asking for them.
-  bool _isLocked(CrosswordState state, (int, int) cell) {
-    final c = state.puzzle.cells[cell];
-    return (c is AnswerCell && c.isSeed) || state.revealedCells.contains(cell);
-  }
-
   /// Delete the selected cell's letter (and its incorrect mark), or step back
   /// and delete the previous cell's letter when the selected cell is already
   /// empty. Seeds and revealed cells are never cleared — stepping back onto
@@ -371,30 +355,14 @@ class CrosswordEngine {
   }
 
   /// Whether every fillable cell has input — right or wrong.
-  bool isFilled(CrosswordState state) {
-    for (final entry in state.puzzle.cells.entries) {
-      final cell = entry.value;
-      if (cell is AnswerCell &&
-          !cell.isSeed &&
-          !state.userInputs.containsKey(entry.key)) {
-        return false;
-      }
-    }
-    return true;
-  }
+  bool isFilled(CrosswordState state) =>
+      _nav.isFilled(state.puzzle, state.userInputs);
 
   /// Whether [inputs] solve the puzzle: every fillable cell holds its
   /// solution letter. Seeds are given-correct; separators never affect
   /// validation (per the JSON format spec).
-  bool computeSolved(CrosswordState state, Map<(int, int), String> inputs) {
-    for (final entry in state.puzzle.cells.entries) {
-      final cell = entry.value;
-      if (cell is AnswerCell && !cell.isSeed && inputs[entry.key] != cell.value) {
-        return false;
-      }
-    }
-    return true;
-  }
+  bool computeSolved(CrosswordState state, Map<(int, int), String> inputs) =>
+      _nav.isSolved(state.puzzle, inputs);
 
   /// Make [word] the active word and select [cell] within it, highlighting the
   /// whole word (including its clue cell) and pinning the direction to the
@@ -417,64 +385,42 @@ class CrosswordEngine {
     );
   }
 
+  // The methods below adapt the active [CrosswordState] to the pure queries in
+  // [WordNavigator]: they pull the puzzle, inputs, and active word out of the
+  // state and hand the navigator just the values it needs.
+
+  /// Whether [cell] can no longer be edited under [state].
+  bool _isLocked(CrosswordState state, (int, int) cell) =>
+      _nav.isLocked(state.puzzle, cell, state.revealedCells);
+
   /// The first fillable (non-seed) cell of [word] still missing input, or null
   /// when the word is fully filled.
   (int, int)? _firstEmptyCell(
     CrosswordState state,
     Word word,
     Map<(int, int), String> inputs,
-  ) {
-    for (final cell in word.cells) {
-      if (_isEmptyFillable(state, cell, inputs)) return cell;
-    }
-    return null;
-  }
+  ) => _nav.firstEmptyCell(state.puzzle, word, inputs);
 
   /// The next word after the active one (wrapping) that still has an empty
   /// fillable cell, or null when every other word is complete.
   Word? _nextUnfinishedWord(
     CrosswordState state,
     Map<(int, int), String> inputs,
-  ) {
-    final words = state.puzzle.words;
-    if (words.isEmpty) return null;
-    final start = words.indexWhere((w) => w.id == state.activeWordId);
-    for (var offset = 1; offset <= words.length; offset++) {
-      final word = words[(start + offset) % words.length];
-      if (_firstEmptyCell(state, word, inputs) != null) return word;
-    }
-    return null;
-  }
-
-  /// Whether [cell] is an answer cell the player still needs to fill. Seed cells
-  /// carry a given letter, so they never count as empty.
-  bool _isEmptyFillable(
-    CrosswordState state,
-    (int, int) cell,
-    Map<(int, int), String> inputs,
-  ) {
-    final c = state.puzzle.cells[cell];
-    return c is AnswerCell && !c.isSeed && !inputs.containsKey(cell);
-  }
+  ) => _nav.nextUnfinishedWord(state.puzzle, state.activeWordId, inputs);
 
   /// The active word's local axis at [cell], or the current direction if the
   /// cell is not on the active word.
-  Direction _axisAt(CrosswordState state, (int, int) cell) {
-    final word = state.puzzle.wordById(state.activeWordId ?? '');
-    if (word == null) return state.currentDirection;
-    final i = word.cells.indexOf(cell);
-    return i < 0 ? state.currentDirection : word.axisAt(i);
-  }
+  Direction _axisAt(CrosswordState state, (int, int) cell) => _nav.axisAt(
+    state.puzzle.wordById(state.activeWordId ?? ''),
+    cell,
+    state.currentDirection,
+  );
 
   /// Step [delta] cells along the active word's ordered path from [cell],
   /// following the word through any bend; null if it would leave the word.
   (int, int)? _step(CrosswordState state, (int, int) cell, int delta) {
     final word = state.puzzle.wordById(state.activeWordId ?? '');
     if (word == null) return null;
-    final i = word.cells.indexOf(cell);
-    if (i < 0) return null;
-    final j = i + delta;
-    if (j < 0 || j >= word.cells.length) return null;
-    return word.cells[j];
+    return _nav.step(word, cell, delta);
   }
 }

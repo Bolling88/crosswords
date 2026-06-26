@@ -11,6 +11,7 @@ export 'settings/presentation/settings_screen/cubit/settings_state.dart';
 export 'settings/presentation/settings_screen/widgets/font_option_tile.dart';
 export 'gameplay/domain/services/progress_service.dart';
 export 'gameplay/presentation/crossword_screen/crossword_engine.dart';
+export 'gameplay/presentation/crossword_screen/word_navigator.dart';
 export 'gameplay/presentation/crossword_screen/crossword_player.dart';
 export 'gameplay/presentation/crossword_screen/cubit/crossword_cubit.dart';
 export 'gameplay/presentation/crossword_screen/cubit/crossword_state.dart';
