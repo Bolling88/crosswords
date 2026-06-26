@@ -62,8 +62,8 @@ List<Offset> startArrowSpine(ArrowShape shape) {
   final clueDir = Offset(-v.entry.dx, -v.entry.dy);
   const center = Offset(0.5, 0.5);
   final tail = center + clueDir * 0.5; // on the edge facing the clue
-  final elbow = center + clueDir * 0.16;
-  final tip = _clampInner(elbow + v.travel * 0.34);
+  final elbow = center + clueDir * 0.32; // short stub in from that edge
+  final tip = _clampInner(elbow + v.travel * 0.22);
   return [tail, elbow, tip];
 }
 
